@@ -13,9 +13,7 @@
 
 
 module purge
-module load matlab/2022a
-
-cd /scratch/sd3927/FWB-CF-v2/Simulation
+module load matlab/2023a
 
 echo "$SLURM_ARRAY_TASK_ID"
 
