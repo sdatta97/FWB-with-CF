@@ -21,7 +21,6 @@ height_transmitter_sub6 = 4;
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 rmin = 1e9;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
-% params.r_min = rmin*rand(params.numUE,1);
 
 %% gNB locations
 % params.numGNB = 10;
