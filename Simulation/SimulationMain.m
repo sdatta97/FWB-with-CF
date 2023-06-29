@@ -168,6 +168,8 @@ lambda_UE_sub6 = lambda_BS./4;
         params.ricianFactor = ricianFactor;
         outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_probability_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
+        outage_duration_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
+        outage_duration_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         
         %% Simulation
         for idxDiscDelay = 1:length(protocolParams.discovery_time)
@@ -194,20 +196,27 @@ lambda_UE_sub6 = lambda_BS./4;
                         rate_dl = rate_analytical(params, plos2, plos, BETA, ricianFactor);
                         % rate_dl = rate_analyticalv2(params, plos2, plos, BETA, ricianFactor);
                         for k = 1:params.numUE
-                           plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+                           % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+                           [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            % plos3 = pLoS3(theta,omega,params.coverageRange);
                           % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6)' >= params.r_min_sub6(:)))
                                p1 = 1;
+                               tos = 0;
                            else
                                % p1 = 1-plos4;
                                % p1 = 1-plos(k);
-                               p1 = 1-plos3;
+                               % p1 = 1-plos3;
+                               p1 = 1-pos3;
+                               tos = tos3;
                            end
                            outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
                            % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos4;
-                           outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos3;
+                           % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos3;
+                           outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
                            % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos(k);
+                           outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + tos;
+                           outage_duration_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + tos3;
                         end
                     end
                 end
@@ -263,8 +272,8 @@ lambda_UE_sub6 = lambda_BS./4;
 
         %Taking care of folder directory creation etc
         dataFolder = 'resultData';
-        outageFolder = strcat(dataFolder,'/outageResults_new');
-        eventFolder = strcat(dataFolder,'/allResults_new');
+        outageFolder = strcat(dataFolder,'/outageResults');
+        eventFolder = strcat(dataFolder,'/allResults');
         if not(isfolder(dataFolder))
             mkdir(dataFolder)
         end
@@ -316,10 +325,14 @@ lambda_UE_sub6 = lambda_BS./4;
         %     'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
         %     'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
         %     'minRatereq,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
+        % output_categories = ['UE idx,','lambdaBS,','numBlockers,',...
+        %     'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
+        %     'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
+        %     'minRatereq,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
         output_categories = ['UE idx,','lambdaBS,','numBlockers,',...
             'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
             'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
-            'minRatereq,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
+            'minRatereq,','outageDuration_wo_CF_Analysis,','outageDurationAnalysis,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
 
         fprintf(fileID,output_categories);
 
@@ -346,9 +359,11 @@ lambda_UE_sub6 = lambda_BS./4;
                             outage_probability      = thisOutputs.outage_probability(ue_idx);
                             out_prob_analysis = outage_probability_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
                             out_prob_analysis_wo_cf = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
+                            out_dur_analysis = outage_duration_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
+                            out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
                             min_rate_req = params.r_min(ue_idx);
                             % formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
-                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             % fprintf(fileID,formatSpec,ue_idx,numBS,numBlockers,...
                             %     discDelay,failureDetectionDelay,connDelay,...
                             %     signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
@@ -360,7 +375,7 @@ lambda_UE_sub6 = lambda_BS./4;
                             fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),numBlockers,...
                                 discDelay,failureDetectionDelay,connDelay,...
                                 signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
-                                min_rate_req, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
+                                min_rate_req, out_dur_analysis_wo_cf, out_dur_analysis, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
                         end
                     end
                 end

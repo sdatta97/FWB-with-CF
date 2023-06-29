@@ -1,5 +1,5 @@
 % function p = pLoS3(theta,omega,R)
-function p = pLoS3(BS_locations, UE_location, theta,omega,psi, idx_max)
+function [p,t] = pLoS3(BS_locations, UE_location, theta,omega,psi, idx_max)
 M_eff = size(idx_max,1);
 M = size(BS_locations,1);
 % r = zeros(M_eff,1);
@@ -7,11 +7,11 @@ M = size(BS_locations,1);
 %     r(ap) = sqrt(sum((UE_location-BS_locations(idx_max(ap),:)).^2)); 
 % end
 r = zeros(M,1);
-prob = zeros(M,1);
+% prob = zeros(M,1);
 for ap = 1:M
     r(ap) = sqrt(sum((UE_location-BS_locations(ap,:)).^2)); 
 end
-[~, bsPriorities] = sort(r,'ascend');
+% [~, bsPriorities] = sort(r,'ascend');
 % for ap = 1:M
 %     prob(ap) = find(bsPriorities==ap); 
 % end
@@ -31,4 +31,6 @@ p = (theta*r_avg/(theta*r_avg+omega)) + (theta*r_avg/(theta*r_avg+psi))^M*(omega
 % p = sum(((theta.*r)./(theta.*r+omega)).*prob);
 % alpha = theta*(2*R/3);
 % p = alpha/(alpha+omega);
+p_cov = omega/(theta*r_avg+omega) - (theta*r_avg/(theta*r_avg+psi))^M*(omega/(theta*r_avg+omega));
+t = p/(theta*r_avg*p_cov);
 end
