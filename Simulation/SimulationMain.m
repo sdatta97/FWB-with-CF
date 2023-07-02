@@ -193,8 +193,9 @@ lambda_UE_sub6 = lambda_BS./4;
                             % plos(k) = mean(plos2(idx_max(:,k),k),1);
                         end
                         % rate_dl = rate_analytical(params, plos2, plos);
-                        rate_dl = rate_analytical(params, plos2, plos, BETA, ricianFactor);
+                        % rate_dl = rate_analytical(params, plos2, plos, BETA, ricianFactor);
                         % rate_dl = rate_analyticalv2(params, plos2, plos, BETA, ricianFactor);
+                        rate_dl = rate_analyticalv3(params, plos2, plos, BETA, ricianFactor);
                         for k = 1:params.numUE
                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
