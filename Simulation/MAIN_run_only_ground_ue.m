@@ -16,7 +16,6 @@ CH_estimation = 0;  % 1= have channel estimation
 LB=1;  %Lower bound
 UB =1;  %Upper bound
 no_of_rea =2;     % no.of channel realizations
-GUE_SNR = 0;
 %%
 % snr_db = -50:10:40;
 snr_db = 40;
@@ -24,7 +23,7 @@ LOOP = length(snr_db);
 
 L = 128; %64; %no/of AP
 N = 64;  % antennas per AP
-K = 20; GUE_ue=1;  % --Ground UEs
+K = 20;  % --Ground UEs
 ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 ASD_CORR = 0;
 Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
@@ -32,8 +31,7 @@ Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=A
 pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 noiseFigure = 9; % gue
 sigma_sf =4;
-B=20e6; %Communication bandwidth
-Band = 100e6;%20e6;
+Band = 100e6;%20e6; %Communication bandwidth
 tau_c = 200;      % coherence block length
 
 %%  define
@@ -106,8 +104,6 @@ for n = 1:nbr_setups
                 %%
                 % CHANNEL GENERATION, ESTIMATION
                 [h,h_hat_HI,psi_HI]= function_channel_Generation_HI(N,L,K,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
-                
-                
                 %% EST_CHANNEL GAIN
                 gamma = zeros(L,K);
                 GAMMA_NLOS = zeros(N,N,L,K);
@@ -174,9 +170,7 @@ for n = 1:nbr_setups
                             %                             eta(ap,k) =  snr; %snr/K;
                         end
                     end
-                end
-                ABC=0;
-                
+                end                
                 %% monte--carlo
                 
                 % perfect-CSI monte-carlo (Upper bound)
