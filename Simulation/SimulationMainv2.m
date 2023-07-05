@@ -16,6 +16,30 @@ end
 %RNG seed.
 rng(str2double(aID),'twister');
 
+%% GUE channel parameters
+params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
+params.RAYLEIGH=0;   %1= rayleigh, % 0=rician
+params.Perf_CSI =1;
+params.cov_area = 1; %0.25; % 4; %km
+%%
+params.TAU_P_K_by_two = 0; %1;  
+params.CH_estimation = 0;  % 1= have channel estimation
+%%
+params.LB=1;  %Lower bound
+params.UB =1;  %Upper bound
+params.no_of_rea =2;     % no.of channel realizations
+%%
+% snr_db = -50:10:40;
+params.snr_db = 40;
+params.ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
+params.ASD_CORR = 0;
+params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+
+params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
+params.noiseFigure = 9; % gue
+params.sigma_sf =4;
+params.Band = 100e6;%20e6; %Communication bandwidth
+params.tau_c = 200;      % coherence block length
 % rng(2,'twister');
 %%
 % load('params.mat')
@@ -50,12 +74,12 @@ params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all 
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
-lambda_BS = 50:50:200;
-% lambda_BS = 200;
+% lambda_BS = 50:50:200;
+lambda_BS = 50;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = lambda_BS./4;
+lambda_UE_sub6 = lambda_BS./10;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -126,8 +150,8 @@ lambda_UE_sub6 = lambda_BS./4;
         % establish a viable channel btw UE and a recently unblocked gNB. This can
         % run in paralel, i.e., even when UE is connected to another gNB, UE can
         % discover other gNB in the background.
-        protocolParams.discovery_time = [20 50]*10^(-3);
-        % protocolParams.discovery_time = 50*10^(-3);
+        % protocolParams.discovery_time = [20 50]*10^(-3);
+        protocolParams.discovery_time = 50*10^(-3);
         
         % in ms, measurement report trigger time. 
         % BeamFailureMaxCount*MeasurementFrequency (10*2 = 20).
@@ -141,8 +165,8 @@ lambda_UE_sub6 = lambda_BS./4;
         protocolParams.frameHopCount = 0; %6;
         % RACH delay, how long it takes to setup a connection with a discovered
         % gNB.
-        protocolParams.connection_time = [10 20 50]*10^(-3);
-        % protocolParams.connection_time = 50*10^(-3);
+        % protocolParams.connection_time = [10 20 50]*10^(-3);
+        protocolParams.connection_time = 50*10^(-3);
         
         % Signaling delay to start data transfer after rach is completed. Singaling
         % to setup UE data plane path Can be modeled as addition to the RACH in our
@@ -185,10 +209,7 @@ lambda_UE_sub6 = lambda_BS./4;
                             % plos(k) = prod(plos2(:,k),1);
                             plos(k) = prod(plos2(idx_max(:,k),k),1);
                         end
-                        % rate_dl = rate_analytical(params, plos2, plos);
-                        % rate_dl = rate_analytical(params, plos2, plos, BETA, ricianFactor);
-                        % rate_dl = rate_analyticalv2(params, plos2, plos, BETA, ricianFactor);
-                        rate_dl = rate_analyticalv3(params, plos2, plos, BETA, ricianFactor);
+                        rate_dl = rate_analyticalv4(params, plos2, plos, BETA, ricianFactor);
                         for k = 1:params.numUE
                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
@@ -252,9 +273,7 @@ lambda_UE_sub6 = lambda_BS./4;
                         simInputs.connection_setup_delay = protocolParams.connection_time(idxConnDelay);
                         simInputs.signalingAfterRachDelay = protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay);
                         simOutputs{idxDiscDelay,idxFailureDetectionDelay,...
-                            idxConnDelay,idxSignalingAfterRachDelay} =  discreteSimulator(simInputs); 
-                        % simOutputs_wo_cf{idxDiscDelay,idxFailureDetectionDelay,...
-                            % idxConnDelay,idxSignalingAfterRachDelay} =  discreteSimulatorv2(simInputs); 
+                            idxConnDelay,idxSignalingAfterRachDelay} =  discreteSimulatorv3(simInputs); 
                     end
                 end
             end
