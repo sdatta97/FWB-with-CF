@@ -10,8 +10,11 @@ for ue_idx = 1:(params.numUE+params.numUE_sub6)
         % outs = [dataBS_mobile{bs_idx}(1,1:end),params.simTime];
         % ins = [0,dataBS_mobile{(ue_idx-1)*params.numGNB_sub6+bs_idx}(3,1:end)];
         % outs = [dataBS_mobile{(ue_idx-1)*params.numGNB_sub6+bs_idx}(1,1:end),params.simTime];
-        ins = [0,dataBS_mobile{(ue_idx-1)*params.numGNB+bs_idx}(3,1:end)];
-        outs = [dataBS_mobile{(ue_idx-1)*params.numGNB+bs_idx}(1,1:end),params.simTime];durs = outs - ins;
+        % ins = [0,dataBS_mobile{(ue_idx-1)*params.numGNB+bs_idx}(3,1:end)];
+        % outs = [dataBS_mobile{(ue_idx-1)*params.numGNB+bs_idx}(1,1:end),params.simTime];    
+        ins = [0,dataBS_mobile{(ue_idx-1)*(params.numGNB+params.numGNB_sub6)+bs_idx}(3,1:end)];
+        outs = [dataBS_mobile{(ue_idx-1)*(params.numGNB+params.numGNB_sub6)+bs_idx}(1,1:end),params.simTime];  
+        durs = outs - ins;
         BS_discovered_times = [ins;durs;outs];
         [~,sort_idx] = sort(BS_discovered_times(1,:));
         BS_discovered_times = BS_discovered_times(:,sort_idx);
@@ -38,8 +41,9 @@ for ue_idx = 1:(params.numUE+params.numUE_sub6)
         %Now impose the discovery times when necessary, by shifting t_in times by
         %discovery duration
         % bsBlockageTimes{bs_idx} = BS_discovered_times;
-        bsBlockageTimes{(ue_idx-1)*params.numGNB+bs_idx} = BS_discovered_times;        
-        % bsBlockageTimes{(ue_idx-1)*params.numGNB_sub6+bs_idx} = BS_discovered_times;        
+        % bsBlockageTimes{(ue_idx-1)*params.numGNB+bs_idx} = BS_discovered_times;        
+        % bsBlockageTimes{(ue_idx-1)*params.numGNB_sub6+bs_idx} = BS_discovered_times;    
+        bsBlockageTimes{(ue_idx-1)*(params.numGNB+params.numGNB_sub6)+bs_idx} = BS_discovered_times;        
         len = size(BS_discovered_times,2);
         for jj=len:-1:1
             if (BS_discovered_times(1,jj) + discovery_time) < BS_discovered_times(3,jj) 

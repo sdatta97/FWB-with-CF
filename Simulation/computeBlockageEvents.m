@@ -81,7 +81,7 @@ for indBC=1:length(numBlockers) %For every blocker count seperate systems
     
     dataBS = cell(nBS,1);
     for indBS = 1:nBS
-        dataBS{indBS}=cell(1,nB);
+        dataBS{(ue_idx-1)*nBS+indBS}=cell(1,nB);
     end
     for indB = 1:nB 
         blocker_height = hb(indB);
@@ -103,44 +103,40 @@ for indBC=1:length(numBlockers) %For every blocker count seperate systems
             vectorDistances = [intersectionX,intersectionY] - blockerMovementSegments(blockages,1:2);
             scalDistances = sqrt(sum(vectorDistances.^2,2));
             intersectionTime = blockerMovementStartTimes(blockages) + scalDistances./ blockerMovementVelocities(blockages);
-            dataBS{indBS}{indB} = sort(intersectionTime(intersectionTime<simTime))';
+            dataBS{(ue_idx-1)*nBS+indBS}{indB} = sort(intersectionTime(intersectionTime<simTime))';
         end
     end
     
     for indBS = 1:nBS
-        dataBS{indBS}=cell2mat(dataBS{indBS});
+        dataBS{(ue_idx-1)*nBS+indBS}=cell2mat(dataBS{(ue_idx-1)*nBS+indBS});
     end
     
     
     for indBS = 1:nBS
-        len =length(dataBS{indBS});
-        dataBS{indBS}(2,:) =  exprnd(1/mu,1,len); % block duration
-        dataBS{indBS}(3,:) = dataBS{indBS}(2,:) + dataBS{indBS}(1,:); % end of physical blockages\
+        len =length(dataBS{(ue_idx-1)*nBS+indBS});
+        dataBS{(ue_idx-1)*nBS+indBS}(2,:) =  exprnd(1/mu,1,len); % block duration
+        dataBS{(ue_idx-1)*nBS+indBS}(3,:) = dataBS{(ue_idx-1)*nBS+indBS}(2,:) + dataBS{(ue_idx-1)*nBS+indBS}(1,:); % end of physical blockages\
         %if a blocker arrives before the previous blocker served then that is a
         %one long blockage, for programming purposes we delete the second
         %arrival and make one long combined blockage
-        [~,sort_idx]=sort(dataBS{indBS}(1,:));
-        dataBS{indBS} = dataBS{indBS}(:,sort_idx);
+        [~,sort_idx]=sort(dataBS{(ue_idx-1)*nBS+indBS}(1,:));
+        dataBS{(ue_idx-1)*nBS+indBS} = dataBS{(ue_idx-1)*nBS+indBS}(:,sort_idx);
         isCleared = 0;
         while ~isCleared
             isCleared=1;
-            len = size(dataBS{indBS},2);
+            len = size(dataBS{(ue_idx-1)*nBS+indBS},2);
             for jj=len:-1:2
-                if dataBS{indBS}(3,jj-1) >= dataBS{indBS}(1,jj)
+                if dataBS{(ue_idx-1)*nBS+indBS}(3,jj-1) >= dataBS{(ue_idx-1)*nBS+indBS}(1,jj)
                     isCleared=0;
-                    dataBS{indBS}(3,jj-1) = max(dataBS{indBS}(3,jj),dataBS{indBS}(3,jj-1));
-                    dataBS{indBS}(:,jj) = [];
-                    dataBS{indBS}(2,jj-1) = dataBS{indBS}(3,jj-1) - dataBS{indBS}(1,jj-1);
+                    dataBS{(ue_idx-1)*nBS+indBS}(3,jj-1) = max(dataBS{(ue_idx-1)*nBS+indBS}(3,jj),dataBS{(ue_idx-1)*nBS+indBS}(3,jj-1));
+                    dataBS{(ue_idx-1)*nBS+indBS}(:,jj) = [];
+                    dataBS{(ue_idx-1)*nBS+indBS}(2,jj-1) = dataBS{(ue_idx-1)*nBS+indBS}(3,jj-1) - dataBS{(ue_idx-1)*nBS+indBS}(1,jj-1);
                 end
             end  
         end
-        dataBS{indBS}= dataBS{indBS}(:,dataBS{indBS}(3,:)<simTime);
+        dataBS{(ue_idx-1)*nBS+indBS}= dataBS{(ue_idx-1)*nBS+indBS}(:,dataBS{(ue_idx-1)*nBS+indBS}(3,:)<simTime);
     end
     
 end
-
-
-
-
 end
 
