@@ -23,8 +23,8 @@ d_DECORR  =0.1; %KM;   %100; %M  %shadow fading correlation
 decorr = d_DECORR;
 %% Noise model
 Noise_var = Band * boltz_const * Noise_temp * Noise_fig;
-Noise_var_dB = 10*log10(Noise_var)+30;  
-Noise_var_dBm = -93.9; %dBm % Noise_fig =7;
+Noise_var_dBm = 10*log10(Noise_var)+30;  
+% Noise_var_dBm = -93.9; %dBm % Noise_fig =7;
 %% Simulation area model
 % AP_locations = (rand(AP,1)*D) + 1i*(rand(AP,1)*D);% randomly generating AP locations within DxD square area.
 % UE_locations = (rand(UE,1)*D) + 1i*(rand(UE,1)*D);% randomly generating AP locations within DxD square area.  % UAVs, GUEs

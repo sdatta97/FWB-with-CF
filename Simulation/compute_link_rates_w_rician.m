@@ -1,8 +1,9 @@
 function rate_dl = compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState)
  %%  define
+ %%  define
 N = params.num_antennas_per_gNB;  % antennas per AP
 L = params.numGNB_sub6;
-K = params.numUE_sub6;  % --Ground UEs
+K = params.numUE + params.numUE_sub6;  % --Ground UEs
 snr_db = params.snr_db;
 LOOP = length(params.snr_db);
 asd_length = length(params.ASD_VALUE);
@@ -14,8 +15,6 @@ K_Factor = params.K_Factor;
 RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
 Perf_CSI = params.Perf_CSI;
 cov_area = params.cov_area;
-BETA = params.BETA;
-ricianFactor = params.ricianFactor;
 %%
 TAU_P_K_by_two = params.TAU_P_K_by_two;  
 CH_estimation = params.CH_estimation;  
@@ -85,7 +84,11 @@ for iter = 1:LOOP
             PHI = zeros(tau_p,K);
             PHI1   =  orth(rand(tau_p));
             %% GUE-GUE pilot contamination
-            phi_indexUG = repmat(randperm(tau_p),1,2); % take reaming half pilots for GUEs
+            if TAU_P_K_by_two == 1
+                phi_indexUG = repmat(randperm(tau_p),1,2); % take reaming half pilots for GUEs
+            else
+                phi_indexUG = randperm(tau_p);
+            end
             for k=1:K
                 PHI(:,k)=PHI1(:,phi_indexUG(k));   %PHI -- tau_p X (K-columns)               % orthogonal pilot seq
             end
