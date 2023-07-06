@@ -42,12 +42,12 @@ UE_locations_wrapped = repmat(UE_locations,[1 length(wrap_locations)]) + repmat(
 shadow_corr_matrix_APs = zeros(AP,AP);
 shadow_corr_matrix_UEs = zeros(UE,UE);
 for l = 1:AP
-    distancetoAP = min(abs(AP_locations_wrapped - repmat(AP_locations(l),size(AP_locations_wrapped))),[],2);   %2nd dimnsion
+    distancetoAP = min(abs(AP_locations_wrapped - repmat(AP_locations(l),size(AP_locations_wrapped))),[],2)/1000;   %2nd dimnsion
     shadow_corr_matrix_APs(:,l) = 2.^(-distancetoAP/decorr);
 %     a(l) = sigma_sf * sqrt(shadow_corr_matrix_APs(:,l)) * randn(1,1); 
 end
 for k = 1:UE
-    distancetoUE = min(abs(UE_locations_wrapped  - repmat(UE_locations(k),size(UE_locations_wrapped ))),[],2);
+    distancetoUE = min(abs(UE_locations_wrapped  - repmat(UE_locations(k),size(UE_locations_wrapped ))),[],2)/1000;
     shadow_corr_matrix_UEs(:,k) = 2.^(-distancetoUE/decorr);
 %     b(l) = sigma_sf * sqrt(shadow_corr_matrix_UEs(:,l)) * randn(1,1);
     
@@ -66,9 +66,10 @@ PL_dash = zeros(UE,AP);
 
 for ue = 1:UE
     for ap = 1:AP
-        [UE_AP_dist(ue,ap), whichAP] = min( abs( UE_locations(ue)*ones(1,length(wrap_locations))-AP_locations_wrapped(ap,:) ) ); %taking the minimum distance out of the 9 virtual AP locations
+        [UE_AP_dist(ue,ap), whichAP] = min(abs( UE_locations(ue)*ones(1,length(wrap_locations))-AP_locations_wrapped(ap,:))); %taking the minimum distance out of the 9 virtual AP locations
+        UE_AP_dist(ue,ap) = UE_AP_dist(ue,ap)/1000;
         %cal 3D dist
-        UE_AP_3D(ue,ap) = sqrt(sum(([real(UE_locations(ue)),imag(UE_locations(ue)),h_UE_GUE/1000]-[real(AP_locations_wrapped(ap,whichAP)), imag(AP_locations_wrapped(ap,whichAP)),h_AP/1000]).^2));
+        UE_AP_3D(ue,ap) = sqrt(sum(([real(UE_locations(ue)),imag(UE_locations(ue)),h_UE_GUE]-[real(AP_locations_wrapped(ap,whichAP)), imag(AP_locations_wrapped(ap,whichAP)),h_AP]).^2))/1000;
         PL_dash(ue,ap) = 32.4 + 20*log10(f_c) + 20*log10(UE_AP_3D(ue,ap));  % distance--KM, f_c--MHz
         UE_AP_angle(ue,ap) = angle(UE_locations(ue)-AP_locations_wrapped(ap,whichAP));
     end
@@ -95,12 +96,12 @@ AP_AP_dist = zeros(AP,AP);
 UE_UE_dist = zeros(UE,UE);
 for ap1 = 1:AP
     for ap2 = 1:AP
-        AP_AP_dist(ap1,ap2) = min(abs(AP_locations(ap1)*ones(1,length(wrap_locations))-AP_locations_wrapped(ap2,:))); %taking the minimum distance out of the 9 virtual AP locations;
+        AP_AP_dist(ap1,ap2) = min(abs(AP_locations(ap1)*ones(1,length(wrap_locations))-AP_locations_wrapped(ap2,:)))/1000; %taking the minimum distance out of the 9 virtual AP locations;
     end
 end
 for ue1 = 1:UE
     for ue2 = 1:UE
-        UE_UE_dist(ue1,ue2) = min(abs(UE_locations(ue1)*ones(1,length(wrap_locations))-UE_locations_wrapped(ue2,:))); %taking the minimum distance out of the 9 virtual UE locations
+        UE_UE_dist(ue1,ue2) = min(abs(UE_locations(ue1)*ones(1,length(wrap_locations))-UE_locations_wrapped(ue2,:)))/1000; %taking the minimum distance out of the 9 virtual UE locations
     end
 end
 Cov_A = 2.^(-1*AP_AP_dist./d_DECORR);
@@ -253,7 +254,4 @@ for l = 1:AP
         end
     end
 end
-
-
-
 end

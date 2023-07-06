@@ -242,7 +242,7 @@ lambda_UE_sub6 = lambda_BS./10;
                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            % plos3 = pLoS3(theta,omega,params.coverageRange);
                           % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                           if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6)' >= params.r_min_sub6(:)))
+                           if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
                                p1 = 1;
                                tos = 0;
                            else
