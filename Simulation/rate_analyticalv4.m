@@ -1,5 +1,5 @@
 % function rate_dl = rate_analytical(params, plos2, plos)
-function rate_dl = rate_analyticalv4(params, plos2, plos, BETA, ricianFactor)
+function rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE,h_LOS_GUE, PLOS_GUE)
  %%  define
 N = params.num_antennas_per_gNB;  % antennas per AP
 L = params.numGNB_sub6;
@@ -40,7 +40,9 @@ HI_UE_rx7= zeros(K,LOOP,asd_length,hi_length);
 HI_AP_tx7= zeros(K,LOOP,asd_length,hi_length);
 BU7= zeros(K,LOOP,asd_length,hi_length);
 INTERFERENCE_UAV_GUE_EACH7= zeros(K,K,LOOP,asd_length,hi_length);     
-[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band);
+% [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band);
+channelGain_GUE = params.BETA;
+K_Rician = params.ricianFactor;
 R10 = R_GUE;
 h_LOSall = h_LOS_GUE;
 %% PLOS cal

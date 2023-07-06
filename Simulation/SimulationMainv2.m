@@ -183,10 +183,37 @@ lambda_UE_sub6 = lambda_BS./10;
         % K_list = [1,2,3,4];                      % Degree of Connectivity
         % protocolParams.omega_list = 1./protocolParams.connection_time;
         % self_blockage = 5/6;
-        
-        [BETA, ricianFactor] = channel_cellfree_2v2(params.numUE+params.numUE_sub6,params.numGNB_sub6, params.num_sc_sub6*params.scs_sub6, [params.locationsBS;params.locationsBS_sub6], [params.UE_locations;params.UE_locations_sub6]);
-        params.BETA = BETA;
-        params.ricianFactor = ricianFactor;
+       
+        N = params.num_antennas_per_gNB;  % antennas per AP
+        L = params.numGNB_sub6;
+        K = params.numUE + params.numUE_sub6;  % --Ground UEs
+        snr_db = params.snr_db;
+        LOOP = length(params.snr_db);
+        asd_length = length(params.ASD_VALUE);
+        hi_length = length(params.Kt_Kr_vsUE);
+        ASD_VALUE = params.ASD_VALUE;
+        ASD_CORR = params.ASD_CORR;
+        Kt_Kr_vsUE = params.Kt_Kr_vsUE;
+        K_Factor = params.K_Factor;
+        RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
+        Perf_CSI = params.Perf_CSI;
+        cov_area = params.cov_area;
+        %%
+        TAU_P_K_by_two = params.TAU_P_K_by_two;  
+        CH_estimation = params.CH_estimation;  
+        %%
+        LB = params.LB;  %Lower bound
+        UB = params.UB;  %Upper bound
+        no_of_rea = params.no_of_rea;     % no.of channel realizations
+        %%
+        pilot_pow = params.pilot_pow; 
+        noiseFigure = params.noiseFigure;
+        sigma_sf = params.sigma_sf;
+        Band = params.Band; %Communication bandwidth
+        tau_c = params.tau_c;      % coherence block length  
+        [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
+        params.BETA = channelGain_GUE';
+        params.ricianFactor = K_Rician';
         outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_probability_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_duration_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
@@ -209,7 +236,7 @@ lambda_UE_sub6 = lambda_BS./10;
                             % plos(k) = prod(plos2(:,k),1);
                             plos(k) = prod(plos2(idx_max(:,k),k),1);
                         end
-                        rate_dl = rate_analyticalv4(params, plos2, plos, BETA, ricianFactor);
+                        rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
                         for k = 1:params.numUE
                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);

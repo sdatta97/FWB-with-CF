@@ -1,4 +1,4 @@
-function [channelGain_over_noise,R,h_LOS,K_Rician,probLOS] = channel_cellfree_GUE3(UE,AP,N,ASD_VALUE,ASD_CORR,rayleigh,BETA,K_factor,cov_area,Band)
+function [channelGain_over_noise,R,h_LOS,K_Rician,probLOS] = channel_cellfree_GUE3(UE,AP,N,ASD_VALUE,ASD_CORR,rayleigh,BETA,K_factor,cov_area,Band, AP_locations, UE_locations)
 %% Noise and channel modelling Constants
 
 % cell-free vs small-cell paper  % eq (52)
@@ -26,8 +26,10 @@ Noise_var = Band * boltz_const * Noise_temp * Noise_fig;
 Noise_var_dB = 10*log10(Noise_var)+30;  
 Noise_var_dBm = -93.9; %dBm % Noise_fig =7;
 %% Simulation area model
-AP_locations = (rand(AP,1)*D) + 1i*(rand(AP,1)*D);% randomly generating AP locations within DxD square area.
-UE_locations = (rand(UE,1)*D) + 1i*(rand(UE,1)*D);% randomly generating AP locations within DxD square area.  % UAVs, GUEs
+% AP_locations = (rand(AP,1)*D) + 1i*(rand(AP,1)*D);% randomly generating AP locations within DxD square area.
+% UE_locations = (rand(UE,1)*D) + 1i*(rand(UE,1)*D);% randomly generating AP locations within DxD square area.  % UAVs, GUEs
+AP_locations = AP_locations(:,1) + 1i*AP_locations(:,2);
+UE_locations = UE_locations(:,1) + 1i*UE_locations(:,2);
 
 wrap_X = repmat([-D 0 D],[3 1]); % wrapping matrix used to wrap AP locations in X direction
 wrap_Y = wrap_X';% wrapping matrix used to wrap AP locations in Y direction
@@ -39,7 +41,6 @@ UE_locations_wrapped = repmat(UE_locations,[1 length(wrap_locations)]) + repmat(
 %Compute the correlation matrices for the shadow fading   % L=AP, K=UE
 shadow_corr_matrix_APs = zeros(AP,AP);
 shadow_corr_matrix_UEs = zeros(UE,UE);
-
 for l = 1:AP
     distancetoAP = min(abs(AP_locations_wrapped - repmat(AP_locations(l),size(AP_locations_wrapped))),[],2);   %2nd dimnsion
     shadow_corr_matrix_APs(:,l) = 2.^(-distancetoAP/decorr);
