@@ -12,7 +12,8 @@ numBlockers = params.numBlockers;
 width_area  = params.areaDimensions(1);
 length_area  = params.areaDimensions(2);
 numUE = params.numUE;
-% numUE_sub6 = params.numUE_sub6;
+numUE_sub6 = params.numUE_sub6;
+nUE = numUE + numUE_sub6;
 if (ue_idx<=numUE)
     UE_location = params.UE_locations(ue_idx,:);
 else
@@ -79,7 +80,8 @@ for indBC=1:length(numBlockers) %For every blocker count seperate systems
     nB = numBlockers(indBC);
     s_mobility = all_mobility{indBC};
     
-    dataBS = cell(nBS,1);
+    % dataBS = cell(nBS,1);
+    dataBS = cell(nUE*nBS,1);
     for indBS = 1:nBS
         dataBS{(ue_idx-1)*nBS+indBS}=cell(1,nB);
     end
