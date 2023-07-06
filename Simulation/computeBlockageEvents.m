@@ -20,7 +20,7 @@ else
 end
 hr = params.hr;
 ht = params.ht;
-locationsBS = params.locationsBS;
+locationsBS = [params.locationsBS; params.locationsBS_sub6];
 % locationsBS = params.locationsBS_sub6;
 V=params.V;
 hb = params.hb;
@@ -84,7 +84,7 @@ for indBC=1:length(numBlockers) %For every blocker count seperate systems
         dataBS{indBS}=cell(1,nB);
     end
     for indB = 1:nB 
-        blocker_height = params.hb(indB);
+        blocker_height = hb(indB);
         frac = (blocker_height-hr)/(ht-hr);
         BS_blockage_coordinates = UE_location + frac*(locationsBS-UE_location);
         UE_BS_blockage_line_segments = [repmat(UE_location,[nBS,1]), BS_blockage_coordinates];

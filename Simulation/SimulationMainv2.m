@@ -268,8 +268,8 @@ lambda_UE_sub6 = lambda_BS./10;
         %% Mobile blockage events
         tic
         dataBS_mobile = [];
-        % for i = 1:(params.numUE+params.numUE_sub6)
-        for i = 1:(params.numUE)
+        for i = 1:(params.numUE+params.numUE_sub6)
+        % for i = 1:(params.numUE)
             dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
         end
         % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
