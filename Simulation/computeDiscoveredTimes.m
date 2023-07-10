@@ -41,9 +41,9 @@ for ue_idx = 1:params.numUE
         %Now impose the discovery times when necessary, by shifting t_in times by
         %discovery duration
         % bsBlockageTimes{bs_idx} = BS_discovered_times;
-        % bsBlockageTimes{(ue_idx-1)*params.numGNB+bs_idx} = BS_discovered_times;        
+        bsBlockageTimes{(ue_idx-1)*params.numGNB+bs_idx} = BS_discovered_times;        
         % bsBlockageTimes{(ue_idx-1)*params.numGNB_sub6+bs_idx} = BS_discovered_times;    
-        bsBlockageTimes{(ue_idx-1)*(params.numGNB+params.numGNB_sub6)+bs_idx} = BS_discovered_times;        
+        % bsBlockageTimes{(ue_idx-1)*(params.numGNB+params.numGNB_sub6)+bs_idx} = BS_discovered_times;        
         len = size(BS_discovered_times,2);
         for jj=len:-1:1
             if (BS_discovered_times(1,jj) + discovery_time) < BS_discovered_times(3,jj) 

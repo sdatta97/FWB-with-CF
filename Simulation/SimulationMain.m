@@ -126,8 +126,8 @@ lambda_UE_sub6 = lambda_BS./4;
         % establish a viable channel btw UE and a recently unblocked gNB. This can
         % run in paralel, i.e., even when UE is connected to another gNB, UE can
         % discover other gNB in the background.
-        protocolParams.discovery_time = [20 50]*10^(-3);
-        % protocolParams.discovery_time = 50*10^(-3);
+        % protocolParams.discovery_time = [20 50]*10^(-3);
+        protocolParams.discovery_time = 50*10^(-3);
         
         % in ms, measurement report trigger time. 
         % BeamFailureMaxCount*MeasurementFrequency (10*2 = 20).
@@ -141,8 +141,8 @@ lambda_UE_sub6 = lambda_BS./4;
         protocolParams.frameHopCount = 0; %6;
         % RACH delay, how long it takes to setup a connection with a discovered
         % gNB.
-        protocolParams.connection_time = [10 20 50]*10^(-3);
-        % protocolParams.connection_time = 50*10^(-3);
+        % protocolParams.connection_time = [10 20 50]*10^(-3);
+        protocolParams.connection_time = 50*10^(-3);
         
         % Signaling delay to start data transfer after rach is completed. Singaling
         % to setup UE data plane path Can be modeled as addition to the RACH in our
