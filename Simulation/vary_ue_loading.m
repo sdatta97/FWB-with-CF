@@ -118,8 +118,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % rmin = 1e9;
         % params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
        
-        params.numUE = 1;
-        params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+        params.numUE = 2;
+        params.RUE = 0.1*sqrt(rand(params.numUE,1)); %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
         params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
         rmin = 1e9;
@@ -260,13 +260,19 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
                             params.numUE = n;
 
-                            n = params.numUE_sub6;
+                            numUE_sub6 = params.numUE_sub6;
+                            numUE = params.numUE;
                             params.numUE_sub6 = 0;
+                            params.numUE = 1;
                             Band = params.Band;
                             params.Band = Band - Band_sub6;
-                            SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
-                            Band_mmw = max(params.r_min./SE_dl_tmp);
-                            params.numUE_sub6 = n;
+                            % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
+                            for i = 1:numUE
+                                SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                                Band_mmw = max(params.r_min./SE_dl_tmp);
+                            end
+                            params.numUE_sub6 = numUE_sub6;
+                            params.numUE = numUE;
                             params.Band = Band;
                         end
                         for k = 1:params.numUE
