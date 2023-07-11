@@ -165,11 +165,16 @@ for iter = 1:LOOP
                     end
                 end
             end
-             %% monte--carlo              
-            % ImpCSI -- LB, closed form iCSI
-            [SE_LB_ALL, SNR_NUM_LB7(1:K,iter,iASD,iHI), SNR_DEN_LB7(1:K,iter,iASD,iHI), HI_UE_rx7(1:K,iter,iASD,iHI), HI_AP_tx7(1:K,iter,iASD,iHI), BU7(1:K,iter,iASD,iHI),INTERFERENCE_UAV_GUE_EACH7(1:K,1:K,iter,iASD,iHI)] = function_LB_impCSI(K_mmW,K,L,N,eta,h_LOS,R,psi_HI,eta_p,PHI,k_t2,k_r2_UE,gamma, gamma_MAT, beta_actual, beta_actual_MAT, C_ERR, GAMMA_NLOS, plos, plos2);            
-            SE_LB_each(1:K,iter,iASD,iHI) = tau_factor*SE_LB_ALL;
-            SE_LB(iter,iASD,iHI) = tau_factor*sum(SE_LB_ALL);                                       
+            %% monte--carlo
+            % perfect-CSI monte-carlo (Upper bound)
+            % Imp-CSI monte-carlo (Upper bound)
+            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea);
+            SE_monte_impCSI(iter,iASD,iHI,n) = tau_factor*sum(SE_UB);
+            SE_UB_each(1:K,iter,iASD,iHI,n) = tau_factor*SE_UB;
+            % % ImpCSI -- LB, closed form iCSI
+            % [SE_LB_ALL, SNR_NUM_LB7(1:K,iter,iASD,iHI), SNR_DEN_LB7(1:K,iter,iASD,iHI), HI_UE_rx7(1:K,iter,iASD,iHI), HI_AP_tx7(1:K,iter,iASD,iHI), BU7(1:K,iter,iASD,iHI),INTERFERENCE_UAV_GUE_EACH7(1:K,1:K,iter,iASD,iHI)] = function_LB_impCSI(K_mmW,K,L,N,eta,h_LOS,R,psi_HI,eta_p,PHI,k_t2,k_r2_UE,gamma, gamma_MAT, beta_actual, beta_actual_MAT, C_ERR, GAMMA_NLOS, plos, plos2);            
+            % SE_LB_each(1:K,iter,iASD,iHI) = tau_factor*SE_LB_ALL;
+            % SE_LB(iter,iASD,iHI) = tau_factor*sum(SE_LB_ALL);                                       
         end  
     end
 end
@@ -200,5 +205,6 @@ sum_SE_LB=squeeze(SE_LB_avg); %sum over K, % imp CSI LB
 SE_UB_avg = mean(SE_monte_impCSI,4);
 sum_SE_UB=squeeze(SE_UB_avg);
 % rate_dl = Band*sum_SE_LB/K;
-rate_dl = Band*mean(SE_LB_each,2);
+% rate_dl = Band*mean(SE_LB_each,2);
+rate_dl = Band*mean(SE_UB_each,2);
 end

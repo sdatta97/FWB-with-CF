@@ -68,7 +68,7 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 50;
+lambda_BS = 100;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
@@ -132,7 +132,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
         params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
-        rmin_sub6 = 1e8;
+        rmin_sub6 = 1e6;
         params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
         %% PHY layer params
         params.scs_mmw = 2e9;     %not using this parameter now
@@ -245,18 +245,19 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             plos(k) = prod(plos2(idx_max(:,k),k),1);
                         end
                         rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
-                        if any(rate_dl(1:params.numUE) < params.r_min(1:params.numUE))
-                            n = params.numUE_sub6;
-                            params.numUE_sub6 = 0;
-                            SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
-                            Band_mmw = max(params.r_min./SE_dl_tmp);
-                            params.numUE_sub6 = n;
+                        if any(rate_dl < [params.r_min; params.r_min_sub6])
                             n = params.numUE;
                             params.numUE = 0;
-                            Band = params.Band;
-                            params.Band = Band - Band_mmw;
                             SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
                             Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
+                            params.numUE = n;
+
+                            n = params.numUE_sub6;
+                            params.numUE_sub6 = 0;
+                            Band = params.Band;
+                            params.Band = Band - Band_sub6;
+                            SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
+                            Band_mmw = max(params.r_min./SE_dl_tmp);
                             params.numUE_sub6 = n;
                             params.Band = Band;
                         end
