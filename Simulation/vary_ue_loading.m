@@ -60,17 +60,10 @@ length_area_sub6 = 2*params.coverageRange_sub6;
 width_area_sub6 = 2*params.coverageRange_sub6;
 height_transmitter_sub6 = 4;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
-%%UE location
-params.numUE = 1;
-params.RUE = 0;  %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
-params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
-params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
 
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-rmin = 1e9;
-params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
@@ -79,7 +72,8 @@ lambda_BS = 50;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = lambda_BS;
+lambda_UE = 10;
+lambda_UE_sub6 = 10; %:10:50;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -108,8 +102,17 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 64;
+        params.num_antennas_per_gNB = 16;
         %%UE locations
+
+
+        %%UE location
+        params.numUE = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        params.RUE = params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+        params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
+        params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
+        rmin = 1e9;
+        params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
         % params.numUE_sub6 = 10;
         % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
         % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange/1000)^2);
@@ -120,11 +123,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % rmin_sub6 = 1e6;
         % params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
 
-        params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
         params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
-        rmin_sub6 = 1e6;
+        rmin_sub6 = 1e8;
         params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
         %% PHY layer params
         params.scs_mmw = 2e9;     %not using this parameter now
@@ -268,8 +272,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         %% Mobile blockage events
         tic
         dataBS_mobile = [];
-        for i = 1:params.numUE
-        % for i = 1:(params.numUE)
+        % for i = 1:params.numUE+params.numUE_sub6
+        for i = 1:(params.numUE)
             dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
         end
         % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
@@ -350,9 +354,14 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         %     'lambdaBS_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin)];
         % results_save_string = strcat(eventFolder,result_string,'.mat');
         % save(results_save_string,'simOutputs','protocolParams','dataDescription')
+        % result_string = ['/results_',num2str(numUE),...
+        %     'UE_',num2str(lambda_BS(idxBSDensity)),...
+        %     'lambdaBS_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin)];
+        % results_save_string = strcat(eventFolder,result_string,'.mat');
         result_string = ['/results_',num2str(numUE),...
             'UE_',num2str(lambda_BS(idxBSDensity)),...
-            'lambdaBS_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin)];
+            'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
+            'lambdaUE_sub6_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate_', num2str(rmin),'Min_rate_sub6_', num2str(rmin_sub6)];
         results_save_string = strcat(eventFolder,result_string,'.mat');
         save(results_save_string,'simOutputs','protocolParams','dataDescription')
 
@@ -369,11 +378,14 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         %     'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
         %     'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
         %     'minRatereq,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
-        output_categories = ['UE idx,','lambdaBS,','numBlockers,',...
+        % output_categories = ['UE idx,','lambdaBS,','numBlockers,',...
+        %     'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
+        %     'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
+        %     'minRatereq,','outageDuration_wo_CF_Analysis,','outageDurationAnalysis,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
+        output_categories = ['UE idx,','lambdaBS,','lambdaUE_sub6,','numBlockers,',...
             'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
             'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
-            'minRatereq,','outageDuration_wo_CF_Analysis,','outageDurationAnalysis,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
-
+            'minRatereq,','minRatereq_sub6,','outageDuration_wo_CF_Analysis,','outageDurationAnalysis,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
         fprintf(fileID,output_categories);
 
         for idxDiscDelay = 1:length(protocolParams.discovery_time)
@@ -403,7 +415,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
                             min_rate_req = params.r_min(ue_idx);
                             % formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
-                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             % fprintf(fileID,formatSpec,ue_idx,numBS,numBlockers,...
                             %     discDelay,failureDetectionDelay,connDelay,...
                             %     signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
@@ -412,10 +424,14 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             %     discDelay,failureDetectionDelay,connDelay,...
                             %     signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
                             %     min_rate_req, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
-                            fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),numBlockers,...
+                            % fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),numBlockers,...
+                            %     discDelay,failureDetectionDelay,connDelay,...
+                            %     signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
+                            %     min_rate_req, out_dur_analysis_wo_cf, out_dur_analysis, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
+                            fprintf(fileID,formatSpec,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
                                 discDelay,failureDetectionDelay,connDelay,...
                                 signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
-                                min_rate_req, out_dur_analysis_wo_cf, out_dur_analysis, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
+                                min_rate_req, min_rate_req_sub6, out_dur_analysis_wo_cf, out_dur_analysis, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
                         end
                     end
                 end

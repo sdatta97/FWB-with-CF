@@ -71,10 +71,10 @@ bsLastConnectionTimes = -100*ones(numUE,numBS); %When was the last time this bs 
 
 % Discovery computations
 % link = cell(numBS,1);
-% link = cell(numUE,numBS);
-link = cell((numUE+numUE_sub6),numBS);
-% for ue_idx = 1:numUE
-for ue_idx = 1:(numUE+numUE_sub6)
+link = cell(numUE,numBS);
+% link = cell((numUE+numUE_sub6),numBS);
+for ue_idx = 1:numUE
+% for ue_idx = 1:(numUE+numUE_sub6)
     for idxBS = 1:numBS
         % link{idxBS}.discoveredTimes = discoveredTimes{idxBS};
         % link{idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime);
