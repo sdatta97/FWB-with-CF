@@ -199,7 +199,6 @@ sum_SE_LB=squeeze(SE_LB_avg); %sum over K, % imp CSI LB
 
 SE_UB_avg = mean(SE_monte_impCSI,4);
 sum_SE_UB=squeeze(SE_UB_avg);
-
 % rate_dl = Band*sum_SE_LB/K;
 rate_dl = Band*mean(SE_LB_each,2);
 end

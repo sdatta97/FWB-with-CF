@@ -72,7 +72,7 @@ lambda_BS = 50;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE = 10;
+lambda_UE = 1;
 lambda_UE_sub6 = 10; %:10:50;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
@@ -107,7 +107,11 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
 
 
         %%UE location
-        params.numUE = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        while (n==0)
+            n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        end
+        params.numUE = n;
         params.RUE = params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
         params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
@@ -241,6 +245,21 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             plos(k) = prod(plos2(idx_max(:,k),k),1);
                         end
                         rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
+                        if any(rate_dl(1:params.numUE) < params.r_min(1:params.numUE))
+                            n = params.numUE_sub6;
+                            params.numUE_sub6 = 0;
+                            SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
+                            Band_mmw = max(params.r_min./SE_dl_tmp);
+                            params.numUE_sub6 = n;
+                            n = params.numUE;
+                            params.numUE = 0;
+                            Band = params.Band;
+                            params.Band = Band - Band_mmw;
+                            SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
+                            Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
+                            params.numUE_sub6 = n;
+                            params.Band = Band;
+                        end
                         for k = 1:params.numUE
                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
