@@ -1,5 +1,4 @@
-function [SE_k, SE_num_m, SE_den_m, HI_UE_rx_m,HI_AP_tr_m  ] = function_monte_carlo(L,K,N,eta,h,h_hat,K_AP_TR,K_UE_RX,no_of_rea)
-%function [SE_k,SE_num_m,SE_den_m,HI_UE_rx_m] = function_monte_carlo(L,K,N,eta,h,h_hat,eta_T,k_t2,k_r2_UE,snr,HI_term_UE_rx_monte,no_of_rea)
+function [SE_k, SE_num_m, SE_den_m, HI_UE_rx_m,HI_AP_tr_m] = function_monte_carlo(L,K,K_mmW,N,eta,h,h_hat,K_AP_TR,K_UE_RX,no_of_rea,plos)
 
 SE_k = zeros(K,1);
 SE_num_m = zeros(K,1);
@@ -46,10 +45,22 @@ for k = 1:K
         % num_montec1=num_montec1+num_monte;
         
         interference_kj_monte_sum=0;
-        for kd = 1:K
+        for kd = 1:K_mmW
             if kd~=k
                 interference_kj_monte =0;
                 for ap2 = 1:L
+                    % interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h(:,ch,ap2,k)'*h_hat(:,ch,ap2,kd);
+                    interference_kj_monte = interference_kj_monte + plos(kd)*sqrt(eta(ap2,kd))*h(:,ch,ap2,k)'*h_hat(:,ch,ap2,kd);
+                end
+                interference_kj_monte = abs(interference_kj_monte)^2;
+                interference_kj_monte_sum = interference_kj_monte_sum + interference_kj_monte;
+            end
+        end
+        for kd = 1+K_mmW:K
+            if kd~=k
+                interference_kj_monte =0;
+                for ap2 = 1:L
+                    % interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h(:,ch,ap2,k)'*h_hat(:,ch,ap2,kd);
                     interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h(:,ch,ap2,k)'*h_hat(:,ch,ap2,kd);
                 end
                 interference_kj_monte = abs(interference_kj_monte)^2;
@@ -71,71 +82,3 @@ for k = 1:K
     SE_k(k)= mean(SE_k_monte);   % SE
        
 end
-
-%% ---------------------------------- 
-% function [SE_k, SE_num_m, SE_den_m, HI_UE_rx_m,HI_AP_tr_m  ] = function_monte_carlo(L,K,N,eta,h,h_hat,eta_T,k_t2,k_r2_UE,snr,HI_term_UE_rx_monte,no_of_rea)
-% %function [SE_k,SE_num_m,SE_den_m,HI_UE_rx_m] = function_monte_carlo(L,K,N,eta,h,h_hat,eta_T,k_t2,k_r2_UE,snr,HI_term_UE_rx_monte,no_of_rea)
-% 
-% SE_k = zeros(K,1);
-% SE_num_m = zeros(K,1);
-% SE_den_m = zeros(K,1);
-% HI_UE_rx_m = zeros(K,1);
-% HI_AP_tr_m = zeros(K,1);
-% for k = 1:K
-%     SE_k_monte = zeros(no_of_rea,1);
-%     SE_num_m1 = zeros(no_of_rea,1);
-%     SE_den_m1 = zeros(no_of_rea,1);
-%     HI_UE_rx_m1 = zeros(no_of_rea,1);
-%     HI_AP_tx_m1 = zeros(no_of_rea,1);
-%     
-%     for realization = 1:no_of_rea
-%         
-%         %numerator -- monte   h_hat(:,chreali,ap,k)
-%         num_monte=0;
-%         h_impariment = 0;
-%         h_impariment_UE_rx = 0;
-%         for ap = 1:L
-%             num_monte = num_monte + sqrt(eta(ap,k))*h(:,realization,ap,k)'*h_hat(:,realization,ap,k);
-%             h_impariment = h_impariment + h(:,realization,ap,k).'*eta_T(:,realization,ap);
-%             h_impariment_UE_rx = h_impariment_UE_rx + k_r2_UE * h(:,realization,ap,k)' *HI_term_UE_rx_monte(:,:,ap,realization)* h(:,realization,ap,k);
-%         end
-%         HI_UE_rx = abs( sqrt(h_impariment_UE_rx) * randn(1,1))^2;
-%         snr_num_monte_c = abs(num_monte)^2;
-%         HI_monte = abs(h_impariment)^2;
-%         %                 num_montec1=num_montec1+num_monte;
-%         
-%         interference_kj_monte_sum=0;
-%         for kd = 1:K
-%             if kd~=k
-%                 interference_kj_monte =0;
-%                 for ap2 = 1:L
-%                     interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h(:,realization,ap2,k)'*h_hat(:,realization,ap2,kd);
-%                 end
-%                 interference_kj_monte = abs(interference_kj_monte)^2;
-%                 interference_kj_monte_sum = interference_kj_monte_sum + interference_kj_monte;
-%             end
-%         end
-%         
-%         %SE for each realization
-%         SE_k_monte(realization) = log2(1+ snr_num_monte_c/(1+HI_monte+ HI_UE_rx + interference_kj_monte_sum ));
-%         SE_k_each = mean(SE_k_monte);
-%         
-%         %to check values
-%         SE_num_m1(realization) = snr_num_monte_c;
-%         SE_den_m1(realization) = HI_monte+ HI_UE_rx + interference_kj_monte_sum;
-%         HI_UE_rx_m1(realization) = HI_UE_rx;
-%         HI_AP_tx_m1(realization) = HI_monte;
-%         
-%         SE_num_m2 = mean(SE_num_m1);
-%         SE_den_m2 = mean(SE_den_m1);
-%         HI_UE_rx_m2 = mean(HI_UE_rx_m1);
-%         HI_AP_tx_m2 = mean(HI_AP_tx_m1);
-%     end
-%     SE_k(k)= SE_k_each;   % SE
-%     
-%     
-%     SE_num_m(k) = SE_num_m2;
-%     SE_den_m(k) = SE_den_m2;
-%     HI_UE_rx_m(k) = HI_UE_rx_m2;
-%     HI_AP_tr_m(k) = HI_AP_tx_m2;
-% end

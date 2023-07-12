@@ -346,9 +346,10 @@ while nextEventTime < params.simTime
                     else
                         % [BETA, phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link);
                         % [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link,BETA,ricianFactor);
-                        [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link);
-                        rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
+                        % [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link);
+                        % rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
                         r_calc_sub6 = compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
+                        rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
                         for ue_idx_2 = 1:numUE
                             if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)
                                 rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
