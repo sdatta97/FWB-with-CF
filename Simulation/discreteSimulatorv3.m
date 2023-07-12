@@ -378,7 +378,7 @@ while nextEventTime < params.simTime
                             for i = 1:numUE
                                 params.R_GUE = R_GUE(:,:,:,i);
                                 params.h_LOS_GUE = h_LOS_GUE(:,:,i);
-                                SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState); %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                                SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
                                 Band_mmw = params.r_min(i)/SE_dl_tmp;
                                 if (Band_mmw <= params.Band)
                                     params.bw_alloc(i) = Band_mmw;
