@@ -380,7 +380,7 @@ while nextEventTime < params.simTime
                                 params.h_LOS_GUE = h_LOS_GUE(:,:,i);
                                 SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
                                 Band_mmw = params.r_min(i)/SE_dl_tmp;
-                                if (Band_mmw <= params.Band)
+                                if ((Band_mmw <= params.Band) && (sub6ConnectionState(i) == 1))
                                     params.bw_alloc(i) = Band_mmw;
                                     Band_tmp = params.Band;
                                     params.Band = Band_mmw;
@@ -405,7 +405,8 @@ while nextEventTime < params.simTime
                         for ue_idx_2 = 1+numUE:numUE+numUE_sub6
                             rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
                         end
-                        if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+                        % if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+                        if ((rates_on_sub6_handoff(ue_idx) >= r_min(ue_idx)) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 1;
