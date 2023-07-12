@@ -301,6 +301,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             params.numUE_sub6 = numUE_sub6;
                             params.numUE = numUE;
                             params.Band = Band;
+                            params.R_GUE = R_GUE;
+                            params.h_LOS_GUE = h_LOS_GUE;
                         end
                         for k = 1:params.numUE
                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
