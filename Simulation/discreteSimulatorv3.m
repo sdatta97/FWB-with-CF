@@ -348,7 +348,54 @@ while nextEventTime < params.simTime
                         % [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link,BETA,ricianFactor);
                         % [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link);
                         % rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
-                        r_calc_sub6 = compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
+                        sub6ConnectionState = UE.sub6ConnectionState;
+                        sub6ConnectionState(ue_idx) = 0;
+                        r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
+                        if any(r_calc_sub6 < [params.r_min; params.r_min_sub6])
+                            n = params.numUE;
+                            params.numUE = 0;
+                            R_GUE = params.R_GUE;
+                            h_LOS_GUE = params.h_LOS_GUE;
+                            params.R_GUE = R_GUE(:,:,:,1+n:end);
+                            params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
+                            SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState); %compute_link_rates_w_rician(params, link, ue_idx, )./params.Band;
+                            Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
+                            params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
+                            Band = params.Band;
+                            params.Band = Band_sub6;
+                            SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState); %rate_analyticalv4(params, sub6ConnectionState); %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
+                            r_calc_sub6 (1+n:end) = params.bw_alloc_sub6.*SE_dl_tmp;
+                            params.numUE = n;
+                            params.Band = Band;
+
+                            numUE_sub6 = params.numUE_sub6;
+                            numUE = params.numUE;
+                            params.numUE_sub6 = 0;
+                            params.numUE = 1;
+                            Band = params.Band;
+                            params.Band = Band - Band_sub6;
+                            % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
+                            for i = 1:numUE
+                                params.R_GUE = R_GUE(:,:,:,i);
+                                params.h_LOS_GUE = h_LOS_GUE(:,:,i);
+                                SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState); %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                                Band_mmw = params.r_min(i)/SE_dl_tmp;
+                                if (Band_mmw <= params.Band)
+                                    params.bw_alloc(i) = Band_mmw;
+                                    Band_tmp = params.Band;
+                                    params.Band = Band_mmw;
+                                    % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                                    r_calc_sub6(i) = params.bw_alloc(i)*SE_dl_tmp; 
+                                    params.Band = Band_tmp - Band_mmw;
+                                end
+                                % rate_dl (1:n) = params.bw_alloc.*SE_dl_tmp;
+                            end
+                            params.numUE_sub6 = numUE_sub6;
+                            params.numUE = numUE;
+                            params.Band = Band;
+                            params.R_GUE = R_GUE;
+                            params.h_LOS_GUE = h_LOS_GUE;
+                        end
                         rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
                         for ue_idx_2 = 1:numUE
                             if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)

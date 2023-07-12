@@ -114,7 +114,8 @@ for indBC=1:length(numBlockers) %For every blocker count seperate systems
     
     
     for indBS = 1:nBS
-        len =length(dataBS{(ue_idx-1)*nBS+indBS});
+        % len =length(dataBS{(ue_idx-1)*nBS+indBS});
+        len =length(dataBS{indBS});
         dataBS{indBS}(2,:) =  exprnd(1/mu,1,len); % block duration
         dataBS{indBS}(3,:) = dataBS{indBS}(2,:) + dataBS{indBS}(1,:); % end of physical blockages\
         %if a blocker arrives before the previous blocker served then that is a

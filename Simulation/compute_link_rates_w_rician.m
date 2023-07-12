@@ -15,13 +15,15 @@ K_Factor = params.K_Factor;
 RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
 Perf_CSI = params.Perf_CSI;
 cov_area = params.cov_area;
+sub6ConnectionState(ue_idx) = 1;
 %%
 TAU_P_K_by_two = params.TAU_P_K_by_two;  
 CH_estimation = params.CH_estimation;  
 %%
 % LB = params.LB;  %Lower bound
 % UB = params.UB;  %Upper bound
-no_of_rea = params.no_of_rea;     % no.of channel realizations
+% no_of_rea = params.no_of_rea;     % no.of channel realizations
+no_of_rea = 1;
 %%
 pilot_pow = params.pilot_pow; 
 noiseFigure = params.noiseFigure;
@@ -40,7 +42,7 @@ HI_UE_rx7= zeros(K,LOOP,asd_length,hi_length);
 HI_AP_tx7= zeros(K,LOOP,asd_length,hi_length);
 BU7= zeros(K,LOOP,asd_length,hi_length);
 INTERFERENCE_UAV_GUE_EACH7= zeros(K,K,LOOP,asd_length,hi_length);     
-[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band);
+[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band,  [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
 R10 = R_GUE;
 h_LOSall = h_LOS_GUE;
 %% PLOS cal

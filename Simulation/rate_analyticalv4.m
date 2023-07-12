@@ -1,5 +1,6 @@
 % function rate_dl = rate_analytical(params, plos2, plos)
-function rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE,h_LOS_GUE, PLOS_GUE)
+% function rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE,h_LOS_GUE, PLOS_GUE)
+function rate_dl = rate_analyticalv4(params, plos)
  %%  define
 N = params.num_antennas_per_gNB;  % antennas per AP
 L = params.numGNB_sub6;
@@ -44,8 +45,8 @@ INTERFERENCE_UAV_GUE_EACH7= zeros(K,K,LOOP,asd_length,hi_length);
 % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band);
 channelGain_GUE = params.BETA;
 K_Rician = params.ricianFactor;
-R10 = R_GUE;
-h_LOSall = h_LOS_GUE;
+R10 = params.R_GUE;
+h_LOSall = params.h_LOS_GUE;
 %% PLOS cal
 %         % GUE
 %         CAL_PLOS_GUE = (PLOS_GUE==1);
@@ -168,13 +169,13 @@ for iter = 1:LOOP
             %% monte--carlo
             % perfect-CSI monte-carlo (Upper bound)
             % Imp-CSI monte-carlo (Upper bound)
-            % [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW, N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea,plos);
-            % SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
-            % SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
-            % % ImpCSI -- LB, closed form iCSI
-            [SE_LB_ALL, SNR_NUM_LB7(1:K,iter,iASD,iHI), SNR_DEN_LB7(1:K,iter,iASD,iHI), HI_UE_rx7(1:K,iter,iASD,iHI), HI_AP_tx7(1:K,iter,iASD,iHI), BU7(1:K,iter,iASD,iHI),INTERFERENCE_UAV_GUE_EACH7(1:K,1:K,iter,iASD,iHI)] = function_LB_impCSI(K_mmW,K,L,N,eta,h_LOS,R,psi_HI,eta_p,PHI,k_t2,k_r2_UE,gamma, gamma_MAT, beta_actual, beta_actual_MAT, C_ERR, GAMMA_NLOS, plos, plos2);            
-            SE_LB_each(1:K,iter,iASD,iHI) = tau_factor*SE_LB_ALL;
-            SE_LB(iter,iASD,iHI) = tau_factor*sum(SE_LB_ALL);                                       
+            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW, N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea,plos);
+            SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
+            SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
+            % ImpCSI -- LB, closed form iCSI
+            % [SE_LB_ALL, SNR_NUM_LB7(1:K,iter,iASD,iHI), SNR_DEN_LB7(1:K,iter,iASD,iHI), HI_UE_rx7(1:K,iter,iASD,iHI), HI_AP_tx7(1:K,iter,iASD,iHI), BU7(1:K,iter,iASD,iHI),INTERFERENCE_UAV_GUE_EACH7(1:K,1:K,iter,iASD,iHI)] = function_LB_impCSI(K_mmW,K,L,N,eta,h_LOS,R,psi_HI,eta_p,PHI,k_t2,k_r2_UE,gamma, gamma_MAT, beta_actual, beta_actual_MAT, C_ERR, GAMMA_NLOS, plos, plos2);            
+            % SE_LB_each(1:K,iter,iASD,iHI) = tau_factor*SE_LB_ALL;
+            % SE_LB(iter,iASD,iHI) = tau_factor*sum(SE_LB_ALL);                                       
         end  
     end
 end
@@ -205,6 +206,6 @@ sum_SE_LB=squeeze(SE_LB_avg); %sum over K, % imp CSI LB
 SE_UB_avg = mean(SE_monte_impCSI,4);
 sum_SE_UB=squeeze(SE_UB_avg);
 % rate_dl = Band*sum_SE_LB/K;
-rate_dl = Band*mean(SE_LB_each,2);
-% rate_dl = Band*mean(SE_UB_each,2);
+% rate_dl = Band*mean(SE_LB_each,2);
+rate_dl = Band*mean(SE_UB_each,2);
 end
