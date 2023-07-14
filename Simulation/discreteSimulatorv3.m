@@ -379,21 +379,21 @@ while nextEventTime < params.simTime
                             Band = params.Band;
                             params.Band = Band - Band_sub6;
                             % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
-                            for i = 1:numUE
-                                params.R_GUE = R_GUE(:,:,:,i);
-                                params.h_LOS_GUE = h_LOS_GUE(:,:,i);
-                                SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
-                                Band_mmw = params.r_min(i)/SE_dl_tmp;
-                                if ((Band_mmw <= params.Band) && (sub6ConnectionState(i) == 1))
-                                    params.bw_alloc(i) = Band_mmw;
-                                    Band_tmp = params.Band;
-                                    params.Band = Band_mmw;
-                                    % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
-                                    r_calc_sub6(i) = params.bw_alloc(i)*SE_dl_tmp; 
-                                    params.Band = Band_tmp - Band_mmw;
-                                end
-                                % rate_dl (1:n) = params.bw_alloc.*SE_dl_tmp;
+                            % for i = 1:numUE
+                            params.R_GUE = R_GUE(:,:,:,ue_idx);
+                            params.h_LOS_GUE = h_LOS_GUE(:,:,ue_idx);
+                            SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                            Band_mmw = params.r_min(ue_idx)/SE_dl_tmp;
+                            if ((Band_mmw <= params.Band) && (sub6ConnectionState(ue_idx) == 1))
+                                params.bw_alloc(ue_idx) = Band_mmw;
+                                Band_tmp = params.Band;
+                                params.Band = Band_mmw;
+                                % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                                r_calc_sub6(ue_idx) = params.bw_alloc(ue_idx)*SE_dl_tmp; 
+                                params.Band = Band_tmp - Band_mmw;
                             end
+                            % rate_dl (1:n) = params.bw_alloc.*SE_dl_tmp;
+                            % end
                             params.numUE_sub6 = numUE_sub6;
                             params.numUE = numUE;
                             params.Band = Band;

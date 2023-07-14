@@ -257,54 +257,54 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             plos(k) = prod(plos2(idx_max(:,k),k),1);
                         end
                         rate_dl = rate_analyticalv4(params, plos); %rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
-                        if any(rate_dl < [params.r_min; params.r_min_sub6])
-                            n = params.numUE;
-                            params.numUE = 0;
-                            R_GUE = params.R_GUE;
-                            h_LOS_GUE = params.h_LOS_GUE;
-                            params.R_GUE = R_GUE(:,:,:,1+n:end);
-                            params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
-                            SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
-                            Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
-                            % params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
-                            params.bw_alloc_sub6 = Band_sub6.*ones(params.numUE_sub6,1);
-                            Band = params.Band;
-                            params.Band = Band_sub6;
-                            % SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
-                            rate_dl (1+n:end) = params.bw_alloc_sub6.*SE_dl_tmp;
-                            params.numUE = n;
-                            params.Band = Band;
+                        % if any(rate_dl < [params.r_min; params.r_min_sub6])
+                        n = params.numUE;
+                        params.numUE = 0;
+                        R_GUE = params.R_GUE;
+                        h_LOS_GUE = params.h_LOS_GUE;
+                        params.R_GUE = R_GUE(:,:,:,1+n:end);
+                        params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
+                        SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
+                        Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
+                        % params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
+                        params.bw_alloc_sub6 = Band_sub6.*ones(params.numUE_sub6,1);
+                        Band = params.Band;
+                        params.Band = Band_sub6;
+                        % SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
+                        rate_dl (1+n:end) = params.bw_alloc_sub6.*SE_dl_tmp;
+                        params.numUE = n;
+                        params.Band = Band;
 
-                            numUE_sub6 = params.numUE_sub6;
-                            numUE = params.numUE;
-                            params.numUE_sub6 = 0;
-                            params.numUE = 1;
-                            Band = params.Band;
-                            params.Band = Band - Band_sub6;
-                            % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
-                            for i = 1:numUE
-                                params.R_GUE = R_GUE(:,:,:,i);
-                                params.h_LOS_GUE = h_LOS_GUE(:,:,i);
-                                SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band;%rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
-                                Band_mmw = params.r_min(i)/SE_dl_tmp;
-                                if (Band_mmw <= params.Band)
-                                    params.bw_alloc(i) = Band_mmw;
-                                    % params.bw_alloc(i) = params.Band;
-                                    Band_tmp = params.Band;
-                                    params.Band = Band_mmw;
-                                    % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
-                                    rate_dl(i) = params.bw_alloc(i)*SE_dl_tmp; 
-                                    params.Band = Band_tmp - Band_mmw;
-                                    % break;
-                                end
-                                % rate_dl (1:n) = params.bw_alloc.*SE_dl_tmp;
+                        numUE_sub6 = params.numUE_sub6;
+                        numUE = params.numUE;
+                        params.numUE_sub6 = 0;
+                        params.numUE = 1;
+                        Band = params.Band;
+                        params.Band = Band - Band_sub6;
+                        % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
+                        for i = 1:numUE
+                            params.R_GUE = R_GUE(:,:,:,i);
+                            params.h_LOS_GUE = h_LOS_GUE(:,:,i);
+                            SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band;%rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                            Band_mmw = params.r_min(i)/SE_dl_tmp;
+                            if (Band_mmw <= params.Band)
+                                params.bw_alloc(i) = Band_mmw;
+                                % params.bw_alloc(i) = params.Band;
+                                Band_tmp = params.Band;
+                                params.Band = Band_mmw;
+                                % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                                rate_dl(i) = params.bw_alloc(i)*SE_dl_tmp; 
+                                params.Band = Band_tmp - Band_mmw;
+                                % break;
                             end
-                            params.numUE_sub6 = numUE_sub6;
-                            params.numUE = numUE;
-                            params.Band = Band;
-                            params.R_GUE = R_GUE;
-                            params.h_LOS_GUE = h_LOS_GUE;
+                            % rate_dl (1:n) = params.bw_alloc.*SE_dl_tmp;
                         end
+                        params.numUE_sub6 = numUE_sub6;
+                        params.numUE = numUE;
+                        params.Band = Band;
+                        params.R_GUE = R_GUE;
+                        params.h_LOS_GUE = h_LOS_GUE;
+                        % end
                         for k = 1:params.numUE
                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
