@@ -350,7 +350,7 @@ while nextEventTime < params.simTime
                         % [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link);
                         % rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
                         sub6ConnectionState = UE.sub6ConnectionState;
-                        sub6ConnectionState(ue_idx) = 1;
+                        % sub6ConnectionState(ue_idx) = 1;
                         r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
                         % if any(r_calc_sub6 < [params.r_min; params.r_min_sub6])
                         if ((r_calc_sub6(ue_idx) < params.r_min(ue_idx)) || any(r_calc_sub6(1+params.numUE:params.numUE+params.numUE_sub6) < params.r_min_sub6))
@@ -360,7 +360,7 @@ while nextEventTime < params.simTime
                             h_LOS_GUE = params.h_LOS_GUE;
                             params.R_GUE = R_GUE(:,:,:,1+n:end);
                             params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
-                            sub6ConnectionState(ue_idx) = 0;
+                            % sub6ConnectionState(ue_idx) = 0;
                             SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %compute_link_rates_w_rician(params, link, ue_idx, )./params.Band;
                             Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
                             % params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
@@ -371,7 +371,7 @@ while nextEventTime < params.simTime
                             r_calc_sub6 (1+n:end) = params.bw_alloc_sub6.*SE_dl_tmp;
                             params.numUE = n;
                             params.Band = Band;
-                            sub6ConnectionState(ue_idx) = 1;
+                            % sub6ConnectionState(ue_idx) = 1;
 
                             numUE_sub6 = params.numUE_sub6;
                             numUE = params.numUE;
@@ -383,9 +383,10 @@ while nextEventTime < params.simTime
                             % for i = 1:numUE
                             params.R_GUE = R_GUE(:,:,:,ue_idx);
                             params.h_LOS_GUE = h_LOS_GUE(:,:,ue_idx);
-                            SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                            % SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                            SE_dl_tmp = rate_analyticalv4(params, 1)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
                             Band_mmw = params.r_min(ue_idx)/SE_dl_tmp;
-                            if ((Band_mmw <= params.Band) && (sub6ConnectionState(ue_idx) == 1))
+                            if (Band_mmw <= params.Band)
                                 params.bw_alloc(ue_idx) = Band_mmw;
                                 Band_tmp = params.Band;
                                 params.Band = Band_mmw;
