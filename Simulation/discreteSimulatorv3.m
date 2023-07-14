@@ -14,6 +14,7 @@ r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
 BETA = params.BETA;
 ricianFactor = params.ricianFactor;
+params.no_of_rea = 1;     % no.of channel realizations
 
 discovery_delay         = simInputs.discovery_delay;
 failureDetectionDelay   = simInputs.failureDetectionDelay;
@@ -358,15 +359,18 @@ while nextEventTime < params.simTime
                             h_LOS_GUE = params.h_LOS_GUE;
                             params.R_GUE = R_GUE(:,:,:,1+n:end);
                             params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
+                            sub6ConnectionState(ue_idx) = 0;
                             SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %compute_link_rates_w_rician(params, link, ue_idx, )./params.Band;
                             Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
-                            params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
+                            % params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
+                            params.bw_alloc_sub6 = Band_sub6*ones(params.numUE_sub6,1);
                             Band = params.Band;
                             params.Band = Band_sub6;
                             % SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, sub6ConnectionState); %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
                             r_calc_sub6 (1+n:end) = params.bw_alloc_sub6.*SE_dl_tmp;
                             params.numUE = n;
                             params.Band = Band;
+                            sub6ConnectionState(ue_idx) = 1;
 
                             numUE_sub6 = params.numUE_sub6;
                             numUE = params.numUE;

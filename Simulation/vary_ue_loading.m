@@ -27,7 +27,7 @@ params.CH_estimation = 0;  % 1= have channel estimation
 %%
 params.LB=1;  %Lower bound
 params.UB =1;  %Upper bound
-params.no_of_rea = 1;     % no.of channel realizations
+params.no_of_rea = 10;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
 params.snr_db = 40;
@@ -266,7 +266,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
                             SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
                             Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
-                            params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
+                            % params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
+                            params.bw_alloc_sub6 = Band_sub6.*ones(params.numUE_sub6,1);
                             Band = params.Band;
                             params.Band = Band_sub6;
                             % SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
