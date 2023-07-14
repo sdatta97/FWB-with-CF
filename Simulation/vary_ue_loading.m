@@ -68,11 +68,11 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 100;
+lambda_BS = 50;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE = 1;
+lambda_UE = 10;
 lambda_UE_sub6 = 10; %:10:50;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
@@ -102,29 +102,29 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 32;
+        params.num_antennas_per_gNB = 16;
         %%UE locations
 
 
         %%UE location
-%         n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
-%         while (n==0)
-%             n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
-%         end
-%         params.numUE = n;
-%         params.RUE = params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
-%         params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
-%         params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-%         rmin = 1e9;
-%         params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
-%         params.bw_alloc = zeros(params.numUE,1);
-       
-        params.numUE = 1;
-        params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+        n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        while (n==0)
+            n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        end
+        params.numUE = n;
+        params.RUE = params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
         params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
         rmin = 1e9;
-        params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave user
+        params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
+        params.bw_alloc = zeros(params.numUE,1);
+       
+        % params.numUE = 1;
+        % params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+        % params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
+        % params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
+        % rmin = 1e9;
+        % params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave user
 
         % params.numUE_sub6 = 10;
         % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
@@ -264,12 +264,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             h_LOS_GUE = params.h_LOS_GUE;
                             params.R_GUE = R_GUE(:,:,:,1+n:end);
                             params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
-                            SE_dl_tmp = rate_analyticalv4(params, plos); %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
+                            SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
                             Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
                             params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
                             Band = params.Band;
                             params.Band = Band_sub6;
-                            SE_dl_tmp = rate_analyticalv4(params, plos); %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
+                            % SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
                             rate_dl (1+n:end) = params.bw_alloc_sub6.*SE_dl_tmp;
                             params.numUE = n;
                             params.Band = Band;
@@ -284,7 +284,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             for i = 1:numUE
                                 params.R_GUE = R_GUE(:,:,:,i);
                                 params.h_LOS_GUE = h_LOS_GUE(:,:,i);
-                                SE_dl_tmp = rate_analyticalv4(params, plos);%rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
+                                SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band;%rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
                                 Band_mmw = params.r_min(i)/SE_dl_tmp;
                                 if (Band_mmw <= params.Band)
                                     params.bw_alloc(i) = Band_mmw;
