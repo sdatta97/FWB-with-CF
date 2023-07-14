@@ -43,10 +43,7 @@ params.tau_c = 200;      % coherence block length
 % rng(2,'twister');
 %%
 % load('params.mat')
-<<<<<<< HEAD
 params.simTime = 2*60; %sec Total Simulation time should be more than 100.
-=======
-params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
