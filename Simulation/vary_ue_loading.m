@@ -43,7 +43,7 @@ params.tau_c = 200;      % coherence block length
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 1; %sec Total Simulation time should be more than 100.
+params.simTime = 2*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -450,7 +450,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
             'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
             'minRatereq,','minRatereq_sub6,','outageDuration_wo_CF_Analysis,','outageDurationAnalysis,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
         fprintf(fileID,output_categories);
-
+        min_rate_req_sub6 = params.r_min_sub6(1);
         for idxDiscDelay = 1:length(protocolParams.discovery_time)
             for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
                 for idxConnDelay = 1:length(protocolParams.connection_time)
