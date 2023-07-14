@@ -290,11 +290,11 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                             if (Band_mmw <= params.Band)
                                 params.bw_alloc(i) = Band_mmw;
                                 % params.bw_alloc(i) = params.Band;
-                                Band_tmp = params.Band;
-                                params.Band = Band_mmw;
+                                % Band_tmp = params.Band;
+                                % params.Band = Band_mmw;
                                 % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
                                 rate_dl(i) = params.bw_alloc(i)*SE_dl_tmp; 
-                                params.Band = Band_tmp - Band_mmw;
+                                % params.Band = Band_tmp - Band_mmw;
                                 % break;
                             end
                             % rate_dl (1:n) = params.bw_alloc.*SE_dl_tmp;
@@ -309,7 +309,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            % plos3 = pLoS3(theta,omega,params.coverageRange);
-                          % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+                           % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                            if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
                                p1 = 1;
                                tos = 0;

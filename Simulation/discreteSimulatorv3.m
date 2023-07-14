@@ -352,7 +352,8 @@ while nextEventTime < params.simTime
                         sub6ConnectionState = UE.sub6ConnectionState;
                         sub6ConnectionState(ue_idx) = 1;
                         r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
-                        if any(r_calc_sub6 < [params.r_min; params.r_min_sub6])
+                        % if any(r_calc_sub6 < [params.r_min; params.r_min_sub6])
+                        if ((r_calc_sub6(ue_idx) < params.r_min(ue_idx)) || any(r_calc_sub6(1+params.numUE:params.numUE+params.numUE_sub6) < params.r_min_sub6))
                             n = params.numUE;
                             params.numUE = 0;
                             R_GUE = params.R_GUE;
