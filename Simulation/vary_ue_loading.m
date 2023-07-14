@@ -68,7 +68,7 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 50;
+lambda_BS = 100;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
@@ -102,7 +102,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 16;
+        params.num_antennas_per_gNB = 64;
         %%UE locations
 
 
@@ -247,7 +247,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                         theta = protocolParams.theta;
                         omega = 1/(protocolParams.connection_time(idxConnDelay) + protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay) + protocolParams.FailureDetectionTime(idxFailureDetectionDelay));
                         psi = 1/(protocolParams.discovery_time(idxDiscDelay) + 1/params.mu);
-                        plos2 = pLoS2(params.locationsBS, [params.UE_locations;params.UE_locations_sub6], theta,omega,psi);
+                        % plos2 = pLoS2(params.locationsBS, [params.UE_locations;params.UE_locations_sub6], theta,omega,psi);
+                        plos2 = pLoS2(params.locationsBS_sub6, [params.UE_locations;params.UE_locations_sub6], theta,omega,psi);
                         plos = zeros(params.numUE,1);
                         % [~,idx_max] = mink(plos2(:,1:params.numUE),2,1);
                         % [~,idx_max] = mink(plos2(:,1:params.numUE),1,1);
@@ -255,6 +256,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                         for k = 1:params.numUE
                             % plos(k) = prod(plos2(:,k),1);
                             plos(k) = prod(plos2(idx_max(:,k),k),1);
+                            % plos(k) = prod(plos2(idx_max(:,k),k),params.numGNB);
                         end
                         rate_dl = rate_analyticalv4(params, plos); %rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
                         % if any(rate_dl < [params.r_min; params.r_min_sub6])
