@@ -30,7 +30,8 @@ params.UB =1;  %Upper bound
 params.no_of_rea = 10;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
-params.snr_db = 40;
+params.snr_db = 30;
+params.snr_db_mmw = 100;
 params.ASD_VALUE = 0.25;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 10;
 params.Kt_Kr_vsUE  = 0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
@@ -102,7 +103,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 64;
+        params.num_antennas_per_gNB = 100;
         %%UE locations
 
 

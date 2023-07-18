@@ -7,6 +7,7 @@ L = params.numGNB_sub6;
 K = params.numUE + params.numUE_sub6;  % --Ground UEs
 K_mmW = params.numUE;
 snr_db = params.snr_db;
+snr_db_mmw = params.snr_db_mmw;
 LOOP = length(params.snr_db);
 asd_length = length(params.ASD_VALUE);
 hi_length = length(params.Kt_Kr_vsUE);
@@ -152,12 +153,22 @@ for iter = 1:LOOP
             snr_linear = db2pow(snr_db(iter));
             disp([' SNR: '   num2str(snr_db(iter))]);
             snr = snr_linear;
-            % power allocation
+            snr_linear_mmw = db2pow(snr_db_mmw(iter));
+            disp([' SNR mmW: '   num2str(snr_db_mmw(iter))]);
+            snr_mmw = snr_linear_mmw;            % power allocation
             eta = zeros(L,K);
             %% allocate equal power to all
             for ap = 1:L
                 summ = sum(gamma(ap,:));
-                for k=1:K
+                for k=1:K_mmW
+                    if gamma(ap,k)== 0
+                        eta(ap,k) =  0;
+                    else
+                        eta(ap,k) =  snr_mmw/summ;
+                        %                             eta(ap,k) =  snr; %snr/K;
+                    end
+                end
+                for k=1+K_mmW:K
                     if gamma(ap,k)== 0
                         eta(ap,k) =  0;
                     else
