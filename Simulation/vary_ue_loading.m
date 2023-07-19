@@ -34,7 +34,7 @@ params.snr_db = 30;
 params.snr_db_mmw = 100;
 params.ASD_VALUE = 0.25;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 10;
-params.Kt_Kr_vsUE  = 0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
@@ -103,8 +103,9 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 100;
-        %%UE locations
+        params.num_antennas_per_gNB = 10;
+        params.num_antennas_per_gNB_mmW = 100;
+       %%UE locations
 
 
         %%UE location
@@ -203,9 +204,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % protocolParams.omega_list = 1./protocolParams.connection_time;
         % self_blockage = 5/6;
        
+        % N = params.num_antennas_per_gNB;  % antennas per AP
+        N_mmW = params.num_antennas_per_gNB_mmW;  % antennas per AP
         N = params.num_antennas_per_gNB;  % antennas per AP
         L = params.numGNB_sub6;
         K = params.numUE + params.numUE_sub6;  % --Ground UEs
+        K_mmW = params.numUE;
         snr_db = params.snr_db;
         LOOP = length(params.snr_db);
         asd_length = length(params.ASD_VALUE);
@@ -230,11 +234,14 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         sigma_sf = params.sigma_sf;
         Band = params.Band; %Communication bandwidth
         tau_c = params.tau_c;      % coherence block length  
-        [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
+        % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
+        [channelGain_GUE,R_GUE,h_LOS_GUE,R_GUE_mmW,h_LOS_GUE_mmW,K_Rician,probLOS] = channel_cellfree_GUE3(K,K_mmW,L,N,N_mmW,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
         params.BETA = channelGain_GUE';
         params.ricianFactor = K_Rician';
         params.R_GUE = R_GUE;
         params.h_LOS_GUE = h_LOS_GUE;
+        params.R_GUE_mmW = R_GUE_mmW;
+        params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;
         outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_probability_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_duration_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));

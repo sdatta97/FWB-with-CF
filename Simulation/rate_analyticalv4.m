@@ -3,6 +3,7 @@
 function rate_dl = rate_analyticalv4(params, plos)
  %%  define
 N = params.num_antennas_per_gNB;  % antennas per AP
+N_mmW = params.num_antennas_per_gNB_mmW;  % antennas per AP
 L = params.numGNB_sub6;
 K = params.numUE + params.numUE_sub6;  % --Ground UEs
 K_mmW = params.numUE;
@@ -46,6 +47,8 @@ INTERFERENCE_UAV_GUE_EACH7= zeros(K,K,LOOP,asd_length,hi_length);
 % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band);
 channelGain_GUE = params.BETA;
 K_Rician = params.ricianFactor;
+R10_mmW = params.R_GUE_mmW;
+h_LOSall_mmW = params.h_LOS_GUE_mmW;
 R10 = params.R_GUE;
 h_LOSall = params.h_LOS_GUE;
 %% PLOS cal
@@ -74,10 +77,12 @@ for iter = 1:LOOP
         
         for iASD = 1: asd_length
             %%
-            R= R10(:,:,:,1:K,iASD);
+            R_mmW= R10_mmW(:,:,:,:,iASD);
             disp(['ASD:'   num2str(iASD)]);
-            h_LOS = h_LOSall(:,:,1:K);
-            % orthogonal pilot seq
+            h_LOS_mmW = h_LOSall_mmW;
+            R= R10(:,:,:,:,iASD);
+            disp(['ASD:'   num2str(iASD)]);
+            h_LOS = h_LOSall(:,:,:);            % orthogonal pilot seq
             if TAU_P_K_by_two == 1
                 tau_p = K/2;  %no. of pilots per coher block
             else
@@ -99,7 +104,7 @@ for iter = 1:LOOP
             end
             %%
             % CHANNEL GENERATION, ESTIMATION
-            [h,h_hat_HI,psi_HI]= function_channel_Generation_HI(N,L,K,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
+            [h_mmW,h_hat_HI_mmW,psi_HI_mmW,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K,K_mmW,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
             %% EST_CHANNEL GAIN
             gamma = zeros(L,K);
             GAMMA_NLOS = zeros(N,N,L,K);
@@ -124,8 +129,10 @@ for iter = 1:LOOP
                 end
             else
                 % NO CHANNEL -ESTIMATOIN CASE
-                psi_HI = zeros(N,N,L,K);
-                R = zeros(N,N,L,K);
+                psi_HI_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+                R_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+                psi_HI = zeros(N,N,L,K-K_mmW);
+                R = zeros(N,N,L,K-K_mmW);
                 for ap=1:L
                     for ue=1:K
                         GAMMA_NLOS(:,:,ap,ue) = zeros(N,N); %eta_p*R(:,:,ap,ue)*psi_HI(:,:,ap,ue)*R(:,:,ap,ue);

@@ -1,9 +1,9 @@
-function [channelGain_over_noise,R,h_LOS,K_Rician,probLOS] = channel_cellfree_GUE3(UE,AP,N,ASD_VALUE,ASD_CORR,rayleigh,BETA,K_factor,cov_area,Band, AP_locations, UE_locations)
+% function [channelGain_over_noise,R,h_LOS,K_Rician,probLOS] = channel_cellfree_GUE3(UE,AP,N,ASD_VALUE,ASD_CORR,rayleigh,BETA,K_factor,cov_area,Band, AP_locations, UE_locations)
+function [channelGain_over_noise,R,h_LOS,R_mmW,h_LOS_mmW,K_Rician,probLOS] = channel_cellfree_GUE3(UE,UE_mmW,AP,N,N_mmW,ASD_VALUE,ASD_CORR,rayleigh,BETA,K_factor,cov_area,Band, AP_locations, UE_locations)
 %% Noise and channel modelling Constants
 
 % cell-free vs small-cell paper  % eq (52)
 D     = cov_area; % 1000/1000; % Side of the square coverage area in Km
-
 h_UE_GUE  = 1.5; % in m   %GUE
 
 h_AP  = 10; % in m
@@ -112,10 +112,11 @@ shadowing_a     = sqrtm(Cov_A)*rand_AP;
 shadowing_b     = sqrtm(Cov_B)*rand_UE;
 
 %% ------------------------------------------
-R_norm= zeros(N,N,UE,AP,length(ASD_VALUE));
+R_norm_mmW = zeros(N_mmW,N_mmW,UE_mmW,AP,length(ASD_VALUE));
+R_norm_sub6 = zeros(N,N,UE-UE_mmW,AP,length(ASD_VALUE));
 maxdistLOS=300;
 probLOS = zeros(UE,AP); K_Rician = zeros(UE,AP);
-shaddow_fad = zeros(UE,AP);
+shadow_fad = zeros(UE,AP);
 path_loss_dB = zeros(UE,AP);
 %---------------------------------------
 %  K_Rician=10.^((13-0.03*UE_AP_dist*1000)./10); 
@@ -126,19 +127,19 @@ for ue = 1:UE
         %-------------------------------------------------------
         if rayleigh==1  %rayleigh
             probLOS(ue,ap)= 0; K_Rician(ue,ap)=0;
-            shaddow_fad(ue,ap)    = sigma_sf_NLOS*(sqrt(delta)*shadowing_a(ap)+ sqrt(1-delta)*shadowing_b(ue));% correlated shadow fading model from paper
-            path_loss_dB(ue,ap) = -34.53-38*log10(UE_AP_dist(ue,ap)*1000) +shaddow_fad(ue,ap);  %Pathloss component for Rayleigh fading
+            shadow_fad(ue,ap)    = sigma_sf_NLOS*(sqrt(delta)*shadowing_a(ap)+ sqrt(1-delta)*shadowing_b(ue));% correlated shadow fading model from paper
+            path_loss_dB(ue,ap) = -34.53-38*log10(UE_AP_dist(ue,ap)*1000) +shadow_fad(ue,ap);  %Pathloss component for Rayleigh fading
         else
             %Generate shadow fading realizations
             if (UE_AP_dist(ue,ap)*1000) <= 300
                 probLOS(ue,ap)=((maxdistLOS-(UE_AP_dist(ue,ap)*1000))./maxdistLOS);
                 K_Rician(ue,ap)=10.^((13-0.03*UE_AP_dist(ue,ap)*1000)./10);
-                shaddow_fad(ue,ap)    = sigma_sf_LOS*(sqrt(delta)*shadowing_a(ap)+ sqrt(1-delta)*shadowing_b(ue));% correlated shadow fading model from paper
-                path_loss_dB(ue,ap) = -30.18-26*log10(UE_AP_dist(ue,ap)*1000) +shaddow_fad(ue,ap);  %Pathloss component for Rician Fading
+                shadow_fad(ue,ap)    = sigma_sf_LOS*(sqrt(delta)*shadowing_a(ap)+ sqrt(1-delta)*shadowing_b(ue));% correlated shadow fading model from paper
+                path_loss_dB(ue,ap) = -30.18-26*log10(UE_AP_dist(ue,ap)*1000) +shadow_fad(ue,ap);  %Pathloss component for Rician Fading
             else
                 probLOS(ue,ap)= 0; K_Rician(ue,ap)=0;
-                shaddow_fad(ue,ap)    = sigma_sf_NLOS*(sqrt(delta)*shadowing_a(ap)+ sqrt(1-delta)*shadowing_b(ue));% correlated shadow fading model from paper
-                path_loss_dB(ue,ap) = -34.53-38*log10(UE_AP_dist(ue,ap)*1000) +shaddow_fad(ue,ap);  %Pathloss component for Rayleigh fading
+                shadow_fad(ue,ap)    = sigma_sf_NLOS*(sqrt(delta)*shadowing_a(ap)+ sqrt(1-delta)*shadowing_b(ue));% correlated shadow fading model from paper
+                path_loss_dB(ue,ap) = -34.53-38*log10(UE_AP_dist(ue,ap)*1000) +shadow_fad(ue,ap);  %Pathloss component for Rayleigh fading
             end
         end
         %-------------------------------------------------------
@@ -156,24 +157,40 @@ for ue = 1:UE
         if ASD_CORR ==1
             for iASD = 1:length(ASD_VALUE)
                 if ASD_VALUE(iASD) ~=0
-                    R_norm(:,:,ue,ap,iASD)  = functionRlocalscattering(N,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
+                    if (ue<=UE_mmW)
+                        R_norm_mmW(:,:,ue,ap,iASD)  = functionRlocalscattering(N_mmW,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
+                    else
+                        R_norm_sub6(:,:,ue-UE_mmW,ap,iASD)  = functionRlocalscattering(N,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
+                    end
                 elseif ASD_VALUE(iASD)==0
-                    R_norm(:,:,ue,ap,iASD)=eye(N_A);                                                                 %Normalized covariance matrix (Uncorrelated)
+                    if (ue<=UE_mmW)
+                        R_norm_mmW(:,:,ue,ap,iASD)=eye(N_mmW);     %Normalized covariance matrix (Uncorrelated)
+                    else
+                        R_norm_sub6(:,:,ue-UE_mmW,ap,iASD)=eye(N);     %Normalized covariance matrix (Uncorrelated)
+                    end                        
                 end
             end
-        end       
+        end
     end
 end
 
 if ASD_CORR ==0   % EXP-CORR
-    R_EXP = zeros(N,N,length(ASD_VALUE));    
+    R_EXP_mmW = zeros(N_mmW,N_mmW,length(ASD_VALUE));    
+    for iASD1 = 1:length(ASD_VALUE)        
+        for u1 = 1:N_mmW
+            for u2 = 1:N_mmW
+                R_EXP_mmW(u1,u2,iASD1) = ASD_VALUE(iASD1)^(abs(u1-u2));
+            end
+        end
+    end 
+    R_EXP_sub6 = zeros(N,N,length(ASD_VALUE));    
     for iASD1 = 1:length(ASD_VALUE)        
         for u1 = 1:N
             for u2 = 1:N
-                R_EXP(u1,u2,iASD1) = ASD_VALUE(iASD1)^(abs(u1-u2));
+                R_EXP_sub6(u1,u2,iASD1) = ASD_VALUE(iASD1)^(abs(u1-u2));
             end
         end
-    end   
+    end  
 end
 
 %% Channel gain over noise
@@ -188,22 +205,42 @@ end
 
 
 %% Calculate --- Covariance matrices
-R = zeros(N,N,AP,UE,length(ASD_VALUE));
+R_mmW = zeros(N_mmW,N_mmW,AP,UE_mmW,length(ASD_VALUE));
+R = zeros(N,N,AP,UE-UE_mmW,length(ASD_VALUE));
 for ap=1:AP
-    for ue=1:UE   
+    for ue=1:UE_mmW   
         %-----------CORR
         for iASD = 1:length(ASD_VALUE)
             if K_Rician(ue,ap)== 0
                 if ASD_CORR ==1
-                    R(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_norm(:,:,ue,ap,iASD);
+                    R_mmW(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_norm_mmW(:,:,ue,ap,iASD);
                 elseif ASD_CORR ==0
-                    R(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_EXP(:,:,iASD);
+                    R_mmW(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_EXP_mmW(:,:,iASD);
                 end
             else
                 if ASD_CORR ==1
-                    R(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_norm(:,:,ue,ap,iASD);
+                    R_mmW(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_norm_mmW(:,:,ue,ap,iASD);
                 elseif ASD_CORR ==0
-                    R(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_EXP(:,:,iASD);
+                    R_mmW(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_EXP_mmW(:,:,iASD);
+                end
+            end            
+
+        end
+    end
+    for ue=1+UE_mmW:UE   
+        %-----------CORR
+        for iASD = 1:length(ASD_VALUE)
+            if K_Rician(ue,ap)== 0
+                if ASD_CORR ==1
+                    R(:,:,ap,ue-UE_mmW,iASD)     = channelGain_over_noise(ue,ap)*R_norm_sub6(:,:,ue-UE_mmW,ap,iASD);
+                elseif ASD_CORR ==0
+                    R(:,:,ap,ue-UE_mmW,iASD)     = channelGain_over_noise(ue,ap)*R_EXP_sub6(:,:,iASD);
+                end
+            else
+                if ASD_CORR ==1
+                    R(:,:,ap,ue-UE_mmW,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_norm_sub6(:,:,ue-UE_mmW,ap,iASD);
+                elseif ASD_CORR ==0
+                    R(:,:,ap,ue-UE_mmW,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_EXP_sub6(:,:,iASD);
                 end
             end            
 
@@ -244,13 +281,21 @@ end
 %     end
 % end
 %% --------------------------------
+h_LOS_mmW = zeros(N_mmW,AP,UE_mmW);
 h_LOS = zeros(N,AP,UE);
 for l = 1:AP
-    for k = 1:UE
+    for k = 1:UE_mmW
         if K_Rician(k,l)== 0
-            h_LOS(:,l,k)  = zeros(N,1);
+            h_LOS_mmW(:,l,k)  = zeros(N_mmW,1);
         else
-            h_LOS(:,l,k) = sqrt(channelGain_over_noise(k,l)/(K_Rician(k,l)+1) )* sqrt(K_Rician(k,l))*(exp(1i*2*pi.*(0:(N-1))*sin(UE_AP_angle(k,l))*antennaSpacing));      %Normalized Mean vector
+            h_LOS_mmW(:,l,k) = sqrt(channelGain_over_noise(k,l)/(K_Rician(k,l)+1) )* sqrt(K_Rician(k,l))*(exp(1i*2*pi.*(0:(N_mmW-1))*sin(UE_AP_angle(k,l))*antennaSpacing));      %Normalized Mean vector
+        end
+    end
+    for k = 1+UE_mmW:UE
+        if K_Rician(k,l)== 0
+            h_LOS(:,l,k-UE_mmW)  = zeros(N,1);
+        else
+            h_LOS(:,l,k-UE_mmW) = sqrt(channelGain_over_noise(k,l)/(K_Rician(k,l)+1) )* sqrt(K_Rician(k,l))*(exp(1i*2*pi.*(0:(N-1))*sin(UE_AP_angle(k,l))*antennaSpacing));      %Normalized Mean vector
         end
     end
 end
