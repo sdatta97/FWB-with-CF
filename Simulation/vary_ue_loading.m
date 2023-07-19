@@ -34,7 +34,7 @@ params.snr_db = 30;
 params.snr_db_mmw = 100;
 params.ASD_VALUE = 0.25;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 10;
-params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.Kt_Kr_vsUE  = 0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
@@ -69,12 +69,12 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 100;
+lambda_BS = 1;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE = 10;
-lambda_UE_sub6 = 10; %:10:50;
+lambda_UE = 1;
+lambda_UE_sub6 = 1; %:10:50;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -103,8 +103,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 10;
-        params.num_antennas_per_gNB_mmW = 100;
+        params.num_antennas_per_gNB = 1;
+        params.num_antennas_per_gNB_mmW = 2;
        %%UE locations
 
 

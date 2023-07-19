@@ -106,54 +106,84 @@ for iter = 1:LOOP
             % CHANNEL GENERATION, ESTIMATION
             [h_mmW,h_hat_HI_mmW,psi_HI_mmW,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K,K_mmW,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
             %% EST_CHANNEL GAIN
-            gamma = zeros(L,K);
-            GAMMA_NLOS = zeros(N,N,L,K);
-            gamma_MAT = zeros(N,N,L,K);
-            beta_actual_MAT = zeros(N,N,L,K);
-            beta_actual  = zeros(L,K);
-            C_ERR = zeros(N,N,L,K);
-            h_NORMsq = zeros(N,L,K);
+            gamma_mmW = zeros(L,K);
+            GAMMA_NLOS_mmW = zeros(N_mmW,N_mmW,L,K);
+            gamma_MAT_mmW = zeros(N_mmW,N_mmW,L,K);
+            beta_actual_MAT_mmW = zeros(N_mmW,N_mmW,L,K);
+            beta_actual_mmW  = zeros(L,K);
+            C_ERR_mmW = zeros(N_mmW,N_mmW,L,K);
+            h_NORMsq_mmW = zeros(N_mmW,L,K);
+            gamma_sub6 = zeros(L,K);
+            GAMMA_NLOS_sub6 = zeros(N,N,L,K);
+            gamma_MAT_sub6 = zeros(N,N,L,K);
+            beta_actual_MAT_sub6 = zeros(N,N,L,K);
+            beta_actual_sub6 = zeros(L,K);
+            C_ERR_sub6 = zeros(N,N,L,K);
+            h_NORMsq_sub6 = zeros(N,L,K);
             if CH_estimation == 1
                 for ap=1:L
                     for ue=1:K
-                        GAMMA_NLOS(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI(:,:,ap,ue)*R(:,:,ap,ue);
-                        gamma_MAT(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + eta_p*R(:,:,ap,ue)*psi_HI(:,:,ap,ue)*R(:,:,ap,ue);
-                        gamma(ap,ue) = abs(trace(gamma_MAT(:,:,ap,ue)));
-                        beta_actual_MAT(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + R(:,:,ap,ue);
-                        beta_actual(ap,ue) = abs(trace(beta_actual_MAT(:,:,ap,ue)));
-                        C_ERR(:,:,ap,ue) = beta_actual_MAT(:,:,ap,ue)-gamma_MAT(:,:,ap,ue);
+                        GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
+                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + R_mmW(:,:,ap,ue);
+                        beta_actual_mmW(ap,ue) = abs(trace(beta_actual_MAT_mmW(:,:,ap,ue)));
+                        C_ERR_mmW(:,:,ap,ue) = beta_actual_MAT_mmW(:,:,ap,ue)-gamma_MAT_mmW(:,:,ap,ue);
+                        for n2=1:N_mmW
+                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
+                        end
+                        GAMMA_NLOS_sub6(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
+                        gamma_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
+                        gamma_sub6(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
+                        beta_actual_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + R(:,:,ap,ue);
+                        beta_actual_sub6(ap,ue) = abs(trace(beta_actual_MAT_sub6(:,:,ap,ue)));
+                        C_ERR_sub6(:,:,ap,ue) = beta_actual_MAT_sub6(:,:,ap,ue)-gamma_MAT_sub6(:,:,ap,ue);
                         for n2=1:N
-                            h_NORMsq(n2,ap,ue) = norm(h_LOS(n2,ap,ue))^2;
+                            h_NORMsq_sub6(n2,ap,ue) = norm(h_LOS(n2,ap,ue))^2;
                         end
                     end
                 end
             else
                 % NO CHANNEL -ESTIMATOIN CASE
-                psi_HI_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
-                R_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
-                psi_HI = zeros(N,N,L,K-K_mmW);
-                R = zeros(N,N,L,K-K_mmW);
+                psi_HI_mmW = zeros(N_mmW,N_mmW,L,K);
+                R_mmW = zeros(N_mmW,N_mmW,L,K);
+                psi_HI_sub6 = zeros(N,N,L,K);
+                R = zeros(N,N,L,K);
                 for ap=1:L
-                    for ue=1:K
-                        GAMMA_NLOS(:,:,ap,ue) = zeros(N,N); %eta_p*R(:,:,ap,ue)*psi_HI(:,:,ap,ue)*R(:,:,ap,ue);
-                        gamma_MAT(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)'; % + eta_p*R(:,:,ap,ue)*psi_HI(:,:,ap,ue)*R(:,:,ap,ue);
-                        gamma(ap,ue) = abs(trace(gamma_MAT(:,:,ap,ue)));
+                    for ue=1:K_mmW
+                        GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R(:,:,ap,ue);
+                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
                         
-                        beta_actual_MAT(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + R(:,:,ap,ue);  % true channel-- both LoS+NLoS
-                        beta_actual(ap,ue) = abs(trace(beta_actual_MAT(:,:,ap,ue)));
-                        C_ERR(:,:,ap,ue) = R(:,:,ap,ue); % beta_actual_MAT(:,:,ap,ue)-gamma_MAT(:,:,ap,ue);
+                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + R_mmW(:,:,ap,ue);  % true channel-- both LoS+NLoS
+                        beta_actual_mmW(ap,ue) = abs(trace(beta_actual_MAT_mmW(:,:,ap,ue)));
+                        C_ERR_mmW(:,:,ap,ue) = R_mmW(:,:,ap,ue); % beta_actual_MAT(:,:,ap,ue)-gamma_MAT(:,:,ap,ue);
+                        for n2=1:N_mmW
+                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
+                        end
+                        GAMMA_NLOS_sub6(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
+                        gamma_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
+                        gamma_sub6(ap,ue) = abs(trace(gamma_MAT_sub6(:,:,ap,ue)));
+                        
+                        beta_actual_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + R(:,:,ap,ue);  % true channel-- both LoS+NLoS
+                        beta_actual_sub6(ap,ue) = abs(trace(beta_actual_MAT_sub6(:,:,ap,ue)));
+                        C_ERR_sub6(:,:,ap,ue) = R(:,:,ap,ue); % beta_actual_MAT(:,:,ap,ue)-gamma_MAT(:,:,ap,ue);
                         for n2=1:N
-                            h_NORMsq(n2,ap,ue) = norm(h_LOS(n2,ap,ue))^2;
+                            h_NORMsq_sub6(n2,ap,ue) = norm(h_LOS(n2,ap,ue))^2;
                         end
                     end
                 end
             end
             %%
             if Perf_CSI == 1
-                GAMMA_NLOS = R;
-                gamma_MAT = beta_actual_MAT;
-                gamma = beta_actual;
-                h_hat_HI=h;
+                GAMMA_NLOS_mmW = R_mmW;
+                gamma_MAT_mmW = beta_actual_MAT_mmW;
+                gamma_mmW = beta_actual_mmW;
+                h_hat_HI_mmW=h_mmW;
+                GAMMA_NLOS_sub6 = R;
+                gamma_MAT_sub6 = beta_actual_MAT_sub6;
+                gamma_sub6 = beta_actual_sub6;
+                h_hat_HI_sub6=h_sub6;
             end
             
             %%
@@ -166,17 +196,18 @@ for iter = 1:LOOP
             eta = zeros(L,K);
             %% allocate equal power to all
             for ap = 1:L
-                summ = sum(gamma(ap,:));
+                summ = sum(gamma_mmW(ap,1:K_mmW));
                 for k=1:K_mmW
-                    if gamma(ap,k)== 0
+                    if gamma_mmW(ap,k)== 0
                         eta(ap,k) =  0;
                     else
                         eta(ap,k) =  snr_mmw/summ;
                         %                             eta(ap,k) =  snr; %snr/K;
                     end
                 end
+                summ = sum(gamma_sub6(ap,1+K_mmW:K));
                 for k=1+K_mmW:K
-                    if gamma(ap,k)== 0
+                    if gamma_sub6(ap,k)== 0
                         eta(ap,k) =  0;
                     else
                         eta(ap,k) =  snr/summ;
@@ -187,7 +218,8 @@ for iter = 1:LOOP
             %% monte--carlo
             % perfect-CSI monte-carlo (Upper bound)
             % Imp-CSI monte-carlo (Upper bound)
-            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW, N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea,plos);
+            % [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW, N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea,plos);
+            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
             SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
             SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
             % ImpCSI -- LB, closed form iCSI
