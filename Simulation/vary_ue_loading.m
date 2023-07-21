@@ -23,7 +23,7 @@ params.Perf_CSI =0;
 params.cov_area = 1; %0.25; % 4; %km
 %%
 params.TAU_P_K_by_two = 0; %1;  
-params.CH_estimation = 0;  % 1= have channel estimation
+params.CH_estimation = 1;  % 1= have channel estimation
 %%
 params.LB=1;  %Lower bound
 params.UB =1;  %Upper bound
@@ -31,10 +31,10 @@ params.no_of_rea = 10;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
 params.snr_db = 30;
-params.snr_db_mmw = 100;
+params.snr_db_mmw = 70;
 params.ASD_VALUE = 0.25;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
-params.ASD_CORR = 10;
-params.Kt_Kr_vsUE  = 0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.ASD_CORR = 0;
+params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
@@ -103,8 +103,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 1;
-        params.num_antennas_per_gNB_mmW = 2;
+        params.num_antennas_per_gNB = 10;
+        params.num_antennas_per_gNB_mmW = 100;
        %%UE locations
 
 
@@ -270,12 +270,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                         % if any(rate_dl < [params.r_min; params.r_min_sub6])
                         n = params.numUE;
                         params.numUE = 0;
-                        R_GUE = params.R_GUE;
-                        h_LOS_GUE = params.h_LOS_GUE;
-                        params.R_GUE = R_GUE(:,:,:,1+n:end);
-                        params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
+                        % R_GUE = params.R_GUE;
+                        % h_LOS_GUE = params.h_LOS_GUE;
+                        % params.R_GUE = R_GUE(:,:,:,1+n:end);
+                        % params.h_LOS_GUE = h_LOS_GUE(:,:,1+n:end);
                         SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1+n:end), h_LOS_GUE(:,:,1+n:end), PLOS_GUE(1+n:end,:))./params.Band;
-                        Band_sub6 = max(params.r_min_sub6./SE_dl_tmp);
+                        Band_sub6 = min(params.r_min_sub6./SE_dl_tmp); %max(params.r_min_sub6./SE_dl_tmp);
                         % params.bw_alloc_sub6 = min(Band_sub6,params.bw_alloc_sub6);
                         params.bw_alloc_sub6 = Band_sub6.*ones(params.numUE_sub6,1);
                         Band = params.Band;
@@ -293,8 +293,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                         params.Band = Band - Band_sub6;
                         % SE_dl_tmp = rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,1:params.numUE), h_LOS_GUE(:,:,1:params.numUE), PLOS_GUE(1:params.numUE,:))./params.Band;
                         for i = 1:numUE
-                            params.R_GUE = R_GUE(:,:,:,i);
-                            params.h_LOS_GUE = h_LOS_GUE(:,:,i);
+                            % params.R_GUE = R_GUE(:,:,:,i);
+                            % params.h_LOS_GUE = h_LOS_GUE(:,:,i);
                             SE_dl_tmp = rate_analyticalv4(params, plos)./params.Band;%rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
                             Band_mmw = params.r_min(i)/SE_dl_tmp;
                             if (Band_mmw <= params.Band)
