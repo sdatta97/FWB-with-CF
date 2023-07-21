@@ -106,23 +106,23 @@ for iter = 1:LOOP
             % CHANNEL GENERATION, ESTIMATION
             [h_mmW,h_hat_HI_mmW,psi_HI_mmW,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K,K_mmW,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
             %% EST_CHANNEL GAIN
-            gamma_mmW = zeros(L,K);
-            GAMMA_NLOS_mmW = zeros(N_mmW,N_mmW,L,K);
-            gamma_MAT_mmW = zeros(N_mmW,N_mmW,L,K);
-            beta_actual_MAT_mmW = zeros(N_mmW,N_mmW,L,K);
-            beta_actual_mmW  = zeros(L,K);
-            C_ERR_mmW = zeros(N_mmW,N_mmW,L,K);
-            h_NORMsq_mmW = zeros(N_mmW,L,K);
-            gamma_sub6 = zeros(L,K);
-            GAMMA_NLOS_sub6 = zeros(N,N,L,K);
-            gamma_MAT_sub6 = zeros(N,N,L,K);
-            beta_actual_MAT_sub6 = zeros(N,N,L,K);
-            beta_actual_sub6 = zeros(L,K);
-            C_ERR_sub6 = zeros(N,N,L,K);
-            h_NORMsq_sub6 = zeros(N,L,K);
+            gamma_mmW = zeros(L,K_mmW);
+            GAMMA_NLOS_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+            gamma_MAT_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+            beta_actual_MAT_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+            beta_actual_mmW  = zeros(L,K_mmW);
+            C_ERR_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+            h_NORMsq_mmW = zeros(N_mmW,L,K_mmW);
+            gamma_sub6 = zeros(L,K-K_mmW);
+            GAMMA_NLOS_sub6 = zeros(N,N,L,K-K_mmW);
+            gamma_MAT_sub6 = zeros(N,N,L,K-K_mmW);
+            beta_actual_MAT_sub6 = zeros(N,N,L,K-K_mmW);
+            beta_actual_sub6 = zeros(L,K-K_mmW);
+            C_ERR_sub6 = zeros(N,N,L,K-K_mmW);
+            h_NORMsq_sub6 = zeros(N,L,K-K_mmW);
             if CH_estimation == 1
                 for ap=1:L
-                    for ue=1:K
+                    for ue=1:K_mmW
                         GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
                         gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
                         gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
@@ -132,6 +132,8 @@ for iter = 1:LOOP
                         for n2=1:N_mmW
                             h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
                         end
+                    end
+                    for ue=1:K-K_mmW
                         GAMMA_NLOS_sub6(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
                         gamma_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
                         gamma_sub6(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
@@ -145,10 +147,10 @@ for iter = 1:LOOP
                 end
             else
                 % NO CHANNEL -ESTIMATOIN CASE
-                psi_HI_mmW = zeros(N_mmW,N_mmW,L,K);
-                R_mmW = zeros(N_mmW,N_mmW,L,K);
-                psi_HI_sub6 = zeros(N,N,L,K);
-                R = zeros(N,N,L,K);
+                psi_HI_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+                R_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+                psi_HI_sub6 = zeros(N,N,L,K-K_mmW);
+                R = zeros(N,N,L,K-K_mmW);
                 for ap=1:L
                     for ue=1:K_mmW
                         GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R(:,:,ap,ue);
@@ -161,6 +163,8 @@ for iter = 1:LOOP
                         for n2=1:N_mmW
                             h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
                         end
+                    end
+                    for ue=1:K-K_mmW
                         GAMMA_NLOS_sub6(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
                         gamma_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
                         gamma_sub6(ap,ue) = abs(trace(gamma_MAT_sub6(:,:,ap,ue)));
@@ -196,7 +200,7 @@ for iter = 1:LOOP
             eta = zeros(L,K);
             %% allocate equal power to all
             for ap = 1:L
-                summ = sum(gamma_mmW(ap,1:K_mmW));
+                summ = sum(gamma_mmW(ap,:));
                 for k=1:K_mmW
                     if gamma_mmW(ap,k)== 0
                         eta(ap,k) =  0;
@@ -205,8 +209,8 @@ for iter = 1:LOOP
                         %                             eta(ap,k) =  snr; %snr/K;
                     end
                 end
-                summ = sum(gamma_sub6(ap,1+K_mmW:K));
-                for k=1+K_mmW:K
+                summ = sum(gamma_sub6(ap,:));
+                for k=1:K-K_mmW
                     if gamma_sub6(ap,k)== 0
                         eta(ap,k) =  0;
                     else

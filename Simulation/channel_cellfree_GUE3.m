@@ -112,8 +112,8 @@ shadowing_a     = sqrtm(Cov_A)*rand_AP;
 shadowing_b     = sqrtm(Cov_B)*rand_UE;
 
 %% ------------------------------------------
-R_norm_mmW = zeros(N_mmW,N_mmW,UE,AP,length(ASD_VALUE));
-R_norm_sub6 = zeros(N,N,UE,AP,length(ASD_VALUE));
+R_norm_mmW = zeros(N_mmW,N_mmW,UE_mmW,AP,length(ASD_VALUE));
+R_norm_sub6 = zeros(N,N,UE-UE_mmW,AP,length(ASD_VALUE));
 maxdistLOS=300;
 probLOS = zeros(UE,AP); K_Rician = zeros(UE,AP);
 shadow_fad = zeros(UE,AP);
@@ -157,11 +157,17 @@ for ue = 1:UE
         if ASD_CORR ==1
             for iASD = 1:length(ASD_VALUE)
                 if ASD_VALUE(iASD) ~=0
-                    R_norm_mmW(:,:,ue,ap,iASD)  = functionRlocalscattering(N_mmW,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
-                    R_norm_sub6(:,:,ue,ap,iASD)  = functionRlocalscattering(N,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
-                elseif ASD_VALUE(iASD)==0
-                    R_norm_mmW(:,:,ue,ap,iASD)=eye(N_mmW);     %Normalized covariance matrix (Uncorrelated)
-                    R_norm_sub6(:,:,ue,ap,iASD)=eye(N);     %Normalized covariance matrix (Uncorrelated)
+                    if (ue<=UE_mmW)
+                        R_norm_mmW(:,:,ue,ap,iASD)  = functionRlocalscattering(N_mmW,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
+                    else
+                        R_norm_sub6(:,:,ue-UE_mmW,ap,iASD)  = functionRlocalscattering(N,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
+                    end
+                elseif ASD_VALUE(iASD)==0                    
+                    if (ue<=UE_mmW)
+                        R_norm_mmW(:,:,ue,ap,iASD)=eye(N_mmW);     %Normalized covariance matrix (Uncorrelated)
+                    else
+                        R_norm_sub6(:,:,ue-UE_mmW,ap,iASD)=eye(N);     %Normalized covariance matrix (Uncorrelated)
+                    end
                 end
             end
         end
@@ -199,27 +205,39 @@ end
 
 
 %% Calculate --- Covariance matrices
-R_mmW = zeros(N_mmW,N_mmW,AP,UE,length(ASD_VALUE));
-R = zeros(N,N,AP,UE,length(ASD_VALUE));
+R_mmW = zeros(N_mmW,N_mmW,AP,UE_mmW,length(ASD_VALUE));
+R = zeros(N,N,AP,UE-UE_mmW,length(ASD_VALUE));
 for ap=1:AP
     for ue=1:UE  
         %-----------CORR
         for iASD = 1:length(ASD_VALUE)
             if K_Rician(ue,ap)== 0
                 if ASD_CORR ==1
-                    R_mmW(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_norm_mmW(:,:,ue,ap,iASD);
-                    R(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_norm_sub6(:,:,ue,ap,iASD);
+                    if (ue<=UE_mmW)
+                        R_mmW(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_norm_mmW(:,:,ue,ap,iASD);
+                    else
+                        R(:,:,ap,ue-UE_mmW,iASD)  = channelGain_over_noise(ue,ap)*R_norm_sub6(:,:,ue-UE_mmW,ap,iASD);
+                    end
                 elseif ASD_CORR ==0
-                    R_mmW(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_EXP_mmW(:,:,iASD);
-                    R(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_EXP_sub6(:,:,iASD);
+                    if (ue<=UE_mmW)
+                        R_mmW(:,:,ap,ue,iASD)     = channelGain_over_noise(ue,ap)*R_EXP_mmW(:,:,iASD);
+                    else
+                        R(:,:,ap,ue-UE_mmW,iASD)  = channelGain_over_noise(ue,ap)*R_EXP_sub6(:,:,iASD);
+                    end
                 end
             else
                 if ASD_CORR ==1
-                    R_mmW(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_norm_mmW(:,:,ue,ap,iASD);
-                    R(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_norm_sub6(:,:,ue,ap,iASD);
+                    if (ue<=UE_mmW)
+                        R_mmW(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_norm_mmW(:,:,ue,ap,iASD);
+                    else
+                        R(:,:,ap,ue-UE_mmW,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_norm_sub6(:,:,ue-UE_mmW,ap,iASD);
+                    end
                 elseif ASD_CORR ==0
-                    R_mmW(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_EXP_mmW(:,:,iASD);
-                    R(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_EXP_sub6(:,:,iASD);
+                    if (ue<=UE_mmW)
+                        R_mmW(:,:,ap,ue,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_EXP_mmW(:,:,iASD);
+                    else
+                        R(:,:,ap,ue-UE_mmW,iASD)     = (1/(K_Rician(ue,ap)+1))*channelGain_over_noise(ue,ap)*R_EXP_sub6(:,:,iASD);
+                    end
                end
             end            
 
@@ -229,21 +247,21 @@ end
 
 %% LOS component
 %% --------------------------------
-h_LOS_mmW = zeros(N_mmW,AP,UE);
-h_LOS = zeros(N,AP,UE);
+h_LOS_mmW = zeros(N_mmW,AP,UE_mmW);
+h_LOS = zeros(N,AP,UE-UE_mmW);
 for l = 1:AP
-    for k = 1:UE
+    for k = 1:UE_mmW
         if K_Rician(k,l)== 0
             h_LOS_mmW(:,l,k)  = zeros(N_mmW,1);
         else
             h_LOS_mmW(:,l,k) = sqrt(channelGain_over_noise(k,l)/(K_Rician(k,l)+1) )* sqrt(K_Rician(k,l))*(exp(1i*2*pi.*(0:(N_mmW-1))*sin(UE_AP_angle(k,l))*antennaSpacing));      %Normalized Mean vector
         end
     end
-    for k = 1:UE
+    for k = 1+UE_mmW:UE
         if K_Rician(k,l)== 0
-            h_LOS(:,l,k)  = zeros(N,1);
+            h_LOS(:,l,k-UE_mmW)  = zeros(N,1);
         else
-            h_LOS(:,l,k) = sqrt(channelGain_over_noise(k,l)/(K_Rician(k,l)+1) )* sqrt(K_Rician(k,l))*(exp(1i*2*pi.*(0:(N-1))*sin(UE_AP_angle(k,l))*antennaSpacing));      %Normalized Mean vector
+            h_LOS(:,l,k-UE_mmW) = sqrt(channelGain_over_noise(k,l)/(K_Rician(k,l)+1) )* sqrt(K_Rician(k,l))*(exp(1i*2*pi.*(0:(N-1))*sin(UE_AP_angle(k,l))*antennaSpacing));      %Normalized Mean vector
         end
     end
 end
