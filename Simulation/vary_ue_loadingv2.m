@@ -69,12 +69,12 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 10;
+lambda_BS = 100;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
 lambda_UE = 10;
-lambda_UE_sub6 = 1; %:10:50;
+lambda_UE_sub6 = 10; %:10:50;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -109,25 +109,25 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
 
 
         %%UE location
-        % n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
-        % while (n==0)
-        %     n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
-        % end
-        % params.numUE = n;
-        % params.RUE = params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
-        % params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
-        % params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-        % rmin = 1e9;
-        % params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
-        % params.bw_alloc = zeros(params.numUE,1);
-       
-        params.numUE = 1;
-        params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+        n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        while (n==0)
+            n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+        end
+        params.numUE = n;
+        params.RUE = params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
         params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
         rmin = 1e9;
-        params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave user
+        params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
         params.bw_alloc = zeros(params.numUE,1);
+       
+        % params.numUE = 1;
+        % params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+        % params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
+        % params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
+        % rmin = 1e9;
+        % params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave user
+        % params.bw_alloc = zeros(params.numUE,1);
 
         % params.numUE_sub6 = 10;
         % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
