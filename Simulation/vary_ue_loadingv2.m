@@ -144,7 +144,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
         params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
-        rmin_sub6 = 1e6;
+        rmin_sub6 = 1e7;
         params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
         params.bw_alloc_sub6 = params.Band*ones(params.numUE_sub6,1);
         %% PHY layer params
