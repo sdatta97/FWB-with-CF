@@ -105,6 +105,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
         params.num_antennas_per_gNB = 10;
         params.num_antennas_per_gNB_mmW = 100;
+        params.num_antennas_per_UE_mmW = 4;
        %%UE locations
 
 
