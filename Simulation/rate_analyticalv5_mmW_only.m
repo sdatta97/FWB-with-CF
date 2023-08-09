@@ -108,7 +108,7 @@ for iter = 1:LOOP
             %%
             % CHANNEL GENERATION, ESTIMATION
             [h_mmW,h_hat_HI_mmW,psi_HI_mmW]= function_channel_Generation_HI_mmW_only(N_mmW,N_UE,L,K_mmW,R_mmW,h_LOS_mmW,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
-            [~,~,~,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K,K_mmW,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
+            [~,~,~,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K-K_mmW,0,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
             %% EST_CHANNEL GAIN
             gamma_mmW = zeros(L,K_mmW);
             GAMMA_NLOS_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
@@ -128,13 +128,13 @@ for iter = 1:LOOP
                 for ap=1:L
                     for ue=1:K_mmW
                         GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
-                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,:,ap,ue)*h_LOS_mmW(:,:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
                         gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
-                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + R_mmW(:,:,ap,ue);
+                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,:,ap,ue)*h_LOS_mmW(:,:,ap,ue)' + R_mmW(:,:,ap,ue);
                         beta_actual_mmW(ap,ue) = abs(trace(beta_actual_MAT_mmW(:,:,ap,ue)));
                         C_ERR_mmW(:,:,ap,ue) = beta_actual_MAT_mmW(:,:,ap,ue)-gamma_MAT_mmW(:,:,ap,ue);
                         for n2=1:N_mmW
-                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
+                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,:,ap,ue))^2;
                         end
                     end
                     for ue=1:K-K_mmW
@@ -227,10 +227,12 @@ for iter = 1:LOOP
             % perfect-CSI monte-carlo (Upper bound)
             % Imp-CSI monte-carlo (Upper bound)
             % [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW, N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea,plos);
-            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
-            SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
-            SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
-            % ImpCSI -- LB, closed form iCSI
+            [SE_UB_mmW, SE_num_UB_mmW, SE_den_UB_mmW, HI_UE_rx_UB_mmW, HI_AP_tr_UB_mmW ] = function_monte_carlo_mmW_only(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
+            [SE_UB_sub6, SE_num_UB_sub6, SE_den_UB_sub6, HI_UE_rx_UB_sub6, HI_AP_tr_UB_sub6 ] = function_monte_carlo(L,K-K_mmW,0,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
+            % SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
+            % SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
+            SE_monte_impCSI(iter,iASD,iHI) = tau_factor*(sum(SE_UB_mmW)+sum(SE_UB_sub6));
+            SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*[SE_UB_mmW;SE_UB_sub6];            % ImpCSI -- LB, closed form iCSI
             % [SE_LB_ALL, SNR_NUM_LB7(1:K,iter,iASD,iHI), SNR_DEN_LB7(1:K,iter,iASD,iHI), HI_UE_rx7(1:K,iter,iASD,iHI), HI_AP_tx7(1:K,iter,iASD,iHI), BU7(1:K,iter,iASD,iHI),INTERFERENCE_UAV_GUE_EACH7(1:K,1:K,iter,iASD,iHI)] = function_LB_impCSI(K_mmW,K,L,N,eta,h_LOS,R,psi_HI,eta_p,PHI,k_t2,k_r2_UE,gamma, gamma_MAT, beta_actual, beta_actual_MAT, C_ERR, GAMMA_NLOS, plos, plos2);            
             % SE_LB_each(1:K,iter,iASD,iHI) = tau_factor*SE_LB_ALL;
             % SE_LB(iter,iASD,iHI) = tau_factor*sum(SE_LB_ALL);                                       
