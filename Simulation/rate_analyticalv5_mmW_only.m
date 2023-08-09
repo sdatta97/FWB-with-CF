@@ -1,6 +1,6 @@
 % function rate_dl = rate_analytical(params, plos2, plos)
 % function rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE,h_LOS_GUE, PLOS_GUE)
-function rate_dl = rate_analyticalv5_mmW_only(params, ue_idx)
+function rate_dl = rate_analyticalv5_mmW_only(params, plos)
  %%  define
 N = params.num_antennas_per_gNB;  % antennas per AP
 N_mmW = params.num_antennas_per_gNB_mmW;  % antennas per AP
@@ -34,16 +34,16 @@ sigma_sf = params.sigma_sf;
 Band = params.Band; %Communication bandwidth
 tau_c = params.tau_c;      % coherence block length
 NMSE = zeros(LOOP,1);
-SE_UB_each = zeros(K,LOOP,asd_length,hi_length);  %UPPER-bound
-SE_LB_each = zeros(K,LOOP,asd_length,hi_length);  %lower-bound
+SE_UB_each = zeros(K_mmW,LOOP,asd_length,hi_length);  %UPPER-bound
+SE_LB_each = zeros(K_mmW,LOOP,asd_length,hi_length);  %lower-bound
 SE_LB = zeros(LOOP,asd_length,hi_length);  %lower-bound
 SE_monte_impCSI = zeros(LOOP,asd_length,hi_length);  %upper bound
 
-SNR_NUM_LB7 = zeros(K,LOOP,asd_length,hi_length);  %lower-bou
-SNR_DEN_LB7= zeros(K,LOOP,asd_length,hi_length);
-HI_UE_rx7= zeros(K,LOOP,asd_length,hi_length);
-HI_AP_tx7= zeros(K,LOOP,asd_length,hi_length);
-BU7= zeros(K,LOOP,asd_length,hi_length);
+SNR_NUM_LB7 = zeros(K_mmW,LOOP,asd_length,hi_length);  %lower-bou
+SNR_DEN_LB7= zeros(K_mmW,LOOP,asd_length,hi_length);
+HI_UE_rx7= zeros(K_mmW,LOOP,asd_length,hi_length);
+HI_AP_tx7= zeros(K_mmW,LOOP,asd_length,hi_length);
+BU7= zeros(K_mmW,LOOP,asd_length,hi_length);
 INTERFERENCE_UAV_GUE_EACH7= zeros(K,K,LOOP,asd_length,hi_length);     
 % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band);
 channelGain_GUE = params.BETA;
@@ -227,44 +227,41 @@ for iter = 1:LOOP
             % perfect-CSI monte-carlo (Upper bound)
             % Imp-CSI monte-carlo (Upper bound)
             % [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW, N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea,plos);
-            [SE_UB_mmW, SE_num_UB_mmW, SE_den_UB_mmW, HI_UE_rx_UB_mmW, HI_AP_tr_UB_mmW ] = function_monte_carlo_mmW_only(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
-            [SE_UB_sub6, SE_num_UB_sub6, SE_den_UB_sub6, HI_UE_rx_UB_sub6, HI_AP_tr_UB_sub6 ] = function_monte_carlo(L,K-K_mmW,0,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
-            % SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
-            % SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
-            SE_monte_impCSI(iter,iASD,iHI) = tau_factor*(sum(SE_UB_mmW)+sum(SE_UB_sub6));
-            SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*[SE_UB_mmW;SE_UB_sub6];            % ImpCSI -- LB, closed form iCSI
+            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo_mmW_only(L,K,K_mmW,N,N_mmW,N_UE,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
+            SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
+            SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
             % [SE_LB_ALL, SNR_NUM_LB7(1:K,iter,iASD,iHI), SNR_DEN_LB7(1:K,iter,iASD,iHI), HI_UE_rx7(1:K,iter,iASD,iHI), HI_AP_tx7(1:K,iter,iASD,iHI), BU7(1:K,iter,iASD,iHI),INTERFERENCE_UAV_GUE_EACH7(1:K,1:K,iter,iASD,iHI)] = function_LB_impCSI(K_mmW,K,L,N,eta,h_LOS,R,psi_HI,eta_p,PHI,k_t2,k_r2_UE,gamma, gamma_MAT, beta_actual, beta_actual_MAT, C_ERR, GAMMA_NLOS, plos, plos2);            
             % SE_LB_each(1:K,iter,iASD,iHI) = tau_factor*SE_LB_ALL;
             % SE_LB(iter,iASD,iHI) = tau_factor*sum(SE_LB_ALL);                                       
         end  
     end
 end
-SNR_NUM_LB9 = mean(SNR_NUM_LB7,5);     NUMM = squeeze(SNR_NUM_LB9);
-SNR_DEN_LB9 = mean(SNR_DEN_LB7,5);     denn = squeeze(SNR_DEN_LB9);
-HI_UE_rx9 = mean(HI_UE_rx7,5);         HI_UEE = squeeze(HI_UE_rx9); 
-HI_AP_tx9 = mean(HI_AP_tx7,5);        HI_APP = squeeze(HI_AP_tx9);
-BU9  = mean(BU7,5);                     BUU = squeeze(BU9);
-%% GUE
-NUMM_GUE_avg9 = NUMM(1:K,:);        NUMM_GUE_avg = mean(NUMM_GUE_avg9,1);
-DENN_GUE_avg9 = denn(1:K,:);        DENN_GUE_avg = mean(DENN_GUE_avg9,1);
-HI_UEE_GUE_avg9 = HI_UEE(1:K,:);    HI_UEE_GUE_avg = mean(HI_UEE_GUE_avg9,1);
-HI_APP_GUE_avg9 = HI_APP(1:K,:);    HI_APP_GUE_avg = mean(HI_APP_GUE_avg9,1);
-BU_GUE_avg9 = BUU(1:K,:);           BU_GUE_avg = mean(BU_GUE_avg9,1);
-
-INTERFERENCE_UAV_GUE_EACH9 = mean(INTERFERENCE_UAV_GUE_EACH7,6);
-INTERFERENCE_GUE_EACH9 = INTERFERENCE_UAV_GUE_EACH9(1:K,:,:,:,:);
-INTERFERENCE_GUE_from_GUEs9 = squeeze(INTERFERENCE_GUE_EACH9(:,1:K,:,:,:));
-%%  IMPORTANT -- for each iteration-- HW
-INTERFERENCE_GUE_from_GUEs99 = sum(INTERFERENCE_GUE_from_GUEs9,2);
-INTERFERENCE_GUE_from_GUEs = mean(squeeze(INTERFERENCE_GUE_from_GUEs99),1);
-Total_interference_GUEs_add = INTERFERENCE_GUE_from_GUEs;  %just interference-- NO-HW-NO BU
-%% 
-SUM_SE_setup = squeeze(SE_LB);
-SE_LB_avg = mean(SE_LB,4);
-sum_SE_LB=squeeze(SE_LB_avg); %sum over K, % imp CSI LB
-
-SE_UB_avg = mean(SE_monte_impCSI,4);
-sum_SE_UB=squeeze(SE_UB_avg);
+% SNR_NUM_LB9 = mean(SNR_NUM_LB7,5);     NUMM = squeeze(SNR_NUM_LB9);
+% SNR_DEN_LB9 = mean(SNR_DEN_LB7,5);     denn = squeeze(SNR_DEN_LB9);
+% HI_UE_rx9 = mean(HI_UE_rx7,5);         HI_UEE = squeeze(HI_UE_rx9); 
+% HI_AP_tx9 = mean(HI_AP_tx7,5);        HI_APP = squeeze(HI_AP_tx9);
+% BU9  = mean(BU7,5);                     BUU = squeeze(BU9);
+% %% GUE
+% NUMM_GUE_avg9 = NUMM(1:K,:);        NUMM_GUE_avg = mean(NUMM_GUE_avg9,1);
+% DENN_GUE_avg9 = denn(1:K,:);        DENN_GUE_avg = mean(DENN_GUE_avg9,1);
+% HI_UEE_GUE_avg9 = HI_UEE(1:K,:);    HI_UEE_GUE_avg = mean(HI_UEE_GUE_avg9,1);
+% HI_APP_GUE_avg9 = HI_APP(1:K,:);    HI_APP_GUE_avg = mean(HI_APP_GUE_avg9,1);
+% BU_GUE_avg9 = BUU(1:K,:);           BU_GUE_avg = mean(BU_GUE_avg9,1);
+% 
+% INTERFERENCE_UAV_GUE_EACH9 = mean(INTERFERENCE_UAV_GUE_EACH7,6);
+% INTERFERENCE_GUE_EACH9 = INTERFERENCE_UAV_GUE_EACH9(1:K,:,:,:,:);
+% INTERFERENCE_GUE_from_GUEs9 = squeeze(INTERFERENCE_GUE_EACH9(:,1:K,:,:,:));
+% %%  IMPORTANT -- for each iteration-- HW
+% INTERFERENCE_GUE_from_GUEs99 = sum(INTERFERENCE_GUE_from_GUEs9,2);
+% INTERFERENCE_GUE_from_GUEs = mean(squeeze(INTERFERENCE_GUE_from_GUEs99),1);
+% Total_interference_GUEs_add = INTERFERENCE_GUE_from_GUEs;  %just interference-- NO-HW-NO BU
+% %% 
+% SUM_SE_setup = squeeze(SE_LB);
+% SE_LB_avg = mean(SE_LB,4);
+% sum_SE_LB=squeeze(SE_LB_avg); %sum over K, % imp CSI LB
+% 
+% SE_UB_avg = mean(SE_monte_impCSI,4);
+% sum_SE_UB=squeeze(SE_UB_avg);
 % rate_dl = Band*sum_SE_LB/K;
 % rate_dl = Band*mean(SE_LB_each,2);
 rate_dl = Band*mean(SE_UB_each,2);

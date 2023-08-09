@@ -104,7 +104,9 @@ for iter = 1:LOOP
             end
             %%
             % CHANNEL GENERATION, ESTIMATION
-            [h_mmW,h_hat_HI_mmW,psi_HI_mmW,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K,K_mmW,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
+            % [h_mmW,h_hat_HI_mmW,psi_HI_mmW,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K,K_mmW,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
+            [h_mmW,h_hat_HI_mmW,psi_HI_mmW]= function_channel_Generation_HI_mmW_only(N_mmW,N_UE,L,K_mmW,R_mmW,h_LOS_mmW,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
+            [~,~,~,h_sub6,h_hat_HI_sub6,psi_HI_sub6]= function_channel_Generation_HI(N,N_mmW,L,K-K_mmW,0,R_mmW,h_LOS_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);%(N,N_mmW,L,K,K_mmW,R,h_LOS,PHI,tau_p,pilot_pow,k_r2,k_t2_UE,no_of_rea);
             %% EST_CHANNEL GAIN
             gamma_mmW = zeros(L,K_mmW);
             GAMMA_NLOS_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
