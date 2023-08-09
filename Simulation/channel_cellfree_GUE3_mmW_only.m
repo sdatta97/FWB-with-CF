@@ -28,24 +28,24 @@ Noise_var_dBm = 10*log10(Noise_var)+30;
 % AP_locations = (rand(AP,1)*D) + 1i*(rand(AP,1)*D);% randomly generating AP locations within DxD square area.
 % UE_locations = (rand(UE,1)*D) + 1i*(rand(UE,1)*D);% randomly generating AP locations within DxD square area.  % UAVs, GUEs
 AP_locations = AP_locations(:,1) + 1i*AP_locations(:,2);
-UE_locations = UE_locations(:,1) + 1i*UE_locations(:,2);
+UE_locations = UE_locations(1:UE_mmW,1) + 1i*UE_locations(1:UE_mmW,2);
 
 wrap_X = repmat([-D 0 D],[3 1]); % wrapping matrix used to wrap AP locations in X direction
 wrap_Y = wrap_X';% wrapping matrix used to wrap AP locations in Y direction
 
 wrap_locations       = wrap_X(:)' + 1i*wrap_Y(:)';
 AP_locations_wrapped = repmat(AP_locations,[1 length(wrap_locations)]) + repmat(wrap_locations,[AP 1]); % each row of matrix corresponds to AP and its 8 neighbours locations
-UE_locations_wrapped = repmat(UE_locations,[1 length(wrap_locations)]) + repmat(wrap_locations,[UE 1]);
+UE_locations_wrapped = repmat(UE_locations,[1 length(wrap_locations)]) + repmat(wrap_locations,[UE_mmW 1]);
 
 %Compute the correlation matrices for the shadow fading   % L=AP, K=UE
 shadow_corr_matrix_APs = zeros(AP,AP);
-shadow_corr_matrix_UEs = zeros(UE,UE);
+shadow_corr_matrix_UEs = zeros(UE_mmW,UE_mmW);
 for l = 1:AP
     distancetoAP = min(abs(AP_locations_wrapped - repmat(AP_locations(l),size(AP_locations_wrapped))),[],2)/1000;   %2nd dimnsion
     shadow_corr_matrix_APs(:,l) = 2.^(-distancetoAP/decorr);
 %     a(l) = sigma_sf * sqrt(shadow_corr_matrix_APs(:,l)) * randn(1,1); 
 end
-for k = 1:UE
+for k = 1:UE_mmW
     distancetoUE = min(abs(UE_locations_wrapped  - repmat(UE_locations(k),size(UE_locations_wrapped ))),[],2)/1000;
     shadow_corr_matrix_UEs(:,k) = 2.^(-distancetoUE/decorr);
 %     b(l) = sigma_sf * sqrt(shadow_corr_matrix_UEs(:,l)) * randn(1,1);
@@ -58,12 +58,12 @@ end
 
 %%
 % Prepare to calculate the distance and angles between each UE and AP
-UE_AP_dist  = zeros(UE,AP);
-UE_AP_angle = zeros(UE,AP);
-UE_AP_3D = zeros(UE,AP);
-PL_dash = zeros(UE,AP);
+UE_AP_dist  = zeros(UE_mmW,AP);
+UE_AP_angle = zeros(UE_mmW,AP);
+UE_AP_3D = zeros(UE_mmW,AP);
+PL_dash = zeros(UE_mmW,AP);
 
-for ue = 1:UE
+for ue = 1:UE_mmW
     for ap = 1:AP
         [UE_AP_dist(ue,ap), whichAP] = min(abs( UE_locations(ue)*ones(1,length(wrap_locations))-AP_locations_wrapped(ap,:))); %taking the minimum distance out of the 9 virtual AP locations
         UE_AP_dist(ue,ap) = UE_AP_dist(ue,ap)/1000;
@@ -92,36 +92,36 @@ end
 
 %Calculate shaddow fading
 AP_AP_dist = zeros(AP,AP);
-UE_UE_dist = zeros(UE,UE);
+UE_UE_dist = zeros(UE_mmW,UE_mmW);
 for ap1 = 1:AP
     for ap2 = 1:AP
         AP_AP_dist(ap1,ap2) = min(abs(AP_locations(ap1)*ones(1,length(wrap_locations))-AP_locations_wrapped(ap2,:)))/1000; %taking the minimum distance out of the 9 virtual AP locations;
     end
 end
-for ue1 = 1:UE
-    for ue2 = 1:UE
+for ue1 = 1:UE_mmW
+    for ue2 = 1:UE_mmW
         UE_UE_dist(ue1,ue2) = min(abs(UE_locations(ue1)*ones(1,length(wrap_locations))-UE_locations_wrapped(ue2,:)))/1000; %taking the minimum distance out of the 9 virtual UE locations
     end
 end
 Cov_A = 2.^(-1*AP_AP_dist./d_DECORR);
 Cov_B = 2.^(-1*UE_UE_dist./d_DECORR);
 rand_AP = (randn(AP,1));
-rand_UE = (randn(UE,1));
+rand_UE = (randn(UE_mmW,1));
 shadowing_a     = sqrtm(Cov_A)*rand_AP;
 shadowing_b     = sqrtm(Cov_B)*rand_UE;
 
 %% ------------------------------------------
 R_norm_mmW = zeros(N_mmW,N_mmW,UE_mmW,AP,length(ASD_VALUE));
-R_norm_sub6 = zeros(N,N,UE-UE_mmW,AP,length(ASD_VALUE));
 maxdistLOS=300;
-probLOS = zeros(UE,AP); K_Rician = zeros(UE,AP);
-shadow_fad = zeros(UE,AP);
-path_loss_dB = zeros(UE,AP);
+probLOS = zeros(UE_mmW,AP); 
+K_Rician = zeros(UE_mmW,AP);
+shadow_fad = zeros(UE_mmW,AP);
+path_loss_dB = zeros(UE_mmW,AP);
 %---------------------------------------
 %  K_Rician=10.^((13-0.03*UE_AP_dist*1000)./10); 
 %---------------------------------------
 %Calculate Pathloss component with shaddow fading, channel mean and covariance matrices
-for ue = 1:UE
+for ue = 1:UE_mmW
     for ap = 1:AP
         %-------------------------------------------------------
         if rayleigh==1  %rayleigh
@@ -156,17 +156,9 @@ for ue = 1:UE
         if ASD_CORR ==1
             for iASD = 1:length(ASD_VALUE)
                 if ASD_VALUE(iASD) ~=0
-                    if (ue<=UE_mmW)
-                        R_norm_mmW(:,:,ue,ap,iASD)  = functionRlocalscattering(N_mmW,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
-                    else
-                        R_norm_sub6(:,:,ue-UE_mmW,ap,iASD)  = functionRlocalscattering(N,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
-                    end
+                    R_norm_mmW(:,:,ue,ap,iASD)  = functionRlocalscattering(N_mmW,UE_AP_angle(ue,ap),ASD_VALUE(iASD),0.5,'Gaussian'); %Normalized covariance matrix (Correlated)
                 elseif ASD_VALUE(iASD)==0                    
-                    if (ue<=UE_mmW)
-                        R_norm_mmW(:,:,ue,ap,iASD)=eye(N_mmW);     %Normalized covariance matrix (Uncorrelated)
-                    else
-                        R_norm_sub6(:,:,ue-UE_mmW,ap,iASD)=eye(N);     %Normalized covariance matrix (Uncorrelated)
-                    end
+                    R_norm_mmW(:,:,ue,ap,iASD)=eye(N_mmW);     %Normalized covariance matrix (Uncorrelated)                    
                 end
             end
         end
