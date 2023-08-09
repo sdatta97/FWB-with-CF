@@ -383,7 +383,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
                         simInputs.connection_setup_delay = protocolParams.connection_time(idxConnDelay);
                         simInputs.signalingAfterRachDelay = protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay);
                         simOutputs{idxDiscDelay,idxFailureDetectionDelay,...
-                            idxConnDelay,idxSignalingAfterRachDelay} =  discreteSimulatorv4(simInputs); 
+                            idxConnDelay,idxSignalingAfterRachDelay} =  discreteSimulatorv5(simInputs); 
                     end
                 end
             end

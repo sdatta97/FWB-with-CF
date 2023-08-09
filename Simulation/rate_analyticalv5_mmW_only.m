@@ -1,9 +1,10 @@
 % function rate_dl = rate_analytical(params, plos2, plos)
 % function rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE,h_LOS_GUE, PLOS_GUE)
-function rate_dl = rate_analyticalv5_mmW_only(params, plos)
+function rate_dl = rate_analyticalv5_mmW_only(params, ue_idx)
  %%  define
 N = params.num_antennas_per_gNB;  % antennas per AP
 N_mmW = params.num_antennas_per_gNB_mmW;  % antennas per AP
+N_UE = params.num_antennas_per_UE_mmW;
 L = params.numGNB_sub6;
 K = params.numUE + params.numUE_sub6;  % --Ground UEs
 K_mmW = params.numUE;
