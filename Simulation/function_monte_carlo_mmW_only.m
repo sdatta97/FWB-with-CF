@@ -65,8 +65,8 @@ for k = 1:K_mmW
                 interference_kj_monte =0;
                 for ap2 = 1:L
                     % interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h(:,ch,ap2,k)'*h_hat(:,ch,ap2,kd);
-                    for n = 1:N_UE
-                        interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h_mmW(:,n,ch,ap2,k)'*h_hat(:,ch,ap2,kd-K_mmW);
+                    for n1 = 1:N_UE
+                        interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h_mmW(:,n1,ch,ap2,k)'*h_hat(:,ch,ap2,kd-K_mmW);
                     end
                 end
                 interference_kj_monte = abs(interference_kj_monte)^2;
