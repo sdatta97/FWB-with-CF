@@ -439,7 +439,8 @@ while nextEventTime < params.simTime
                         end
                         % for ue_idx_2 = 1+numUE:numUE+numUE_sub6
                         for ue_idx_2 = 1:numUE_sub6
-                            rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+                            % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+                            rates_on_sub6_handoff(ue_idx_2+numUE) = r_calc_sub6(ue_idx_2);
                         end
                         % if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
                         if ((rates_on_sub6_handoff(ue_idx) >= r_min(ue_idx)) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
