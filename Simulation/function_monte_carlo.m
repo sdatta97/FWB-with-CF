@@ -35,7 +35,7 @@ for k = 1+K_mmW:K
             % else
             num_monte = num_monte + sqrt(eta(ap,k))*h(:,ch,ap,k-K_mmW)'*h_hat(:,ch,ap,k-K_mmW);
             % end
-            HI_AP_variance_mmW = zeros(N_mmW,N_mmW);
+            % HI_AP_variance_mmW = zeros(N_mmW,N_mmW);
             HI_AP_variance_sub6 = zeros(N,N);
             warning('off','all');
 %             if (k<=K_mmW)

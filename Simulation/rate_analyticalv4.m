@@ -234,9 +234,9 @@ for iter = 1:LOOP
                 summ = sum(gamma_sub6(ap,:));
                 for k=1:K-K_mmW
                     if gamma_sub6(ap,k)== 0
-                        eta(ap,k) =  0;
+                        eta(ap,k+K_mmW) =  0;
                     else
-                        eta(ap,k) =  snr/summ;
+                        eta(ap,k+K_mmW) =  snr/summ;
                         %                             eta(ap,k) =  snr; %snr/K;
                     end
                 end
