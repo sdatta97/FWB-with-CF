@@ -105,8 +105,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         % end
         % params.numGNB_sub6 = n;
-        params.numGNB_sub6 = 10;
-        params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
+        params.numGNB_sub6 = 1;
+        params.RgNB_sub6 = 500; %params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB_sub6 = (2*params.coverageRange_sub6/3) * ones(params.numGNB_sub6,1); %location of gNBs (distance from origin)
         % params.RgNB_sub6 = params.coverageRange_sub6 * ones(params.numGNB_sub6,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
@@ -151,9 +151,9 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
 
         % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        % params.numUE_sub6 = 1;
-        params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+        % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        params.numUE_sub6 = 1;
+        params.RUE_sub6 = 0; %params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
         params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
         rmin_sub6 = 1e6;
