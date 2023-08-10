@@ -355,7 +355,8 @@ while nextEventTime < params.simTime
                         sub6ConnectionState(ue_idx) = 0;
                         r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
                         % if any(r_calc_sub6 < [params.r_min; params.r_min_sub6])
-                        if ((r_calc_sub6(ue_idx) < params.r_min(ue_idx)) || any(r_calc_sub6(1+params.numUE:params.numUE+params.numUE_sub6) < params.r_min_sub6))
+                        % if ((r_calc_sub6(ue_idx) < params.r_min(ue_idx)) || any(r_calc_sub6(1+params.numUE:params.numUE+params.numUE_sub6) < params.r_min_sub6))
+                        if ((r_calc_mmw(ue_idx) < params.r_min(ue_idx)) || any(r_calc_sub6(1:params.numUE_sub6) < params.r_min_sub6))
                             n = params.numUE;
                             params.numUE = 0;
                             [bs_gain, bs_idx] = max(params.BETA(:,ue_idx));
@@ -432,10 +433,12 @@ while nextEventTime < params.simTime
                         rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
                         for ue_idx_2 = 1:numUE
                             if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)
-                                rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+                                % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+                                rates_on_sub6_handoff(ue_idx_2) = r_calc_mmw(ue_idx_2);
                             end
                         end
-                        for ue_idx_2 = 1+numUE:numUE+numUE_sub6
+                        % for ue_idx_2 = 1+numUE:numUE+numUE_sub6
+                        for ue_idx_2 = 1:numUE_sub6
                             rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
                         end
                         % if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
