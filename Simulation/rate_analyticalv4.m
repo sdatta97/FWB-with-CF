@@ -4,6 +4,7 @@ function rate_dl = rate_analyticalv4(params, plos)
  %%  define
 N = params.num_antennas_per_gNB;  % antennas per AP
 N_mmW = params.num_antennas_per_gNB_mmW;  % antennas per AP
+N_UE = params.num_antennas_per_UE_mmW;
 L = params.numGNB_sub6;
 K = params.numUE + params.numUE_sub6;  % --Ground UEs
 K_mmW = params.numUE;
@@ -125,15 +126,24 @@ for iter = 1:LOOP
             if CH_estimation == 1
                 for ap=1:L
                     for ue=1:K_mmW
+                        % GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        % gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        % gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
+                        % beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + R_mmW(:,:,ap,ue);
+                        % beta_actual_mmW(ap,ue) = abs(trace(beta_actual_MAT_mmW(:,:,ap,ue)));
+                        % C_ERR_mmW(:,:,ap,ue) = beta_actual_MAT_mmW(:,:,ap,ue)-gamma_MAT_mmW(:,:,ap,ue);
+                        % for n2=1:N_mmW
+                        %     h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
+                        % end
                         GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
-                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,:,ap,ue)*h_LOS_mmW(:,:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
                         gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
-                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + R_mmW(:,:,ap,ue);
+                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,:,ap,ue)*h_LOS_mmW(:,:,ap,ue)' + R_mmW(:,:,ap,ue);
                         beta_actual_mmW(ap,ue) = abs(trace(beta_actual_MAT_mmW(:,:,ap,ue)));
                         C_ERR_mmW(:,:,ap,ue) = beta_actual_MAT_mmW(:,:,ap,ue)-gamma_MAT_mmW(:,:,ap,ue);
                         for n2=1:N_mmW
-                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
-                        end
+                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,:,ap,ue))^2;
+                        end                    
                     end
                     for ue=1:K-K_mmW
                         GAMMA_NLOS_sub6(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
@@ -155,15 +165,25 @@ for iter = 1:LOOP
                 R = zeros(N,N,L,K-K_mmW);
                 for ap=1:L
                     for ue=1:K_mmW
+                        % GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R(:,:,ap,ue);
+                        % gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        % gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
+                        % 
+                        % beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + R_mmW(:,:,ap,ue);  % true channel-- both LoS+NLoS
+                        % beta_actual_mmW(ap,ue) = abs(trace(beta_actual_MAT_mmW(:,:,ap,ue)));
+                        % C_ERR_mmW(:,:,ap,ue) = R_mmW(:,:,ap,ue); % beta_actual_MAT(:,:,ap,ue)-gamma_MAT(:,:,ap,ue);
+                        % for n2=1:N_mmW
+                        %     h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
+                        % end
                         GAMMA_NLOS_mmW(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R(:,:,ap,ue);
-                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
+                        gamma_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,:,ap,ue)*h_LOS_mmW(:,:,ap,ue)' + eta_p*R_mmW(:,:,ap,ue)*psi_HI_mmW(:,:,ap,ue)*R_mmW(:,:,ap,ue);
                         gamma_mmW(ap,ue) = abs(trace(gamma_MAT_mmW(:,:,ap,ue)));
                         
-                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,ap,ue)*h_LOS_mmW(:,ap,ue)' + R_mmW(:,:,ap,ue);  % true channel-- both LoS+NLoS
+                        beta_actual_MAT_mmW(:,:,ap,ue) = h_LOS_mmW(:,:,ap,ue)*h_LOS_mmW(:,:,ap,ue)' + R_mmW(:,:,ap,ue);  % true channel-- both LoS+NLoS
                         beta_actual_mmW(ap,ue) = abs(trace(beta_actual_MAT_mmW(:,:,ap,ue)));
                         C_ERR_mmW(:,:,ap,ue) = R_mmW(:,:,ap,ue); % beta_actual_MAT(:,:,ap,ue)-gamma_MAT(:,:,ap,ue);
                         for n2=1:N_mmW
-                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,ap,ue))^2;
+                            h_NORMsq_mmW(n2,ap,ue) = norm(h_LOS_mmW(n2,:,ap,ue))^2;
                         end
                     end
                     for ue=1:K-K_mmW

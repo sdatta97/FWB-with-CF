@@ -406,7 +406,7 @@ while nextEventTime < params.simTime
                             % params.R_GUE_mmW = R_GUE_mmW(:,:,:,ue_idx);
                             % params.h_LOS_GUE_mmW = h_LOS_GUE_mmW(:,:,ue_idx);
                             params.R_GUE_mmW = R_GUE_mmW(:,:,bs_idx,ue_idx);
-                            params.h_LOS_GUE_mmW = h_LOS_GUE_mmW(:,bs_idx,ue_idx);
+                            params.h_LOS_GUE_mmW = h_LOS_GUE_mmW(:,:,bs_idx,ue_idx);
                             numGNB_sub6 = params.numGNB_sub6;
                             params.numGNB_sub6 = 1;
                             % SE_dl_tmp = rate_analyticalv4(params, sub6ConnectionState)./params.Band; %rate_analyticalv4(params, plos2, plos, R_GUE(:,:,:,i), h_LOS_GUE(:,:,i), PLOS_GUE(i,:))./params.Band;
