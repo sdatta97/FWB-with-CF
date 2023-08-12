@@ -89,8 +89,11 @@ for k = 1+K_mmW:K
         for kd = 1:K_mmW
             interference_kj_monte =0;
             for ap2 = 1:L
+                N_UE = size(h_hat_mmW,2);
                 interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h(:,ch,ap2,k-K_mmW)'*(h_hat_mmW(:,:,ch,ap2,kd)*ones(N_UE,1));
             end
+            interference_kj_monte = abs(interference_kj_monte)^2;
+            interference_kj_monte_sum = interference_kj_monte_sum + interference_kj_monte;
         end
         for kd = 1+K_mmW:K
             if kd~=k
