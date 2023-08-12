@@ -47,9 +47,12 @@ BU7= zeros(K,LOOP,asd_length,hi_length);
 INTERFERENCE_UAV_GUE_EACH7= zeros(K,K,LOOP,asd_length,hi_length);     
 % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band);
 channelGain_GUE = params.BETA;
+int_channelGain_GUE_mmW = params.BETA_int_mmW; 
+int_R_GUE_mmW = params.int_R_GUE_mmW;
 K_Rician = params.ricianFactor;
 R10_mmW = params.R_GUE_mmW;
 h_LOSall_mmW = params.h_LOS_GUE_mmW;
+int_h_LOS_GUE_mmW = params.int_h_LOS_GUE_mmW;
 R10 = params.R_GUE;
 h_LOSall = params.h_LOS_GUE;
 %% PLOS cal
@@ -114,6 +117,12 @@ for iter = 1:LOOP
             gamma_MAT_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
             beta_actual_MAT_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
             beta_actual_mmW  = zeros(L,K_mmW);
+            % C_ERR_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
+            % h_NORMsq_mmW = zeros(N_mmW,L,K_mmW);
+            % int_GAMMA_NLOS_mmW = zeros(N_mmW,N_mmW,L,K-K_mmW);
+            % int_gamma_MAT_mmW = zeros(N_mmW,N_mmW,L,K-K_mmW);
+            % int_beta_actual_MAT_mmW = zeros(N_mmW,N_mmW,L,K-K_mmW);
+            % int_beta_actual_mmW  = zeros(L,K-K_mmW);
             C_ERR_mmW = zeros(N_mmW,N_mmW,L,K_mmW);
             h_NORMsq_mmW = zeros(N_mmW,L,K_mmW);
             gamma_sub6 = zeros(L,K-K_mmW);
@@ -155,6 +164,15 @@ for iter = 1:LOOP
                         for n2=1:N
                             h_NORMsq_sub6(n2,ap,ue) = norm(h_LOS(n2,ap,ue))^2;
                         end
+                        % GAMMA_NLOS_sub6(:,:,ap,ue) = eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
+                        % gamma_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + eta_p*R(:,:,ap,ue)*psi_HI_sub6(:,:,ap,ue)*R(:,:,ap,ue);
+                        % gamma_sub6(ap,ue) = abs(trace(gamma_MAT_sub6(:,:,ap,ue)));
+                        % beta_actual_MAT_sub6(:,:,ap,ue) = h_LOS(:,ap,ue)*h_LOS(:,ap,ue)' + R(:,:,ap,ue);
+                        % beta_actual_sub6(ap,ue) = abs(trace(beta_actual_MAT_sub6(:,:,ap,ue)));
+                        % C_ERR_sub6(:,:,ap,ue) = beta_actual_MAT_sub6(:,:,ap,ue)-gamma_MAT_sub6(:,:,ap,ue);
+                        % for n2=1:N
+                        %     h_NORMsq_sub6(n2,ap,ue) = norm(h_LOS(n2,ap,ue))^2;
+                        % end                   
                     end
                 end
             else

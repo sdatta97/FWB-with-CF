@@ -89,7 +89,7 @@ for k = 1+K_mmW:K
         for kd = 1:K_mmW
             interference_kj_monte =0;
             for ap2 = 1:L
-                interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*sum(int_h_mmW(:,ch,ap2,k-K_mmW)'*h_hat_mmW(:,:,ch,ap2,kd));
+                interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*sum(h(:,ch,ap2,k-K_mmW)'*h_hat_mmW(:,:,ch,ap2,kd));
             end
         end
         for kd = 1+K_mmW:K
