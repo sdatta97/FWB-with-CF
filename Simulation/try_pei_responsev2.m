@@ -259,7 +259,101 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.R_GUE = R_GUE;
         params.h_LOS_GUE = h_LOS_GUE;
         params.R_GUE_mmW = R_GUE_mmW;
-        params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;        
+        params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;  
+        %%
+        % UE states
+        UE.numGNB = params.numGNB;
+        numBS = params.numGNB;
+        numUE = params.numUE;
+        numUE_sub6 = params.numUE;
+
+        %General timers for primary and secondary
+        % UE.RACH_eff = RACH_eff;
+        % UE.failureDetectionDelay = failureDetectionDelay;
+        % UE.beamFailureRecoveryTimer = beamFailureRecoveryTimer;
+        
+        % Recording variables
+        UE.primaryConnectionStarts = [];
+        UE.primaryConnectionStartIndices = [];
+        UE.primaryConnectionEnds = [];
+        UE.primaryConnectionEndIndices = [];
+        UE.primaryBSHistory = [];
+        UE.primaryEventTimes = [];
+        UE.primaryEventIndices = [];
+        UE.primaryEventDescriptions = [];
+        UE.primaryConnectionStateHistory = [];            
+        
+        UE.secondaryConnectionStarts = [];
+        UE.secondaryConnectionStartIndices = [];
+        UE.secondaryConnectionEnds = [];
+        UE.secondaryConnectionEndIndices = [];
+        UE.secondaryBSHistory = [];
+        UE.secondaryEventTimes = [];
+        UE.secondaryEventIndices = [];
+        UE.secondaryEventDescriptions = [];
+        UE.secondaryConnectionStateHistory = [];
+        
+        UE.sub6ConnectionStarts = [];
+        UE.sub6ConnectionStartIndices = [];
+        UE.sub6ConnectionEnds = [];
+        UE.sub6ConnectionEndIndices = [];
+        UE.sub6EventTimes = [];
+        UE.sub6EventIndices = [];
+        UE.sub6EventDescriptions = [];
+        UE.sub6ConnectionStateHistory = [];
+        
+        %Primary State variables
+        % UE.primaryConnectionState = 0;
+        UE.primaryConnectionState = zeros(numUE,1);
+        % UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory; UE.primaryConnectionState];
+        UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+        % UE.primaryBSIdx = [];
+        % UE.primaryTargetIdx = [];
+        UE.primaryBSIdx = zeros(numUE,1);
+        UE.primaryTargetIdx = zeros(numUE,1);
+        % UE.primaryNextEventTime = -100;
+        UE.primaryNextEventTime = -100*ones(numUE,1);
+        
+        %Secondary State variables
+        % UE.secondaryConnectionState = 0;
+        UE.secondaryConnectionState = zeros(numUE,1);
+        % UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory; UE.secondaryConnectionState];
+        UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
+        % UE.secondaryBSIdx = [];
+        % UE.secondaryTargetIdx = [];
+        UE.secondaryBSIdx = zeros(numUE,1);
+        UE.secondaryTargetIdx = zeros(numUE,1);
+        % UE.secondaryNextEventTime = -100;
+        UE.secondaryNextEventTime = -100*ones(numUE,1);
+        UE.tmpMCGBSIdx = zeros(numUE,1);
+        
+        %Sub 6 State variables
+        % UE.sub6ConnectionState = 0;
+        UE.sub6ConnectionState = zeros(numUE,1);
+        % UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory; UE.sub6ConnectionState];
+        UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+        % UE.sub6NextEventTime = -100;
+        UE.sub6NextEventTime = -100*ones(numUE,1);
+        %%
+        %offloading
+        sub6ConnectionState = UE.sub6ConnectionState;
+        ue_idx=1;
+        sub6ConnectionState(ue_idx) = 1;
+        r_calc_mmw = rate_analyticalv5_mmW_only(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
+        sub6ConnectionState(ue_idx) = 0;
+        r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); 
+        rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
+        for ue_idx_2 = 1:numUE
+            if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)
+                % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+                rates_on_sub6_handoff(ue_idx_2) = r_calc_mmw(ue_idx_2);
+            end
+        end
+        % for ue_idx_2 = 1+numUE:numUE+numUE_sub6
+        for ue_idx_2 = 1:numUE_sub6
+            % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+            rates_on_sub6_handoff(ue_idx_2+numUE) = r_calc_sub6(ue_idx_2);
+        end
     end
 end
 tEnd = toc(tStart);
