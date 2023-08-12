@@ -264,7 +264,7 @@ for iter = 1:LOOP
             % Imp-CSI monte-carlo (Upper bound)
             % [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW, N,eta,h,h_hat_HI,k_t2,k_r2_UE,no_of_rea,plos);
             % [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
-            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,int_h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
+            [SE_UB, SE_num_UB, SE_den_UB, HI_UE_rx_UB, HI_AP_tr_UB ] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_HI_mmW,h_sub6,h_hat_HI_sub6,k_t2,k_r2_UE,no_of_rea,plos);
             SE_monte_impCSI(iter,iASD,iHI) = tau_factor*sum(SE_UB);
             % SE_UB_each(1:K,iter,iASD,iHI) = tau_factor*SE_UB;
             SE_UB_each(1:(K-K_mmW),iter,iASD,iHI) = tau_factor*SE_UB;

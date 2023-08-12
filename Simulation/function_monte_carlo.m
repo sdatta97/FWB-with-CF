@@ -1,6 +1,6 @@
 % function [SE_k, SE_num_m, SE_den_m, HI_UE_rx_m,HI_AP_tr_m] = function_monte_carlo(L,K,K_mmW,N,eta,h,h_hat,K_AP_TR,K_UE_RX,no_of_rea,plos)
 % function [SE_k, SE_num_m, SE_den_m, HI_UE_rx_m,HI_AP_tr_m] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_mmW,h,h_hat,K_AP_TR,K_UE_RX,no_of_rea,plos)
-function [SE_k, SE_num_m, SE_den_m, HI_UE_rx_m,HI_AP_tr_m] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,int_h_mmW,h_hat_mmW,h,h_hat,K_AP_TR,K_UE_RX,no_of_rea,plos)
+function [SE_k, SE_num_m, SE_den_m, HI_UE_rx_m,HI_AP_tr_m] = function_monte_carlo(L,K,K_mmW,N,N_mmW,eta,h_mmW,h_hat_mmW,h,h_hat,K_AP_TR,K_UE_RX,no_of_rea,plos)
 
 % SE_k = zeros(K,1);
 % SE_num_m = zeros(K,1);
@@ -89,7 +89,7 @@ for k = 1+K_mmW:K
         for kd = 1:K_mmW
             interference_kj_monte =0;
             for ap2 = 1:L
-                interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*sum(h(:,ch,ap2,k-K_mmW)'*h_hat_mmW(:,:,ch,ap2,kd));
+                interference_kj_monte = interference_kj_monte + sqrt(eta(ap2,kd))*h(:,ch,ap2,k-K_mmW)'*(h_hat_mmW(:,:,ch,ap2,kd)*ones(N_UE,1));
             end
         end
         for kd = 1+K_mmW:K
