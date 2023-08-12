@@ -251,15 +251,18 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         tau_c = params.tau_c;      % coherence block length  
         % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
         [channelGain_GUE_mmW,R_GUE_mmW,h_LOS_GUE_mmW,K_Rician_mmW,probLOS_mmW] = channel_cellfree_GUE3_mmW_only(K,K_mmW,L,N,N_mmW,N_UE,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
-        [channelGain_GUE,R_GUE,h_LOS_GUE,~,~,K_Rician,probLOS] = channel_cellfree_GUE3(K,K_mmW,L,N,N_mmW,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
-        params.BETA = channelGain_GUE';
+        [channelGain_GUE,R_GUE,h_LOS_GUE,int_R_GUE_mmW,int_h_LOS_GUE_mmW,K_Rician,probLOS] = channel_cellfree_GUE3(K,K_mmW,L,N,N_mmW,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
+        params.BETA = channelGain_GUE(1+params.numUE:params.numUE_sub6)';
         params.BETA_mmW = channelGain_GUE_mmW';
+        params.BETA_int_mmW =  channelGain_GUE(1:params.numUE)';
         params.ricianFactor = K_Rician';
         params.ricianFactor_mmW = K_Rician_mmW';
         params.R_GUE = R_GUE;
         params.h_LOS_GUE = h_LOS_GUE;
         params.R_GUE_mmW = R_GUE_mmW;
+        params.int_R_GUE_mmW = int_R_GUE_mmW;
         params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;  
+        params.int_h_LOS_GUE_mmW = int_h_LOS_GUE_mmW;  
         %%
         % UE states
         UE.numGNB = params.numGNB;
