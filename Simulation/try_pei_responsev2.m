@@ -265,7 +265,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         UE.numGNB = params.numGNB;
         numBS = params.numGNB;
         numUE = params.numUE;
-        numUE_sub6 = params.numUE;
+        numUE_sub6 = params.numUE_sub6;
 
         %General timers for primary and secondary
         % UE.RACH_eff = RACH_eff;
