@@ -343,8 +343,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         ue_idx=1;
         sub6ConnectionState(ue_idx) = 1;
         r_calc_mmw = rate_analyticalv5_mmW_only(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
-        sub6ConnectionState(ue_idx) = 0;
         r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); 
+        sub6ConnectionState(ue_idx) = 0;
+        params.numUE=0;
+        rates_before_sub6_handoff = rate_analyticalv4(params, sub6ConnectionState); 
+        sub6ConnectionState(ue_idx) = 1;
+        params.numUE=1;
         rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
         for ue_idx_2 = 1:numUE
             if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)
