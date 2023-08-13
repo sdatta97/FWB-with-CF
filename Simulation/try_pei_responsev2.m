@@ -33,7 +33,7 @@ params.no_of_rea = 10;     % no.of channel realizations
 params.snr_db = 30;
 params.snr_db_mmw = 30;
 params.ASD_VALUE = 0.25;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
-params.ASD_CORR = 0;
+params.ASD_CORR = 1;
 params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
@@ -81,24 +81,24 @@ lambda_UE_sub6 = 10; %:10:50;
 for idxUEDensity = 1:length(lambda_UE_sub6)
     for idxBSDensity = 1:length(lambda_BS)
         %% gNB locations
-        % n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-        % while (n==0)
-        %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
-        % end
-        % params.numGNB = n;
-        % params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+        while (n==0)
+            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+        end
+        params.numGNB = n;
+        params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
-        % params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
-        % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+        params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
+        params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
         % n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
         % while (n==0)
         %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         % end
-        params.numGNB = 0;
-        params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
-        % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
-        params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
-        params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+        % params.numGNB = 0;
+        % params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+        % % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
+        % params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
+        % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
 
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
         while (n==0)
