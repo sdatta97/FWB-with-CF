@@ -22,11 +22,12 @@ for k = 1:K_mmW
             %numerator -- monte   h_hat(:,chreali,ap,k)
             num_monte = 0;
             for ap =1:L %a-th AP
-                for n1 = 1:N_UE
-                    for n2 = 1:N_UE
-                        num_monte = num_monte + sqrt(eta(ap,k))*h_mmW(:,n1,ch,ap,k)'*h_hat_mmW(:,n2,ch,ap,k);
-                    end
-                end
+                % for n1 = 1:N_UE
+                %     for n2 = 1:N_UE
+                %         % num_monte = num_monte + sqrt(eta(ap,k))*h_mmW(:,n1,ch,ap,k)'*h_hat_mmW(:,n2,ch,ap,k);
+                %     end
+                % end
+                num_monte = num_monte + sqrt(eta(ap,k))*(h_mmW(:,:,ch,ap,k)*ones(N_UE,1))'*(h_hat_mmW(:,:,ch,ap,k)*ones(N_UE,1));
                 HI_AP_variance_mmW = zeros(N_mmW,N_mmW);
                 warning('off','all');
                 for kk = 1:K_mmW
