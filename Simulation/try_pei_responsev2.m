@@ -131,7 +131,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         rmin = 1e9;
         params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
         params.bw_alloc = zeros(params.numUE,1);
-        params.num_antennas_per_UE_mmW = 4;
+        params.num_antennas_per_UE_mmW = 6;
       
         % params.numUE = 1;
         % params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
