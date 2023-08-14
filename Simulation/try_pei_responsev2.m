@@ -69,12 +69,12 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 25;
+lambda_BS = 5;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
 lambda_UE = 10;
-lambda_UE_sub6 = 10; %:10:50;
+lambda_UE_sub6 = 50; %:10:50;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -152,8 +152,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
 
         % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        params.numUE_sub6 = 60;
+        params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        % params.numUE_sub6 = 50;
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
         params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
@@ -365,3 +365,6 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
 end
 tEnd = toc(tStart);
 fprintf('Total runtime: %f seconds\n',tEnd)
+figure
+cdfplot(rates_before_sub6_handoff); hold on;
+cdfplot(rates_on_sub6_handoff(2:end));
