@@ -69,7 +69,7 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 5;
+lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
@@ -366,5 +366,5 @@ end
 tEnd = toc(tStart);
 fprintf('Total runtime: %f seconds\n',tEnd)
 figure
-cdfplot(rates_before_sub6_handoff); hold on;
-cdfplot(rates_on_sub6_handoff(2:end));
+cdfplot(rates_before_sub6_handoff./10^6); hold on;
+cdfplot(rates_on_sub6_handoff(2:end)./10^6);
