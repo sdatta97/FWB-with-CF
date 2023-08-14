@@ -69,7 +69,7 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 10; %25;
+lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
@@ -131,7 +131,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         rmin = 1e9;
         params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
         params.bw_alloc = zeros(params.numUE,1);
-        params.num_antennas_per_UE_mmW = 6;
+        params.num_antennas_per_UE_mmW = 4;
       
         % params.numUE = 1;
         % params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
