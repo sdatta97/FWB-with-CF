@@ -363,8 +363,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         end
     end
 end
-tEnd = toc(tStart);
-fprintf('Total runtime: %f seconds\n',tEnd)
 figure
 cdfplot(rates_before_sub6_handoff./10^6); hold on;
 cdfplot(rates_on_sub6_handoff(2:end)./10^6);
+tEnd = toc(tStart);
+fprintf('Total runtime: %f seconds\n',tEnd)

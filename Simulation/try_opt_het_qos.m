@@ -1,3 +1,7 @@
+close all;
+clear;
+tStart = tic;
+
 for k = 1+K_mmW:K
     % if ((k > K_mmW) || (k<=K_mmW && plos(k) > 0))
     SE_k_monte = zeros(no_of_rea,1);
@@ -98,3 +102,5 @@ for k = 1+K_mmW:K
     HI_AP_tr_m(k-K_mmW) = mean(HI_AP_tx_m1);    
     SE_k(k-K_mmW)= mean(SE_k_monte);   % SE
 end
+tEnd = toc(tStart);
+fprintf('Total runtime: %f seconds\n',tEnd)
