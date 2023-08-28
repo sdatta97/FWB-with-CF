@@ -55,22 +55,21 @@ H_sub6 = (randn(L*N,nbrOfRealizations,N_UE_sub6,K-K_mmW)+1i*randn(L*N,nbrOfReali
 
 
 %Go through all channels and apply the spatial correlation matrices
-for l = 1:L
-    
-    for k = 1:K_mmW
-        
-        %Apply correlation to the uncorrelated channel realizations
-        Rsqrt = sqrtm(R(:,:,l,k));
-        H_mmW((l-1)*N+1:l*N,:,:,k) = sqrt(0.5)*Rsqrt*H_mmW((l-1)*N+1:l*N,:,:,k);
-        
+for n = 1:nbrOfRealizations
+    for l = 1:L
+        for k = 1:K_mmW            
+            %Apply correlation to the uncorrelated channel realizations
+            Rsqrt = sqrtm(R(:,:,l,k));
+            % H_mmW((l-1)*N+1:l*N,n,:,k) = sqrt(0.5)*Rsqrt*H_mmW((l-1)*N+1:l*N,n,:,k);
+            H_mmW((l-1)*N+1:l*N,n,:,k) = sqrt(0.5)*Rsqrt*reshape(H_mmW((l-1)*N+1:l*N,n,:,k),[N,N_UE_mmW]);           
+        end
+        for k = 1:(K-K_mmW)        
+            %Apply correlation to the uncorrelated channel realizations
+            Rsqrt = sqrtm(R(:,:,l,k+K_mmW));
+            % H_sub6((l-1)*N+1:l*N,n,:,k-K_mmW) = sqrt(0.5)*Rsqrt*H_sub6((l-1)*N+1:l*N,n,:,k-K_mmW);
+            H_sub6((l-1)*N+1:l*N,n,:,k) = sqrt(0.5)*Rsqrt*reshape(H_sub6((l-1)*N+1:l*N,n,:,k),[N,N_UE_sub6]);            
+        end
     end
-    for k = 1:(K-K_mmW)        
-        %Apply correlation to the uncorrelated channel realizations
-        Rsqrt = sqrtm(R(:,:,l,k+K_mmW));
-        H_sub6((l-1)*N+1:l*N,:,:,k) = sqrt(0.5)*Rsqrt*H_sub6((l-1)*N+1:l*N,:,:,k);
-        
-    end
-    
 end
 
 
@@ -105,23 +104,24 @@ for l = 1:L
         %Compute processed pilot signal for all UEs that use pilot t
         %according to (4.4) with an additional scaling factor \sqrt{tau_p}
         % yp = sqrt(p)*tau_p*sum(H((l-1)*N+1:l*N,:,t==pilotIndex),3) + sqrt(tau_p)*Np(:,:,l,t);
-        yp_mmW = sqrt(p)*tau_p*sum(H_mmW((l-1)*N+1:l*N,:,:,t==pilotIndex),3) + sqrt(tau_p)*Np(:,:,l,t);
-        yp_sub6 = sqrt(p)*tau_p*sum(H_sub6((l-1)*N+1:l*N,:,:,t==pilotIndex),3) + sqrt(tau_p)*Np(:,:,l,t);
+        bool_pilots = (t==pilotIndex);
+        yp_mmW = sqrt(p)*tau_p*sum(H_mmW((l-1)*N+1:l*N,:,:,bool_pilots(1:K_mmW)),4) + sqrt(tau_p)*Np(:,:,l,t);
+        yp_sub6 = sqrt(p)*tau_p*sum(H_sub6((l-1)*N+1:l*N,:,:,bool_pilots(1+K_mmW:K)),4) + sqrt(tau_p)*Np(:,:,l,t);
         
         %Compute the matrix in (4.6) that is inverted in the MMSE estimator
         %in (4.5)
         PsiInv = (p*tau_p*sum(R(:,:,l,t==pilotIndex),4) + eyeN);
-        
         %Go through all UEs that use pilot t
-        for k = find(t==pilotIndex)'
-            
+        for k = find(t==pilotIndex)'           
             %Compute the MMSE estimate
             RPsi = R(:,:,l,k) / PsiInv;
             % Hhat((l-1)*N+1:l*N,:,k) = sqrt(p)*RPsi*yp;
-            if (k<=K_mmW)
-                Hhat_mmW((l-1)*N+1:l*N,:,:,k) = sqrt(p)*RPsi*yp_mmW;
-            else
-                Hhat_sub6((l-1)*N+1:l*N,:,:,k-K_mmW) = sqrt(p)*RPsi*yp_sub6;
+            for n=1:nbrOfRealizations
+                if (k<=K_mmW)
+                    Hhat_mmW((l-1)*N+1:l*N,n,:,k) = sqrt(p)*RPsi*reshape(yp_mmW(:,n,:),[N,N_UE_mmW]);
+                else
+                    Hhat_sub6((l-1)*N+1:l*N,n,:,k-K_mmW) = sqrt(p)*RPsi*reshape(yp_sub6(:,n,:),[N,N_UE_sub6]);
+                end
             end
             if nargout>2
                 %Compute the spatial correlation matrix of the estimate
@@ -136,7 +136,5 @@ for l = 1:L
             end
             
         end
-        
-    end
-    
+    end    
 end
