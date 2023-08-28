@@ -17,9 +17,9 @@ clear;
 
 
 %% Define simulation setup
-lambda_BS = 25;
-lambda_UE = 10;
-lambda_UE_sub6 = 50; %:10:50;
+lambda_BS = 10; %25;
+lambda_UE = 0; %10;
+lambda_UE_sub6 = 10; %50; %:10:50;
 coverageRange = 100;
 length_area = 2*coverageRange;   
 width_area = 2*coverageRange;
@@ -113,7 +113,6 @@ for n = 1:nbrOfSetups
     K = K_mmW+K_sub6;
     SE_DL_LPMMSE_equal = zeros(K,1); %Equal
     SE_DL_LPMMSE_fractional = zeros(K,1); %FPA, \upsilon = 0.5
-    SE_DL_LPMMSE_fractional2 = zeros(K,1); %FPA, \upsion = -0.5
     SE_DL_LPMMSE_maxmin = zeros(K,1); %MMF
     SE_DL_LPMMSE_sumSE = zeros(K,1); %SumSE
     %Generate one setup with UEs at random locations
@@ -144,7 +143,6 @@ for n = 1:nbrOfSetups
         
         %Compute denominator in (7.47)
         normalizationAPl = sum(sqrt(gainOverNoise(l,servedUEs)));
-        normalizationAPl2 = sum(1./sqrt(gainOverNoise(l,servedUEs)));
 
         for ind = 1:length(servedUEs)
             rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
@@ -247,14 +245,10 @@ set(gca,'fontsize',16);
 
 plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
 plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
-ppp5 = plot(sort(SE_DL_LPMMSE_fractional2(:)),linspace(0,1,K*nbrOfSetups),'k:o','LineWidth',2);
-ppp5.MarkerSize = 6;
-ppp5.MarkerIndices = 1:ceil(K*nbrOfSetups/7):K*nbrOfSetups;
 plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
 plot(sort(SE_DL_LPMMSE_sumSE(:)),linspace(0,1,K*nbrOfSetups),'r--','LineWidth',2);
 
-
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
-legend({'Equal', 'FPA, $\upsilon=0.5$', 'FPA, $\upsilon=-0.5$','MMF','SumSE' },'Interpreter','Latex','Location','SouthEast');
+legend({'Equal', 'FPA, $\upsilon=0.5$', 'MMF','SumSE' },'Interpreter','Latex','Location','SouthEast');
 xlim([0 12]);
