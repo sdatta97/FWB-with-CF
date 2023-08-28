@@ -1,4 +1,4 @@
-function [Hhat,H,B,C] = functionChannelEstimates(R,nbrOfRealizations,L,K,N,tau_p,pilotIndex,p)
+function [Hhat,H,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p)
 %Generate the channel realizations and estimates of these channels for all
 %UEs in the entire network. The channels are assumed to be correlated
 %Rayleigh fading and the MMSE estimator is used.
