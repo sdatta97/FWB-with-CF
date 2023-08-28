@@ -23,28 +23,6 @@ function [signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
 %p                 = Vector of UE transmit powers
 %
 %OUTPUT:
-%signal_P_MMSE     = Matrix with dimension K x K
-%                    where (i,k) is the Monte-Carlo estimation of
-%                    expected value of h_i^HD_kw_k where w_k is 
-%                    P-MMSE combiner/precoder
-%signal2_P_MMSE    = Matrix with dimension K x K
-%                    where (i,k) is the Monte-Carlo estimation of
-%                    expected value of |h_i^HD_kw_k|^2 where w_k is 
-%                    P-MMSE combiner/precoder
-%scaling_P_MMSE    = Matrix with dimension L x K
-%                    where (l,k) is the Monte-Carlo estimation of
-%                    expected value of the norm square of the portion of
-%                    w_k correspinding to AP l for P-MMSE combiner/precoder
-%                    if AP l serves UE k, zero otherwise
-%signal_P_RZF      = Matrix with dimension K x K,
-%                    organized in the same way as signal_P_MMSE but for
-%                    P-RZF combining/precoding
-%signal2_P_RZF     = Matrix with dimension K x K,
-%                    organized in the same way as signal2_P_MMSE but for
-%                    P-RZF combining/precoding
-%scaling_P_RZF     = Matrix with dimension L x K,
-%                    organized in the same way as scaling_P_MMSE but for
-%                    P-RZF combining/precoding
 %signal_LP_MMSE    = Matrix with dimension K x K x L
 %                    where (i,k,l) is the Monte-Carlo estimation of
 %                    expected value of h_{il}^HD_{kl}w_{kl} where w_{kl} is 
@@ -96,37 +74,84 @@ for n=1:nbrOfRealizations
     %Go through all APs
     for l = 1:L
         %Extract channel realizations from all UEs to AP l
-        Hallj = reshape(H(1+(l-1)*N:l*N,n,:),[N K]);
-        
+        % Hallj = reshape(H(1+(l-1)*N:l*N,n,:),[N K]);
+        Hallj_mmW = reshape(H_mmW(1+(l-1)*N:l*N,n,:,:),[N N_UE_mmW K_mmW]);
+        Hallj_sub6 = reshape(H_sub6(1+(l-1)*N:l*N,n,:,:),[N N_UE_sub6 K-K_mmW]);
+
         %Extract channel estimate realizations from all UEs to AP l
-        Hhatallj = reshape(Hhat(1+(l-1)*N:l*N,n,:),[N K]);
-        
+        % Hhatallj = reshape(Hhat(1+(l-1)*N:l*N,n,:),[N K]);
+        Hhatallj_mmW = reshape(Hhat_mmW(1+(l-1)*N:l*N,n,:,:),[N N_UE_mmW K_mmW]);        
+        Hhatallj_sub6 = reshape(Hhat_sub6(1+(l-1)*N:l*N,n,:,:),[N N_UE_sub6 K-K_mmW]);        
+
         %Extract which UEs are served by AP l
-        servedUEs = find(D(l,:)==1);
+        % servedUEs = find(D(l,:)==1);
+        servedUEs_mmW = find(D(l,1:K_mmW)==1);
+        servedUEs_sub6 = find(D(l,1+K_mmW:K)==1);
         %Obtain the statistical matrices used for
         %computing partial combining/precoding schemes
-        Cpserved = reshape(sum(Cp(:,:,l,servedUEs),4),[N N]);
-        Pserved = PowMat(servedUEs,servedUEs);
-        
+        % Cpserved = reshape(sum(Cp(:,:,l,servedUEs),4),[N N]);
+        % Pserved = PowMat(servedUEs,servedUEs);
+        Cpserved_mmW = reshape(sum(Cp(:,:,l,servedUEs_mmW),4),[N N]);
+        Pserved_mmW = PowMat(servedUEs_mmW,servedUEs_mmW);
+        Cpserved_sub6 = reshape(sum(Cp(:,:,l,K_mmW+servedUEs_sub6),4),[N N]);
+        Pserved_sub6 = PowMat(K_mmW+servedUEs_sub6,K_mmW+servedUEs_sub6);
+
         %Compute MR combining scaled by square root of transmit powers
-        Vp_MR = Hhatallj(:,servedUEs)*sqrt(Pserved);
+        % Vp_MR = Hhatallj(:,servedUEs)*sqrt(Pserved);
+        Vp_MR_mmW  = Hhatallj_mmW(:,:,servedUEs_mmW)*sqrt(Pserved_mmW);
+        Vp_MR_sub6 = Hhatallj_sub6(:,:,servedUEs_sub6)*sqrt(Pserved_sub6);
         %Compute LP-MMSE combining
-        V_LP_MMSE = (((Vp_MR*Vp_MR')+Cpserved+eyeN)\Vp_MR)*sqrt(Pserved);
+        % V_LP_MMSE = (((Vp_MR*Vp_MR')+Cpserved+eyeN)\Vp_MR)*sqrt(Pserved);
+        V_LP_MMSE_mmW = (((Vp_MR_mmW*Vp_MR_mmW')+Cpserved_mmW+eyeN)\Vp_MR_mmW)*sqrt(Pserved_mmW);
+        V_LP_MMSE_sub6 = (((Vp_MR_sub6*Vp_MR_sub6')+Cpserved_sub6+eyeN)\Vp_MR_sub6)*sqrt(Pserved_sub6);
         
         %Go through all UEs served by the AP
-        for ind = 1:length(servedUEs)
+        % for ind = 1:length(servedUEs)
+        % 
+        %     %Extract UE index
+        %     % k = servedUEs(ind);
+        %     k = servedUEs(ind);
+        % 
+        %     %Normalize LP-MMSE precoding
+        %     w = V_LP_MMSE(:,ind);
+        % 
+        %     %Compute realizations of the terms inside the expectations
+        %     %of the signal and interference terms in the SE expressions and
+        %     %update Monte-Carlo estimates 
+        %     signal2_LP_MMSE(:,k,l) = signal2_LP_MMSE(:,k,l) + abs(Hallj'*w).^2/nbrOfRealizations;            
+        %     signal_LP_MMSE(:,k,l) = signal_LP_MMSE(:,k,l) + Hallj'*w/nbrOfRealizations;           
+        %     scaling_LP_MMSE(l,k) = scaling_LP_MMSE(l,k) + sum(abs(w).^2,1)/nbrOfRealizations;            
+        % end
+        for ind = 1:length(servedUEs_mmW)
             
             %Extract UE index
-            k = servedUEs(ind);
+            % k = servedUEs(ind);
+            k = servedUEs_mmW(ind);
             
             %Normalize LP-MMSE precoding
-            w = V_LP_MMSE(:,ind);
+            w = V_LP_MMSE_mmW(:,ind);
             
             %Compute realizations of the terms inside the expectations
             %of the signal and interference terms in the SE expressions and
             %update Monte-Carlo estimates 
-            signal2_LP_MMSE(:,k,l) = signal2_LP_MMSE(:,k,l) + abs(Hallj'*w).^2/nbrOfRealizations;            
-            signal_LP_MMSE(:,k,l) = signal_LP_MMSE(:,k,l) + Hallj'*w/nbrOfRealizations;           
+            signal2_LP_MMSE(:,k,l) = signal2_LP_MMSE(:,k,l) + abs(Hallj_mmW'*w).^2/nbrOfRealizations;            
+            signal_LP_MMSE(:,k,l) = signal_LP_MMSE(:,k,l) + Hallj_mmW'*w/nbrOfRealizations;           
+            scaling_LP_MMSE(l,k) = scaling_LP_MMSE(l,k) + sum(abs(w).^2,1)/nbrOfRealizations;            
+        end
+        for ind = 1:length(servedUEs_sub6)
+            
+            %Extract UE index
+            % k = servedUEs(ind);
+            k = servedUEs_sub6(ind);
+            
+            %Normalize LP-MMSE precoding
+            w = V_LP_MMSE_sub6(:,ind);
+            
+            %Compute realizations of the terms inside the expectations
+            %of the signal and interference terms in the SE expressions and
+            %update Monte-Carlo estimates 
+            signal2_LP_MMSE(:,k,l) = signal2_LP_MMSE(:,k,l) + abs(Hallj_sub6'*w).^2/nbrOfRealizations;            
+            signal_LP_MMSE(:,k,l) = signal_LP_MMSE(:,k,l) + Hallj_sub6'*w/nbrOfRealizations;           
             scaling_LP_MMSE(l,k) = scaling_LP_MMSE(l,k) + sum(abs(w).^2,1)/nbrOfRealizations;            
         end
     end            
