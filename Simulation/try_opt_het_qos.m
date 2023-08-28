@@ -121,7 +121,7 @@ for n = 1:nbrOfSetups
     
     %Generate channel realizations, channel estimates, and estimation
     %error correlation matrices for all UEs to the cell-free APs
-    [Hhat,H,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
+    [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
     
     
     % Full uplink power for the computation of precoding vectors using
