@@ -1,223 +1,214 @@
+%This Matlab script can be used to reproduce Figure 7.3 in the monograph:
+%
+%Ozlem Tugfe Demir, Emil Bjornson and Luca Sanguinetti (2021),
+%"Foundations of User-Centric Cell-Free Massive MIMO", 
+%Foundations and Trends in Signal Processing: Vol. 14: No. 3-4,
+%pp 162-472. DOI: 10.1561/2000000109
+%
+%This is version 1.0 (Last edited: 2021-01-31)
+%
+%License: This code is licensed under the GPLv2 license. If you in any way
+%use this code for research that results in publications, please cite our
+%monograph as described above.
+
+%Empty workspace and close figures
 close all;
 clear;
-tStart = tic;
-
-%NUMERATOR
-
-%% CHECK UE RX imapriment %% Not multiplied by HW factors, and TRANSMIT POWERS
-INTERFERENCE_UAV_GUE = zeros(K,K);
-% HI_UE_rx_CL =zeros(K,K,L);
-% HI_AP_tx_CL =zeros(K,K,L);
-% for k = 1:K  %k-th USER
-%     for ap =1:L %a-th AP
-%         for kk = 1:K
-%             %----------COSED-FORM  K_AP_TX,K_UE_RX
-%             if kk~= k
-%                 HI_UE_rx_CL(k,kk,ap) = K_UE_RX*eta(ap,kk)*(trace(beta_actual_MAT(:,:,ap,k)*gamma_MAT(:,:,ap,kk))+ K_AP_TX*trace(beta_actual_MAT(:,:,ap,k)*diag(diag(gamma_MAT(:,:,ap,kk))))); %correct %WITHOUT TR.ap hw
-%                 HI_AP_tx_CL(k,kk,ap) = K_AP_TX*eta(ap,kk)*trace(beta_actual_MAT(:,:,ap,k)*diag(diag(gamma_MAT(:,:,ap,kk))));
-%             else
-%                 HI_UE_rx_CL(k,kk,ap) = K_UE_RX*(eta(ap,kk)*(abs(trace(GAMMA_NLOS(:,:,ap,kk)))^2 + trace(GAMMA_NLOS(:,:,ap,kk)^2) + abs(h_LOS(:,ap,kk)'*h_LOS(:,ap,kk))^2 ...
-%                     + 2*h_LOS(:,ap,kk)'*GAMMA_NLOS(:,:,ap,kk)*h_LOS(:,ap,kk) + 2*real(trace(GAMMA_NLOS(:,:,ap,kk))*h_LOS(:,ap,kk)'*h_LOS(:,ap,kk)) +trace(C_ERR(:,:,ap,kk)*gamma_MAT(:,:,ap,kk)))...
-%                     + K_AP_TX*eta(ap,kk)*((2/N)*trace(GAMMA_NLOS(:,:,ap,kk))^2 + (4/N)*trace(GAMMA_NLOS(:,:,ap,kk))*h_LOS(:,ap,kk)'*h_LOS(:,ap,kk)...
-%                     + sum(abs(abs(h_LOS(:,ap,kk)).^2).^2) +trace(C_ERR(:,:,ap,kk)*diag(diag(gamma_MAT(:,:,ap,kk))))));
-%                 HI_AP_tx_CL(k,kk,ap) = K_AP_TX*eta(ap,kk)*((2/N)*trace(GAMMA_NLOS(:,:,ap,kk))^2 + (4/N)*trace(GAMMA_NLOS(:,:,ap,kk))*h_LOS(:,ap,kk)'*h_LOS(:,ap,kk)...
-%                     + sum(abs(abs(h_LOS(:,ap,kk)).^2).^2) +trace(C_ERR(:,:,ap,kk)*diag(diag(gamma_MAT(:,:,ap,kk)))));
-%             end
-%         end
-%     end
-% end
 
 
-SE_k7 = zeros(K,1);
-snr_numerator1 = zeros(K,1);
-snr_denominator= zeros(K,1);
-Interfsum = zeros(K,1);
-beamforming = zeros(K,1);
-% HI_term_UE_rx1 = zeros(K,1);
-% HI_term_AP_tx1 = zeros(K,1);
-for k=1:K
-    snr_numerator = 0;
-%     HI_term_AP_tr =0;
-%     HI_UE_rx_temp = 0;
-    for ap =1:L
-        snr_numerator = snr_numerator + sqrt(eta(ap,k))*gamma(ap,k); %norm(h_LOS(:,ap,k))^2 + eta_p*trace(R(:,:,ap,k)*psi(:,:,ap,k)*R(:,:,ap,k)) );
-%         for kk = 1:K
-%             %----------COSED-FORM  K_AP_TX,K_UE_RX
-%             if  round( PHI(:,kk)'* PHI(:,k)) ==1   % same pilots j in P_k \k %kk~= k
-%                 HI_UE_rx_CL(k,kk,ap) = K_UE_RX*(eta(ap,kk)*(abs(trace(sqrtm(GAMMA_NLOS(:,:,ap,kk))*sqrtm(GAMMA_NLOS(:,:,ap,k)) ))^2 + trace(GAMMA_NLOS(:,:,ap,kk)*GAMMA_NLOS(:,:,ap,k)) + abs(h_LOS(:,ap,kk)'*h_LOS(:,ap,k))^2 ...
-%                     + h_LOS(:,ap,k)'*GAMMA_NLOS(:,:,ap,kk)*h_LOS(:,ap,k) + h_LOS(:,ap,kk)'*GAMMA_NLOS(:,:,ap,k)*h_LOS(:,ap,kk) + 2*real(trace(sqrtm(GAMMA_NLOS(:,:,ap,kk))*sqrtm(GAMMA_NLOS(:,:,ap,k)))*h_LOS(:,ap,kk)'*h_LOS(:,ap,k)) +trace(C_ERR(:,:,ap,k)*gamma_MAT(:,:,ap,kk)))...
-%                     + K_AP_TX*eta(ap,kk)*((2/N)*trace(GAMMA_NLOS(:,:,ap,kk))*trace(GAMMA_NLOS(:,:,ap,k)) + (2/N)*sqrt(trace(GAMMA_NLOS(:,:,ap,kk)))*sqrt(trace(GAMMA_NLOS(:,:,ap,k)))*h_LOS(:,ap,kk)'*h_LOS(:,ap,k)...
-%                     + trace(GAMMA_NLOS(:,:,ap,k))*h_LOS(:,ap,kk)'*h_LOS(:,ap,kk) + trace(GAMMA_NLOS(:,:,ap,kk))*h_LOS(:,ap,k)'*h_LOS(:,ap,k) + sum(abs((h_LOS(:,ap,kk).*h_LOS(:,ap,k)).^2)) +trace(C_ERR(:,:,ap,k)*diag(diag(gamma_MAT(:,:,ap,kk)))) ));               
-%                 HI_AP_tx_CL(k,kk,ap) = K_AP_TX*eta(ap,kk)*((2/N)*trace(GAMMA_NLOS(:,:,ap,kk))*trace(GAMMA_NLOS(:,:,ap,k)) + (2/N)*sqrt(trace(GAMMA_NLOS(:,:,ap,kk)))*sqrt(trace(GAMMA_NLOS(:,:,ap,k)))*h_LOS(:,ap,kk)'*h_LOS(:,ap,k)...
-%                      + trace(GAMMA_NLOS(:,:,ap,k))*h_LOS(:,ap,kk)'*h_LOS(:,ap,kk) + trace(GAMMA_NLOS(:,:,ap,kk))*h_LOS(:,ap,k)'*h_LOS(:,ap,k) + sum(abs((h_LOS(:,ap,kk).*h_LOS(:,ap,k)).^2)) +trace(C_ERR(:,:,ap,k)*diag(diag(gamma_MAT(:,:,ap,kk)))));
-% 
-%             else
-%                 HI_UE_rx_CL(k,kk,ap) = K_UE_RX*eta(ap,kk)*(trace(beta_actual_MAT(:,:,ap,k)*gamma_MAT(:,:,ap,kk))+ K_AP_TX*trace(beta_actual_MAT(:,:,ap,k)*diag(diag(gamma_MAT(:,:,ap,kk))))); %correct %WITHOUT TR.ap hw
-%                 HI_AP_tx_CL(k,kk,ap) = K_AP_TX*eta(ap,kk)*trace(beta_actual_MAT(:,:,ap,k)*diag(diag(gamma_MAT(:,:,ap,kk))));
-%             end
-%         end
+%% Define simulation setup
+lambda_BS = 25;
+lambda_UE = 10;
+lambda_UE_sub6 = 50; %:10:50;
+%Number of setups with random UE locations
+nbrOfSetups = 10;
+
+%Number of channel realizations per setup
+nbrOfRealizations = 100;
+
+%Number of APs in the cell-free network
+L = 100;
+
+%Number of antennas per AP
+N = 4;
+
+%Number of UEs in the network
+K = 40;
+
+%Length of the coherence block
+tau_c = 200;
+
+%Compute number of pilots per coherence block
+tau_p = 10;
+
+%Compute the prelog factor assuming only downlink data transmission
+preLogFactor = (tau_c-tau_p)/tau_c;
+
+%Angular standard deviation in the local scattering model (in radians)
+ASD_varphi = deg2rad(15); %azimuth angle
+ASD_theta = deg2rad(15);  %elevation angle
+
+%Total uplink transmit power per UE (mW)
+p = 100;
+
+%Total downlink transmit power per AP (mW)
+rho_tot = 200;
+
+
+%Prepare to save simulation results
+
+SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
+SE_DL_LPMMSE_fractional = zeros(K,nbrOfSetups); %FPA, \upsilon = 0.5
+SE_DL_LPMMSE_fractional2 = zeros(K,nbrOfSetups); %FPA, \upsion = -0.5
+SE_DL_LPMMSE_maxmin = zeros(K,nbrOfSetups); %MMF
+SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
+
+
+%% Go through all setups
+for n = 1:nbrOfSetups
+    
+    %Display simulation progress
+    disp(['Setup ' num2str(n) ' out of ' num2str(nbrOfSetups)]);
+    
+    %Generate one setup with UEs at random locations
+    [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L,K,N,tau_p,1,0,ASD_varphi,ASD_theta);
+    
+    
+    %Generate channel realizations, channel estimates, and estimation
+    %error correlation matrices for all UEs to the cell-free APs
+    [Hhat,H,B,C] = functionChannelEstimates(R,nbrOfRealizations,L,K,N,tau_p,pilotIndex,p);
+    
+    
+    % Full uplink power for the computation of precoding vectors using
+    % virtual uplink-downlink duality
+    p_full = p*ones(K,1);
+   
+    gainOverNoise = db2pow(gainOverNoisedB);
+
+    %Equal power allocation
+    rho_dist_equal = (rho_tot/tau_p)*ones(L,K);
+
+    %Compute the power allocation in (7.47) for distributed precoding
+    rho_dist = zeros(L,K); % with exponent 0.5
+    
+    for l = 1:L
+        
+        %Extract which UEs are served by AP l
+        servedUEs = find(D(l,:)==1);
+        
+        %Compute denominator in (7.47)
+        normalizationAPl = sum(sqrt(gainOverNoise(l,servedUEs)));
+        normalizationAPl2 = sum(1./sqrt(gainOverNoise(l,servedUEs)));
+
+        for ind = 1:length(servedUEs)
+            rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
+        end
+        
     end
-%     %%-------------------------  
-%     HI_UE_rx_CL3 = sum(HI_UE_rx_CL(k,:,:),3);
-%     HI_UE_rx_CL2 = sum(HI_UE_rx_CL3);
-% 
-%     HI_AP_tx_CL3 = sum(HI_AP_tx_CL(k,:,:),3);
-%     HI_AP_tx_CL2 = sum(HI_AP_tx_CL3);
     
-    snr_numerator = abs(snr_numerator)^2;
-    % HI_term_AP_tx1(k) = HI_AP_tx_CL2;
-    % HI_term_UE_rx1(k) = HI_UE_rx_CL2;
+    %Obtain the expectations for the computation of the terms in
+    %(7.25)-(7.26)
+    [signal_P_MMSE, signal2_P_MMSE, scaling_P_MMSE,...
+        signal_P_RZF, signal2_P_RZF, scaling_P_RZF,...
+        signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
+     functionComputeExpectations(Hhat,H,D,C,nbrOfRealizations,N,K,L,p_full);
     
-    %DENOMINATOR
-    % psi(N,N,L,K)   (N,N,L,K)   R(N,N,L,K)  gamma(L,K)  ,h_LOS(N,L,K)
-    interference_sum =0;
-    if (k <= K_mmW)
-        for kd = 1:K_mmW
-            if (kd~=k)
-                interference_temp1 =0;
-                interference_temp2 =0;
-                for ap =1:L
-                    if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                        interference_temp1 = interference_temp1 +  eta(ap,kd)*( h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                            + eta_p*h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*trace(psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k)) +eta_p*h_LOS(:,ap,k)'*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*h_LOS(:,ap,k)...
-                            + eta_p*trace(psi(:,:,ap,k)*R(:,:,ap,k)*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*R(:,:,ap,k)) +eta_p*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                            + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))^2 + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k))...
-                            + trace( (R(:,:,ap,k)-eta_p*R(:,:,ap,k)*psi(:,:,ap,k)*R(:,:,ap,k))*(h_LOS(:,ap,kd)* h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)) ) ) ; % p + q terms est, error
-                        
-                    else
-                        interference_temp1 = interference_temp1 + plos(kd)*eta(ap,kd)*trace((h_LOS(:,ap,k)*h_LOS(:,ap,k)'+R(:,:,ap,k))*(h_LOS(:,ap,kd)*h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,kd)));
-                    end
-                    %interference_temp1 = interference_temp1 +  eta(ap,kd)*( (norm(h_LOS(:,ap,k))^2 *norm(h_LOS(:,ap,kd))^2) + (norm(h_LOS(:,ap,k))^2 * trace(R(:,:,ap,kd)))...
-                    %   +(norm(h_LOS(:,ap,kd))^2 * trace(R(:,:,ap,k))) + trace(R(:,:,ap,k))*trace(R(:,:,ap,kd))  );
-                    for ap2 = 1:L
-                        if ap2 ~= ap
-                            if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                                interference_temp2 = interference_temp2 + sqrt(eta(ap,kd)*eta(ap2,kd))* (trace(h_LOS(:,ap,kd)*h_LOS(:,ap,k)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,k))...
-                                    *trace( h_LOS(:,ap2,k)*h_LOS(:,ap2,kd)' + eta_p*R(:,:,ap2,k)*psi(:,:,ap2,kd)*R(:,:,ap2,kd)) );
-                            else
-                                interference_temp2 = interference_temp2 + plos(kd)*sqrt(eta(ap,kd)*eta(ap2,kd))* ( h_LOS(:,ap,k)' *h_LOS(:,ap,kd)*h_LOS(:,ap2,kd)'*h_LOS(:,ap2,k) );  % diff pilots case
-                            end
-                        end
-                    end
-                end
-                temp = interference_temp1 + interference_temp2;
-                INTERFERENCE_UAV_GUE(k,kd) = abs(temp);
-                interference_sum = interference_sum + abs(temp);   % total interference
-            end
-        end
-        for kd = 1+K_mmW:K
-            interference_temp1 =0;
-            interference_temp2 =0;
-            for ap =1:L
-                if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                    interference_temp1 = interference_temp1 +  eta(ap,kd)*( h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                        + eta_p*h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*trace(psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k)) +eta_p*h_LOS(:,ap,k)'*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*h_LOS(:,ap,k)...
-                        + eta_p*trace(psi(:,:,ap,k)*R(:,:,ap,k)*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*R(:,:,ap,k)) +eta_p*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                        + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))^2 + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k))...
-                        + trace( (R(:,:,ap,k)-eta_p*R(:,:,ap,k)*psi(:,:,ap,k)*R(:,:,ap,k))*(h_LOS(:,ap,kd)* h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)) ) ) ; % p + q terms est, error
-                    
-                else
-                    interference_temp1 = interference_temp1 + eta(ap,kd)*trace((h_LOS(:,ap,k)*h_LOS(:,ap,k)'+R(:,:,ap,k))*(h_LOS(:,ap,kd)*h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,kd)));
-                end
-                %interference_temp1 = interference_temp1 +  eta(ap,kd)*( (norm(h_LOS(:,ap,k))^2 *norm(h_LOS(:,ap,kd))^2) + (norm(h_LOS(:,ap,k))^2 * trace(R(:,:,ap,kd)))...
-                %   +(norm(h_LOS(:,ap,kd))^2 * trace(R(:,:,ap,k))) + trace(R(:,:,ap,k))*trace(R(:,:,ap,kd))  );
-                for ap2 = 1:L
-                    if ap2 ~= ap
-                        if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                            interference_temp2 = interference_temp2 + sqrt(eta(ap,kd)*eta(ap2,kd))* (trace(h_LOS(:,ap,kd)*h_LOS(:,ap,k)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,k))...
-                                *trace( h_LOS(:,ap2,k)*h_LOS(:,ap2,kd)' + eta_p*R(:,:,ap2,k)*psi(:,:,ap2,kd)*R(:,:,ap2,kd)) );
-                        else
-                            interference_temp2 = interference_temp2 + sqrt(eta(ap,kd)*eta(ap2,kd))* ( h_LOS(:,ap,k)' *h_LOS(:,ap,kd)*h_LOS(:,ap2,kd)'*h_LOS(:,ap2,k) );  % diff pilots case
-                        end
-                    end
-                end
-            end
-            temp = interference_temp1 + interference_temp2;
-            INTERFERENCE_UAV_GUE(k,kd) = abs(temp);
-            interference_sum = interference_sum + abs(temp);   % total interference
-        end
-    else 
-        for kd = 1:K_mmW
-            interference_temp1 =0;
-            interference_temp2 =0;
-            for ap =1:L
-                if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                    interference_temp1 = interference_temp1 +  eta(ap,kd)*( h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                        + eta_p*h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*trace(psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k)) +eta_p*h_LOS(:,ap,k)'*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*h_LOS(:,ap,k)...
-                        + eta_p*trace(psi(:,:,ap,k)*R(:,:,ap,k)*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*R(:,:,ap,k)) +eta_p*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                        + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))^2 + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k))...
-                        + trace( (R(:,:,ap,k)-eta_p*R(:,:,ap,k)*psi(:,:,ap,k)*R(:,:,ap,k))*(h_LOS(:,ap,kd)* h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)) ) ) ; % p + q terms est, error
-                    
-                else
-                    interference_temp1 = interference_temp1 + plos(kd)*eta(ap,kd)*trace((h_LOS(:,ap,k)*h_LOS(:,ap,k)'+R(:,:,ap,k))*(h_LOS(:,ap,kd)*h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,kd)));
-                end
-                %interference_temp1 = interference_temp1 +  eta(ap,kd)*( (norm(h_LOS(:,ap,k))^2 *norm(h_LOS(:,ap,kd))^2) + (norm(h_LOS(:,ap,k))^2 * trace(R(:,:,ap,kd)))...
-                %   +(norm(h_LOS(:,ap,kd))^2 * trace(R(:,:,ap,k))) + trace(R(:,:,ap,k))*trace(R(:,:,ap,kd))  );
-                for ap2 = 1:L
-                    if ap2 ~= ap
-                        if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                            interference_temp2 = interference_temp2 + sqrt(eta(ap,kd)*eta(ap2,kd))* (trace(h_LOS(:,ap,kd)*h_LOS(:,ap,k)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,k))...
-                                *trace( h_LOS(:,ap2,k)*h_LOS(:,ap2,kd)' + eta_p*R(:,:,ap2,k)*psi(:,:,ap2,kd)*R(:,:,ap2,kd)) );
-                        else
-                            interference_temp2 = interference_temp2 + plos(kd)*sqrt(eta(ap,kd)*eta(ap2,kd))* ( h_LOS(:,ap,k)' *h_LOS(:,ap,kd)*h_LOS(:,ap2,kd)'*h_LOS(:,ap2,k) );  % diff pilots case
-                        end
-                    end
-                end
-            end
-            temp = interference_temp1 + interference_temp2;
-            INTERFERENCE_UAV_GUE(k,kd) = abs(temp);
-            interference_sum = interference_sum + abs(temp);   % total interference
-        end
-        for kd = 1+K_mmW:K
-            if (kd~=k)
-                interference_temp1 =0;
-                interference_temp2 =0;
-                for ap =1:L
-                    if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                        interference_temp1 = interference_temp1 +  eta(ap,kd)*( h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                            + eta_p*h_LOS(:,ap,k)'*h_LOS(:,ap,kd)*trace(psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k)) +eta_p*h_LOS(:,ap,k)'*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*h_LOS(:,ap,k)...
-                            + eta_p*trace(psi(:,:,ap,k)*R(:,:,ap,k)*h_LOS(:,ap,kd)*h_LOS(:,ap,kd)'*R(:,:,ap,k)) +eta_p*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))*h_LOS(:,ap,kd)'*h_LOS(:,ap,k)...
-                            + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd))^2 + (eta_p^2)*trace( psi(:,:,ap,k)*R(:,:,ap,k)*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)*R(:,:,ap,k))...
-                            + trace( (R(:,:,ap,k)-eta_p*R(:,:,ap,k)*psi(:,:,ap,k)*R(:,:,ap,k))*(h_LOS(:,ap,kd)* h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,k)*R(:,:,ap,kd)) ) ) ; % p + q terms est, error
-                        
-                    else
-                        interference_temp1 = interference_temp1 + eta(ap,kd)*trace((h_LOS(:,ap,k)*h_LOS(:,ap,k)'+R(:,:,ap,k))*(h_LOS(:,ap,kd)*h_LOS(:,ap,kd)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,kd)));
-                    end
-                    %interference_temp1 = interference_temp1 +  eta(ap,kd)*( (norm(h_LOS(:,ap,k))^2 *norm(h_LOS(:,ap,kd))^2) + (norm(h_LOS(:,ap,k))^2 * trace(R(:,:,ap,kd)))...
-                    %   +(norm(h_LOS(:,ap,kd))^2 * trace(R(:,:,ap,k))) + trace(R(:,:,ap,k))*trace(R(:,:,ap,kd))  );
-                    for ap2 = 1:L
-                        if ap2 ~= ap
-                            if round( PHI(:,kd)'* PHI(:,k)) ==1   % same pilots j in P_k \k
-                                interference_temp2 = interference_temp2 + sqrt(eta(ap,kd)*eta(ap2,kd))* (trace(h_LOS(:,ap,kd)*h_LOS(:,ap,k)' + eta_p*R(:,:,ap,kd)*psi(:,:,ap,kd)*R(:,:,ap,k))...
-                                    *trace( h_LOS(:,ap2,k)*h_LOS(:,ap2,kd)' + eta_p*R(:,:,ap2,k)*psi(:,:,ap2,kd)*R(:,:,ap2,kd)) );
-                            else
-                                interference_temp2 = interference_temp2 + sqrt(eta(ap,kd)*eta(ap2,kd))* ( h_LOS(:,ap,k)' *h_LOS(:,ap,kd)*h_LOS(:,ap2,kd)'*h_LOS(:,ap2,k) );  % diff pilots case
-                            end
-                        end
-                    end
-                end
-                temp = interference_temp1 + interference_temp2;
-                INTERFERENCE_UAV_GUE(k,kd) = abs(temp);
-                interference_sum = interference_sum + abs(temp);   % total interference
+    %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
+    %\tilde{C}_{ki} in (7.26)
+    bk = zeros(L,K);
+    Ck = zeros(L,L,K,K);
+  
+    %Go through all UEs
+    for k = 1:K
+        %Find the APs that serve UE k
+        servingAPs = find(D(:,k)==1);
+        %The number of APs that serve UE k
+        La = length(servingAPs);
+        %Compute the vector in (7.25) for UE k (only the non-zero indices correspondig to 
+        %serving APs are considered)
+        bk(1:La,k) = real(vec(signal_LP_MMSE(k,k,servingAPs)))./sqrt(scaling_LP_MMSE(servingAPs,k));
+        
+        %Go through all UEs
+        for i = 1:K
+            %Find the APs that serve UE i
+            servingAPs = find(D(:,i)==1);
+            %The number of APs that serve UE i
+            La = length(servingAPs);
+            %Compute the matrices in (7.26) (only the non-zero indices are
+            %considered)
+            if i==k
+               Ck(1:La,1:La,k,k) = bk(1:La,k)*bk(1:La,k)';
+            else
+               Ck(1:La,1:La,k,i) = diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)))...
+                   *(vec(signal_LP_MMSE(k,i,servingAPs))...
+                   *vec(signal_LP_MMSE(k,i,servingAPs))')...
+                   *diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)));
+            end            
+            for j = 1:La
+                Ck(j,j,k,i) = signal2_LP_MMSE(k,i,servingAPs(j))/scaling_LP_MMSE(servingAPs(j),i);
             end
         end
     end
-    beamforming_uncer_cvx = 0;  beamforming_uncer_cvx2=0;
-    for ap = 1:L
-        beamforming_uncer_cvx = beamforming_uncer_cvx + eta(ap,k)*(trace(GAMMA_NLOS(:,:,ap,k)^2) ...
-            + 2*h_LOS(:,ap,k)'*GAMMA_NLOS(:,:,ap,k)*h_LOS(:,ap,k) + trace(C_ERR(:,:,ap,k)*gamma_MAT(:,:,ap,k)) );
-        beamforming_uncer_cvx2 = beamforming_uncer_cvx2 + eta(ap,k)*( abs(trace(GAMMA_NLOS(:,:,ap,k)))^2 + trace(GAMMA_NLOS(:,:,ap,k)^2) + abs(h_LOS(:,ap,k)'*h_LOS(:,ap,k))^2 ...
-            + 2*h_LOS(:,ap,k)'*GAMMA_NLOS(:,:,ap,k)*h_LOS(:,ap,k) + 2*real(trace(GAMMA_NLOS(:,:,ap,k))*h_LOS(:,ap,k)'*h_LOS(:,ap,k)) + trace(C_ERR(:,:,ap,k)*gamma_MAT(:,:,ap,k)) - gamma(ap,k)^2 );
+    
+    %Take the real part (in the SINR expression,the imaginary terms cancel
+    %each other)
+    Ck = real(Ck);
+    
+    %Compute hte square roots of the power allocation coefficients
+    %corresponding to (7.24)
+    tilrho = sqrt(rho_dist_equal);
+    tilrho1 = sqrt(rho_dist);
 
+    %Go through all UEs
+    for k = 1:K
+        %Find APs that serve UE k
+        servingAPs = find(D(:,k)==1);
+        %The number of APs that serve UE k
+        La = length(servingAPs);
+        
+        %Compute the numerator and denominator of (7.23) for equal and FPA
+        %schemes with two different exponents
+        numm = abs(bk(1:La,k)'*tilrho(servingAPs,k))^2;
+        denomm = 1-numm;
+        
+        numm1 = abs(bk(1:La,k)'*tilrho1(servingAPs,k))^2;
+        denomm1 = 1-numm1;
+        
+        for i = 1:K
+            servingAPs = find(D(:,i)==1);
+            La = length(servingAPs);
+            denomm = denomm+tilrho(servingAPs,i)'*Ck(1:La,1:La,k,i)*tilrho(servingAPs,i);
+            denomm1 = denomm1+tilrho1(servingAPs,i)'*Ck(1:La,1:La,k,i)*tilrho1(servingAPs,i);
+        end
+        %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
+        %FPA schemes with two different exponents
+        SE_DL_LPMMSE_equal(k,n) = preLogFactor*log2(1+numm/denomm);
+        SE_DL_LPMMSE_fractional(k,n) = preLogFactor*log2(1+numm1/denomm1);
     end
     
-    Interfsum(k) = interference_sum ;
-    beamforming(k) = abs(beamforming_uncer_cvx);
-    
-    snr_numerator1(k) = snr_numerator;
-    % snr_denominator(k) = abs(interference_sum +  HI_term_AP_tx1(k) + HI_term_UE_rx1(k) + beamforming_uncer_cvx  +1);
-    snr_denominator(k) = abs(interference_sum + beamforming_uncer_cvx  +1);
-    SE_k7(k) = log2(1+ snr_numerator/snr_denominator(k));
+    %Compute SE according to Corollary 6.3 with max-min fair power
+    %allocation in Algorithm 7.5
+    SE_DL_LPMMSE_maxmin(:,n) = functionDownlinkSE_maxmin_dist(bk,Ck,preLogFactor,L,K,D,rho_tot);  
+    %Compute SE according to Corollary 6.3 with sum SE maximizing power
+    %allocation in Algorithm 7.6
+    SE_DL_LPMMSE_sumSE(:,n) =  functionDownlinkSE_sumSE_dist(bk,Ck,preLogFactor,L,K,D,rho_tot,tau_p);   
 end
-tEnd = toc(tStart);
-fprintf('Total runtime: %f seconds\n',tEnd)
+
+% Plot Figure 7.3
+figure;
+hold on; box on;
+set(gca,'fontsize',16);
+
+plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
+plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
+ppp5 = plot(sort(SE_DL_LPMMSE_fractional2(:)),linspace(0,1,K*nbrOfSetups),'k:o','LineWidth',2);
+ppp5.MarkerSize = 6;
+ppp5.MarkerIndices = 1:ceil(K*nbrOfSetups/7):K*nbrOfSetups;
+plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
+plot(sort(SE_DL_LPMMSE_sumSE(:)),linspace(0,1,K*nbrOfSetups),'r--','LineWidth',2);
+
+
+xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
+ylabel('CDF','Interpreter','Latex');
+legend({'Equal', 'FPA, $\upsilon=0.5$', 'FPA, $\upsilon=-0.5$','MMF','SumSE' },'Interpreter','Latex','Location','SouthEast');
+xlim([0 12]);
