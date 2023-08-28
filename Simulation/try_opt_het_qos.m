@@ -29,8 +29,9 @@ width_area_sub6 = 2*coverageRange_sub6;
 %height receiver (UE), approximately the height a human holds the phone
 hr = 1.4;
 ht = 5;
-areaDimensions = [width_area, length_area, height_transmitter];
-areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
+ht_sub6 = 4;
+areaDimensions = [width_area, length_area, ht];
+areaDimensions_sub6 = [width_area_sub6, length_area_sub6, ht_sub6];
 
 
 %Number of setups with random UE locations
@@ -79,12 +80,15 @@ rmin = 1e9;
 rmin_sub6 = 1e7;
 %Prepare to save simulation results
 
-SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_fractional = zeros(K,nbrOfSetups); %FPA, \upsilon = 0.5
-SE_DL_LPMMSE_fractional2 = zeros(K,nbrOfSetups); %FPA, \upsion = -0.5
-SE_DL_LPMMSE_maxmin = zeros(K,nbrOfSetups); %MMF
-SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
-
+% SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_fractional = zeros(K,nbrOfSetups); %FPA, \upsilon = 0.5
+% SE_DL_LPMMSE_fractional2 = zeros(K,nbrOfSetups); %FPA, \upsion = -0.5
+% SE_DL_LPMMSE_maxmin = zeros(K,nbrOfSetups); %MMF
+% SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
+SE_DL_LPMMSE_equal_mean = zeros(nbrOfSetups); %Equal
+SE_DL_LPMMSE_fractional_mean = zeros(nbrOfSetups); %FPA, \upsilon = 0.5
+SE_DL_LPMMSE_maxmin_mean = zeros(nbrOfSetups); %MMF
+SE_DL_LPMMSE_sumSE_mean = zeros(nbrOfSetups); %SumSE
 
 %% Go through all setups
 for n = 1:nbrOfSetups
@@ -107,7 +111,11 @@ for n = 1:nbrOfSetups
     K_mmW = 1;
     K_sub6 = poissrnd(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
     K = K_mmW+K_sub6;
-     
+    SE_DL_LPMMSE_equal = zeros(K,1); %Equal
+    SE_DL_LPMMSE_fractional = zeros(K,1); %FPA, \upsilon = 0.5
+    SE_DL_LPMMSE_fractional2 = zeros(K,1); %FPA, \upsion = -0.5
+    SE_DL_LPMMSE_maxmin = zeros(K,1); %MMF
+    SE_DL_LPMMSE_sumSE = zeros(K,1); %SumSE
     %Generate one setup with UEs at random locations
     [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW, N_UE_sub6, tau_p,1,0,ASD_varphi,ASD_theta);
     
