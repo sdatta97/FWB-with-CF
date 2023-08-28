@@ -20,17 +20,40 @@ clear;
 lambda_BS = 25;
 lambda_UE = 10;
 lambda_UE_sub6 = 50; %:10:50;
+params.coverageRange = 100;
+length_area = 2*params.coverageRange;   
+width_area = 2*params.coverageRange;
+height_transmitter = 5;
+params.areaDimensions = [width_area, length_area, height_transmitter];
+
+
+params.coverageRange_sub6 = 1000;
+length_area_sub6 = 2*params.coverageRange_sub6;   
+width_area_sub6 = 2*params.coverageRange_sub6;
+height_transmitter_sub6 = 4;
+params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
+
+params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
+params.ht = height_transmitter; %height transmitter (BS)
+params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
+
 %Number of setups with random UE locations
 nbrOfSetups = 10;
 
+
+        
+      
 %Number of channel realizations per setup
 nbrOfRealizations = 100;
 
-%Number of APs in the cell-free network
-L = 100;
+% %Number of APs in the cell-free network
+% L = 10;
 
 %Number of antennas per AP
-N = 4;
+N = 10;
+
+%Number of antennas per UE
+N_UE = 4;
 
 %Number of UEs in the network
 K = 40;
@@ -54,7 +77,13 @@ p = 100;
 %Total downlink transmit power per AP (mW)
 rho_tot = 200;
 
-
+%min-QoS reqs
+rmin = 1e9;
+params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
+params.bw_alloc = zeros(params.numUE,1);
+ rmin_sub6 = 1e7;
+params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
+params.bw_alloc_sub6 = params.Band*ones(params.numUE_sub6,1);
 %Prepare to save simulation results
 
 SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
@@ -69,7 +98,26 @@ for n = 1:nbrOfSetups
     
     %Display simulation progress
     disp(['Setup ' num2str(n) ' out of ' num2str(nbrOfSetups)]);
-    
+    nn = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+    while (nn==0)
+        nn = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+    end
+    params.numGNB = nn;
+  
+    params.numGNB_sub6 = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
+    %%UE locations
+
+
+    %%UE location
+    % n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+    % while (n==0)
+    %     n = poissrnd(lambda_UE*pi*(params.coverageRange_sub6/1000)^2);
+    % end
+    % params.numUE = n;
+    params.numUE = 1;
+
+    params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+     
     %Generate one setup with UEs at random locations
     [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L,K,N,tau_p,1,0,ASD_varphi,ASD_theta);
     

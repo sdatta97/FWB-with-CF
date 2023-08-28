@@ -103,10 +103,22 @@ for n = 1:nbrOfSetups
     
     %Random AP locations with uniform distribution
     APpositions = (rand(L,1) + 1i*rand(L,1)) * squareLength;
-    
+    params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+    params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
+    params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+
+    params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
+    params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
+    params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
+
     %Prepare to compute UE locations
     UEpositions = zeros(K,1);
-    
+    params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+    params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
+    params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
+    params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+    params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
+    params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];      
     
     %Compute alternative AP locations by using wrap around
     wrapHorizontal = repmat([-squareLength 0 squareLength],[3 1]);
