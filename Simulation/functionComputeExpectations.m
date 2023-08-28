@@ -1,6 +1,4 @@
-function [signal_P_MMSE, signal2_P_MMSE, scaling_P_MMSE,...
-    signal_P_RZF, signal2_P_RZF, scaling_P_RZF, ...
-    signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
+function [signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
     functionComputeExpectations(Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW,N_UE_sub6,K_mmW,K,L_mmW,L,p)
 %Compute expectatations that appear in the uplink and downlink SE
 %expressions.
@@ -86,13 +84,6 @@ for k=1:K
 end
 
 %Prepare to store simulation results
-signal_P_MMSE = zeros(K,K);
-signal2_P_MMSE = zeros(K,K);
-scaling_P_MMSE = zeros(L,K);
-
-signal_P_RZF = zeros(K,K);
-signal2_P_RZF = zeros(K,K);
-scaling_P_RZF = zeros(L,K);
 
 signal_LP_MMSE = zeros(K,K,L);
 signal2_LP_MMSE = zeros(K,K,L);
@@ -101,9 +92,7 @@ scaling_LP_MMSE = zeros(L,K);
 %% Compute scaling factors for combining/precoding
 
 %Go through all channel realizations
-for n=1:nbrOfRealizations
-    
-    
+for n=1:nbrOfRealizations    
     %Go through all APs
     for l = 1:L
         %Extract channel realizations from all UEs to AP l
@@ -136,104 +125,9 @@ for n=1:nbrOfRealizations
             %Compute realizations of the terms inside the expectations
             %of the signal and interference terms in the SE expressions and
             %update Monte-Carlo estimates 
-            signal2_LP_MMSE(:,k,l) = signal2_LP_MMSE(:,k,l) + abs(Hallj'*w).^2/nbrOfRealizations;
-            
-            signal_LP_MMSE(:,k,l) = signal_LP_MMSE(:,k,l) + Hallj'*w/nbrOfRealizations;
-            
-            scaling_LP_MMSE(l,k) = scaling_LP_MMSE(l,k) + sum(abs(w).^2,1)/nbrOfRealizations;
-
-            
+            signal2_LP_MMSE(:,k,l) = signal2_LP_MMSE(:,k,l) + abs(Hallj'*w).^2/nbrOfRealizations;            
+            signal_LP_MMSE(:,k,l) = signal_LP_MMSE(:,k,l) + Hallj'*w/nbrOfRealizations;           
+            scaling_LP_MMSE(l,k) = scaling_LP_MMSE(l,k) + sum(abs(w).^2,1)/nbrOfRealizations;            
         end
-    end
-    
-    
-    
-    %Consider the centralized schemes
-    
-    
-    %Go through all UEs
-    for k = 1:K
-        
-        
-        %Determine the set of serving APs
-        servingAPs = find(D(:,k)==1);
-        
-        %Compute the number of APs that serve UE k
-        La = length(servingAPs);
-        
-        %Determine which UEs that are served by partially the same set
-        %of APs as UE k, i.e., the set in (5.15)
-        servedUEs = sum(D(servingAPs,:),1)>=1;
-        
-        %Extract channel realizations and estimation error correlation
-        %matrices for the APs that involved in the service of UE k
-        Hallj_active = zeros(N*La,K);
-        Hhatallj_active = zeros(N*La,K);
-        Cp_tot_blk = zeros(N*La,N*La);
-        Cp_tot_blk_partial = zeros(N*La,N*La);
-        
-        for l = 1:La
-            Hallj_active((l-1)*N+1:l*N,:) = reshape(H((servingAPs(l)-1)*N+1:servingAPs(l)*N,n,:),[N K]);
-            Hhatallj_active((l-1)*N+1:l*N,:) = reshape(Hhat((servingAPs(l)-1)*N+1:servingAPs(l)*N,n,:),[N K]);
-            Cp_tot_blk((l-1)*N+1:l*N,(l-1)*N+1:l*N) = sum(Cp(:,:,servingAPs(l),:),4);
-            Cp_tot_blk_partial((l-1)*N+1:l*N,(l-1)*N+1:l*N) = sum(Cp(:,:,servingAPs(l),servedUEs),4);
-        end
-        Hphatallj_active = Hhatallj_active*sqrt(PowMat);
-        %Compute  P-MMSE combining/precoding
-        w = (((Hphatallj_active(:,servedUEs)*Hphatallj_active(:,servedUEs)')+Cp_tot_blk_partial+eye(La*N))\Hphatallj_active(:,k))*sqrt(p(k));
-        
-        
-        %Compute realizations of the terms inside the expectations
-        %of the signal and interference terms in the SE expressions and
-        %update Monte-Carlo estimates 
-        tempor = Hallj_active'*w;
-
-        signal2_P_MMSE(:,k) = signal2_P_MMSE(:,k)...
-                + abs(tempor).^2/nbrOfRealizations;
-            
-        signal_P_MMSE(:,k) = signal_P_MMSE(:,k) ...
-                + tempor/nbrOfRealizations;
-        
-        for l=1:La
-            
-            %Extract the portions of the P-MMSE combining/precoding vector 
-            %corresponding to the each serving AP and compute the
-            %instantaneous norm square of it to update Monte-Carlo
-            %estimation
-            w2 = w((l-1)*N+1:l*N,:);
-            
-            
-            scaling_P_MMSE(servingAPs(l),k) = scaling_P_MMSE(servingAPs(l),k) ...
-                + sum(abs(w2).^2,1)/nbrOfRealizations;
-        end
-        
-        %Compute  P-RZF combining/precoding
-        w = (((Hphatallj_active(:,servedUEs)*Hphatallj_active(:,servedUEs)')+eye(La*N))\Hphatallj_active(:,k))*sqrt(p(k));
-        
-        %Compute realizations of the terms inside the expectations
-        %of the signal and interference terms in the SE expressions and
-        %update Monte-Carlo estimates 
-        tempor = Hallj_active'*w;
-        signal2_P_RZF(:,k) = signal2_P_RZF(:,k)...
-                + abs(tempor).^2/nbrOfRealizations;
-            
-        signal_P_RZF(:,k) = signal_P_RZF(:,k) ...
-                + tempor/nbrOfRealizations;
-        
-        for l=1:La
-            
-            %Extract the portions of the P-RZF combining/precoding vector 
-            %corresponding to the each serving AP and compute the
-            %instantaneous norm square of it to update Monte-Carlo
-            %estimation
-            w2 = w((l-1)*N+1:l*N,:);
-           
-                        
-            scaling_P_RZF(servingAPs(l),k) = scaling_P_RZF(servingAPs(l),k) ...
-                + sum(abs(w2).^2,1)/nbrOfRealizations;
-            
-        end
-    end
-    
-    
+    end            
 end

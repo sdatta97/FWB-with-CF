@@ -61,11 +61,9 @@ NoServ = cell(K,1);
 %Construc the above array and cells
 for k = 1:K
     servingAPs = find(D(:,k)==1);
-    NoservingAPs = find(D(:,k)==0);
-    
+    NoservingAPs = find(D(:,k)==0);    
     Serv{k} = servingAPs;
     NoServ{k} = NoservingAPs;
-    
     La(k) = length(servingAPs);
 end
 
@@ -83,31 +81,24 @@ for k = 1:K
     end
 end
 
-
-while tUpp-tLow > delta %Condition in Line 6
-    
+while tUpp-tLow > delta %Condition in Line 6   
     tMid = (tLow + tUpp)/2; %Line 7
-    S = sqrt(1+1/tMid); %The constant term appearing in the constraints of (7.30)
-    
+    S = sqrt(1+1/tMid); %The constant term appearing in the constraints of (7.30)    
     %Solve the problem in (7.30) with CVX
     cvx_begin quiet
     variable rho(L,K)
     variable rho2(sum(La),1) %non-zero portions of the main optimization variable rho
     minimize norm(rho2)
-    subject to
-    
+    subject to    
     rho2 >= zeros(sum(La),1);
     for k=1:K
-        norm([Ck2(:,:,k)*rho2; 1]) <= S*bk2(:,k)'*rho2;
-        
+        norm([Ck2(:,:,k)*rho2; 1]) <= S*bk2(:,k)'*rho2;       
         rho(Serv{k},k) == rho2(sum(La(1:k-1))+1:sum(La(1:k)),1);
         rho(NoServ{k},k) == zeros(length(NoServ{k}),1);
-    end
-    
+    end   
     for l = 1:L
         norm(rho(l,:)) <= sqrt(rhomax);
-    end
-    
+    end   
     cvx_end
     if cvx_status(1)=='S' %Line 9
         tLow = tMid; %Line 10
@@ -118,19 +109,13 @@ while tUpp-tLow > delta %Condition in Line 6
 end
 
 %Go through all UEs
-for k = 1:K
-    
+for k = 1:K  
     %Compute the numerator and denominator of (7.23)
     numm = abs(bk(1:La(k),k)'*tilrho(Serv{k},k))^2;
-    denomm = 1-numm;
-    
-    for i = 1:K
-        
-        denomm = denomm+tilrho(Serv{i},i)'*Ck(1:La(i),1:La(i),k,i)*tilrho(Serv{i},i);
-       
-    end
-    
+    denomm = 1-numm;    
+    for i = 1:K        
+        denomm = denomm+tilrho(Serv{i},i)'*Ck(1:La(i),1:La(i),k,i)*tilrho(Serv{i},i);      
+    end    
     %Compute SE using Corollary 6.3 and SINRs in (7.23)
-    SE(k) = preLogFactor*log2(1+numm/denomm);
-    
+    SE(k) = preLogFactor*log2(1+numm/denomm);    
 end
