@@ -1,4 +1,4 @@
-function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW, N_UE_sub6,tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
+function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW, N_UE_sub6, coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
 %This function generates realizations of the simulation setup described in
 %Section 5.3.
 %
@@ -58,8 +58,8 @@ if (nargin>5)&&(seed>0)
     rng(seed)
 end
 
-%Size of the coverage area (as a square with wrap-around)
-squareLength = 1000; %meter
+% %Size of the coverage area (as a square with wrap-around)
+% squareLength = 1000; %meter
 
 %Communication bandwidth (Hz)
 B = 20e6;
@@ -102,42 +102,43 @@ masterAPs = zeros(K,1); %the indices of master AP of each UE k
 for n = 1:nbrOfSetups
     
     %Random AP locations with uniform distribution
-    APpositions = (rand(L,1) + 1i*rand(L,1)) * squareLength;
-    params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
-    params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
-    params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+    % APpositions = (rand(L,1) + 1i*rand(L,1)) * squareLength;
+    RgNB = coverageRange * sqrt(rand(L_mmW,1)); %location of gNBs (distance from origin)
+    angleGNB = 2*pi*rand(L_mmW,1);%location of gNBs (angle from x-axis)
+    locationsBS = RgNB.*cos(angleGNB) + 1i*(RgNB.*sin(angleGNB));
 
-    params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
-    params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
-    params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
+    RgNB_sub6 = coverageRange + (coverageRange_sub6 - coverageRange) * sqrt(rand(L-L_mmW,1)); %location of gNBs (distance from origin)
+    angleGNB_sub6 = 2*pi*rand(L-L_mmW,1);%location of gNBs (angle from x-axis)
+    locationsBS_sub6 = RgNB_sub6.*cos(angleGNB_sub6) + 1i*(RgNB_sub6.*sin(angleGNB_sub6));  
+    APpositions = [locationsBS; locationsBS_sub6];
 
     %Prepare to compute UE locations
-    UEpositions = zeros(K,1);
-    params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
-    params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
-    params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-    params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-    params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
-    params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];      
+    % UEpositions = zeros(K,1);
+    RUE = 0; %location of UEs (distance from origin)
+    angleUE = 2*pi*rand(K_mmW,1);%location of UEs (angle from x-axis)
+    UE_locations = RUE.*cos(angleUE) + 1i*(RUE.*sin(angleUE));
+    RUE_sub6 = coverageRange_sub6*sqrt(rand(K-K_mmW,1)); %location of UEs (distance from origin)
+    angleUE_sub6 = 2*pi*rand(K-K_mmW,1);%location of UEs (angle from x-axis)
+    UE_locations_sub6 = RUE_sub6.*cos(angleUE_sub6) + 1i*(RUE_sub6.*sin(angleUE_sub6));      
+    UEpositions = [UE_locations; UE_locations_sub6];
     
     %Compute alternative AP locations by using wrap around
-    wrapHorizontal = repmat([-squareLength 0 squareLength],[3 1]);
+    % wrapHorizontal = repmat([-squareLength 0 squareLength],[3 1]);
+    wrapHorizontal = repmat([-coverageRange_sub6 0 coverageRange_sub6],[3 1]);
     wrapVertical = wrapHorizontal';
     wrapLocations = wrapHorizontal(:)' + 1i*wrapVertical(:)';
     APpositionsWrapped = repmat(APpositions,[1 length(wrapLocations)]) + repmat(wrapLocations,[L 1]);
     
     %Prepare to store shadowing correlation matrix
     shadowCorrMatrix = sigma_sf^2*ones(K,K);
-    shadowAPrealizations = zeros(K,L);
-    
-    
+    shadowAPrealizations = zeros(K,L);    
     
     %Add UEs
     for k = 1:K
         
         %Generate a random UE location in the area
-        UEposition = (rand(1,1) + 1i*rand(1,1)) * squareLength;
-        
+        % UEposition = (rand(1,1) + 1i*rand(1,1)) * squareLength;
+        UEposition = UEpositions(k);        
         %Compute distances assuming that the APs are 10 m above the UEs
         [distanceAPstoUE,whichpos] = min(abs(APpositionsWrapped - repmat(UEposition,size(APpositionsWrapped))),[],2);
         distances(:,k,n) = sqrt(distanceVertical^2+distanceAPstoUE.^2);
