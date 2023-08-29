@@ -1,4 +1,4 @@
-function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW, N_UE_sub6, coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
+function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N, coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
 %This function generates realizations of the simulation setup described in
 %Section 5.3.
 %

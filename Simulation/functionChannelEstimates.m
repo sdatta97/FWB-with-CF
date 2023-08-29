@@ -1,4 +1,4 @@
-function [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p)
+function [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,tau_p,pilotIndex,p)
 %Generate the channel realizations and estimates of these channels for all
 %UEs in the entire network. The channels are assumed to be correlated
 %Rayleigh fading and the MMSE estimator is used.
@@ -51,7 +51,7 @@ function [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrO
 %Generate uncorrelated Rayleigh fading channel realizations
 % H = (randn(L*N,nbrOfRealizations,K)+1i*randn(L*N,nbrOfRealizations,K));
 H_mmW = (randn(L*N,nbrOfRealizations,N_UE_mmW,K_mmW)+1i*randn(L*N,nbrOfRealizations,N_UE_mmW,K_mmW));
-H_sub6 = (randn(L*N,nbrOfRealizations,N_UE_sub6,K-K_mmW)+1i*randn(L*N,nbrOfRealizations,N_UE_sub6,K-K_mmW));
+H_sub6 = (randn(L*N,nbrOfRealizations,K-K_mmW)+1i*randn(L*N,nbrOfRealizations,K-K_mmW));
 
 
 %Go through all channels and apply the spatial correlation matrices
@@ -67,7 +67,7 @@ for n = 1:nbrOfRealizations
             %Apply correlation to the uncorrelated channel realizations
             Rsqrt = sqrtm(R(:,:,l,k+K_mmW));
             % H_sub6((l-1)*N+1:l*N,n,:,k-K_mmW) = sqrt(0.5)*Rsqrt*H_sub6((l-1)*N+1:l*N,n,:,k-K_mmW);
-            H_sub6((l-1)*N+1:l*N,n,:,k) = sqrt(0.5)*Rsqrt*reshape(H_sub6((l-1)*N+1:l*N,n,:,k),[N,N_UE_sub6]);            
+            H_sub6((l-1)*N+1:l*N,n,k) = sqrt(0.5)*Rsqrt*H_sub6((l-1)*N+1:l*N,n,k);            
         end
     end
 end
@@ -84,7 +84,7 @@ Np = sqrt(0.5)*(randn(N,nbrOfRealizations,L,tau_p) + 1i*randn(N,nbrOfRealization
 %Prepare to store results
 % Hhat = zeros(L*N,nbrOfRealizations,K);
 Hhat_mmW = zeros(L*N,nbrOfRealizations,N_UE_mmW,K_mmW);
-Hhat_sub6 = zeros(L*N,nbrOfRealizations,N_UE_sub6,K-K_mmW);
+Hhat_sub6 = zeros(L*N,nbrOfRealizations,K-K_mmW);
 
 if nargout>2
     B = zeros(size(R));
@@ -106,7 +106,7 @@ for l = 1:L
         % yp = sqrt(p)*tau_p*sum(H((l-1)*N+1:l*N,:,t==pilotIndex),3) + sqrt(tau_p)*Np(:,:,l,t);
         bool_pilots = (t==pilotIndex);
         yp_mmW = sqrt(p)*tau_p*sum(H_mmW((l-1)*N+1:l*N,:,:,bool_pilots(1:K_mmW)),4) + sqrt(tau_p)*Np(:,:,l,t);
-        yp_sub6 = sqrt(p)*tau_p*sum(H_sub6((l-1)*N+1:l*N,:,:,bool_pilots(1+K_mmW:K)),4) + sqrt(tau_p)*Np(:,:,l,t);
+        yp_sub6 = sqrt(p)*tau_p*sum(H_sub6((l-1)*N+1:l*N,:,bool_pilots(1+K_mmW:K)),3) + sqrt(tau_p)*Np(:,:,l,t);
         
         %Compute the matrix in (4.6) that is inverted in the MMSE estimator
         %in (4.5)
@@ -120,7 +120,7 @@ for l = 1:L
                 if (k<=K_mmW)
                     Hhat_mmW((l-1)*N+1:l*N,n,:,k) = sqrt(p)*RPsi*reshape(yp_mmW(:,n,:),[N,N_UE_mmW]);
                 else
-                    Hhat_sub6((l-1)*N+1:l*N,n,:,k-K_mmW) = sqrt(p)*RPsi*reshape(yp_sub6(:,n,:),[N,N_UE_sub6]);
+                    Hhat_sub6((l-1)*N+1:l*N,n,k-K_mmW) = sqrt(p)*RPsi*yp_sub6(:,n);
                 end
             end
             if nargout>2

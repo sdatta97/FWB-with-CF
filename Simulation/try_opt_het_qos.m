@@ -51,7 +51,7 @@ N = 10;
 
 %Number of antennas per UE
 N_UE_mmW = 8;
-N_UE_sub6 = 2;
+% N_UE_sub6 = 2;
 
 %Number of UEs in the network
 % K = 40;
@@ -116,13 +116,12 @@ for n = 1:nbrOfSetups
     SE_DL_LPMMSE_maxmin = zeros(K,1); %MMF
     SE_DL_LPMMSE_sumSE = zeros(K,1); %SumSE
     %Generate one setup with UEs at random locations
-    [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,coverageRange,coverageRange_sub6,tau_p,1,0,ASD_varphi,ASD_theta);
-    
+    [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,ASD_varphi,ASD_theta);
     
     %Generate channel realizations, channel estimates, and estimation
     %error correlation matrices for all UEs to the cell-free APs
-    [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
-    
+    [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,tau_p,pilotIndex,p);
+    % N_UE_sub6
     
     % Full uplink power for the computation of precoding vectors using
     % virtual uplink-downlink duality
