@@ -152,8 +152,9 @@ for n = 1:nbrOfSetups
     
     %Obtain the expectations for the computation of the terms in
     %(7.25)-(7.26)
+    %before offload sub-6
     [signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
-     functionComputeExpectations(Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW,N_UE_sub6,K_mmW,K,L_mmW,L,p_full);
+     functionComputeExpectations(Hhat_sub6,H_sub6,D(:,2:end),C(:,:,:,2:end),nbrOfRealizations,N,K-1,L,p_full(2:end));
     
     %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
     %\tilde{C}_{ki} in (7.26)
