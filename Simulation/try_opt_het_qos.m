@@ -122,7 +122,14 @@ for n = 1:nbrOfSetups
     %error correlation matrices for all UEs to the cell-free APs
     [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,tau_p,pilotIndex,p);
     % N_UE_sub6
-    
+    mmW_chgains = zeros(nbrOfRealizations,L);
+    for n_idx = 1:nbrOfRealizations
+        for l = 1:L
+            H = reshape(H_mmW((l-1)*N+1:l*N,n_idx,:), [N,N_UE_mmW]);
+            mmW_chgains(n_idx,l) = max(svd(H'));
+        end
+    end
+    [~,l_idx] = max(mean(mmW_chgains,1));
     % Full uplink power for the computation of precoding vectors using
     % virtual uplink-downlink duality
     p_full = p*ones(K,1);
@@ -145,6 +152,138 @@ for n = 1:nbrOfSetups
 
         for ind = 1:length(servedUEs)
             rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
+        end
+        
+    end
+    
+    %Obtain the expectations for the computation of the terms in
+    %(7.25)-(7.26)
+    %before offload sub-6
+    [signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
+     functionComputeExpectations(Hhat_sub6,H_sub6,D(:,(1+K_mmW):end),C(:,:,:,(1+K_mmW):end),nbrOfRealizations,N,K-K_mmW,L,p_full((1+K_mmW):end));
+    
+    %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
+    %\tilde{C}_{ki} in (7.26)
+    % bk = zeros(L,K);
+    % Ck = zeros(L,L,K,K);
+    bk = zeros(L,K-K_mmW);
+    Ck = zeros(L,L,K-K_mmW,K-K_mmW);  
+    %Go through all UEs
+    % for k = 1:K
+    for k = 1:K-K_mmW
+        %Find the APs that serve UE k
+        % servingAPs = find(D(:,k)==1);
+        servingAPs = find(D(:,k+K_mmW)==1);
+        %The number of APs that serve UE k
+        La = length(servingAPs);
+        %Compute the vector in (7.25) for UE k (only the non-zero indices correspondig to 
+        %serving APs are considered)
+        bk(1:La,k) = real(vec(signal_LP_MMSE(k,k,servingAPs)))./sqrt(scaling_LP_MMSE(servingAPs,k));
+        
+        %Go through all UEs
+        % for i = 1:K
+        for i = 1:K-K_mmW
+            %Find the APs that serve UE i
+            % servingAPs = find(D(:,i)==1);
+            servingAPs = find(D(:,i+K_mmW)==1);
+            %The number of APs that serve UE i
+            La = length(servingAPs);
+            %Compute the matrices in (7.26) (only the non-zero indices are
+            %considered)
+            if i==k
+               Ck(1:La,1:La,k,k) = bk(1:La,k)*bk(1:La,k)';
+            else
+               Ck(1:La,1:La,k,i) = diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)))...
+                   *(vec(signal_LP_MMSE(k,i,servingAPs))...
+                   *vec(signal_LP_MMSE(k,i,servingAPs))')...
+                   *diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)));
+            end            
+            for j = 1:La
+                Ck(j,j,k,i) = signal2_LP_MMSE(k,i,servingAPs(j))/scaling_LP_MMSE(servingAPs(j),i);
+            end
+        end
+    end
+    
+    %Take the real part (in the SINR expression,the imaginary terms cancel
+    %each other)
+    Ck = real(Ck);
+    
+    %Compute hte square roots of the power allocation coefficients
+    %corresponding to (7.24)
+    tilrho = sqrt(rho_dist_equal);
+    tilrho1 = sqrt(rho_dist);
+
+    %Go through all UEs
+    % for k = 1:K
+    for k = 1:K-K_mmW
+        %Find APs that serve UE k
+        % servingAPs = find(D(:,k)==1);
+        servingAPs = find(D(:,k+K_mmW)==1);
+        %The number of APs that serve UE k
+        La = length(servingAPs);
+        
+        %Compute the numerator and denominator of (7.23) for equal and FPA
+        %schemes with two different exponents
+        % numm = abs(bk(1:La,k)'*tilrho(servingAPs,k))^2;
+        numm = abs(bk(1:La,k)'*tilrho(servingAPs,k+K_mmW))^2;
+        denomm = 1-numm;
+        
+        % numm1 = abs(bk(1:La,k)'*tilrho1(servingAPs,k))^2;
+        numm1 = abs(bk(1:La,k)'*tilrho1(servingAPs,k+K_mmW))^2;
+        denomm1 = 1-numm1;
+        
+        % for i = 1:K
+        for i = 1:K-K_mmW
+            % servingAPs = find(D(:,i)==1);
+            servingAPs = find(D(:,i+K_mmW)==1);
+            La = length(servingAPs);
+            % denomm = denomm+tilrho(servingAPs,i)'*Ck(1:La,1:La,k,i)*tilrho(servingAPs,i);
+            % denomm1 = denomm1+tilrho1(servingAPs,i)'*Ck(1:La,1:La,k,i)*tilrho1(servingAPs,i);
+            denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho(servingAPs,i+K_mmW);
+            denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho1(servingAPs,i+K_mmW);        
+        end
+        %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
+        %FPA schemes with two different exponents
+        % SE_DL_LPMMSE_equal(k,n) = preLogFactor*log2(1+numm/denomm);
+        % SE_DL_LPMMSE_fractional(k,n) = preLogFactor*log2(1+numm1/denomm1);
+        SE_DL_LPMMSE_equal(k+K_mmW,n) = preLogFactor*log2(1+numm/denomm);
+        SE_DL_LPMMSE_fractional(k+K_mmW,n) = preLogFactor*log2(1+numm1/denomm1);
+    end
+    
+    %Compute SE according to Corollary 6.3 with max-min fair power
+    %allocation in Algorithm 7.5
+    % SE_DL_LPMMSE_maxmin(:,n) = functionDownlinkSE_maxmin_dist(bk,Ck,preLogFactor,L,K,D,rho_tot);  
+    SE_DL_LPMMSE_maxmin((1+K_mmW):end,n) = functionDownlinkSE_maxmin_dist(bk,Ck,preLogFactor,L,K-1,D(:,(1+K_mmW):end),rho_tot);  
+    %Compute SE according to Corollary 6.3 with sum SE maximizing power
+    %allocation in Algorithm 7.6
+    % SE_DL_LPMMSE_sumSE(:,n) =  functionDownlinkSE_sumSE_dist(bk,Ck,preLogFactor,L,K,D,rho_tot,tau_p);   
+    SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_dist(bk,Ck,preLogFactor,L,K-1,D(:,(1+K_mmW):end),rho_tot,tau_p);   
+
+    %% 
+    %excluding mmW serving gNB
+    % Full uplink power for the computation of precoding vectors using
+    % virtual uplink-downlink duality
+    p_full = p*ones(K,1);
+   
+    gainOverNoise = db2pow(gainOverNoisedB);
+
+    %Equal power allocation
+    rho_dist_equal = (rho_tot/tau_p)*ones(L,K);
+
+    %Compute the power allocation in (7.47) for distributed precoding
+    rho_dist = zeros(L,K); % with exponent 0.5
+    
+    for l = 1:L
+        if (l~=l_idx)
+            %Extract which UEs are served by AP l
+            servedUEs = find(D(l,:)==1);
+            
+            %Compute denominator in (7.47)
+            normalizationAPl = sum(sqrt(gainOverNoise(l,servedUEs)));
+    
+            for ind = 1:length(servedUEs)
+                rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
+            end
         end
         
     end
