@@ -272,34 +272,43 @@ for n = 1:nbrOfSetups
 
     %Compute the power allocation in (7.47) for distributed precoding
     rho_dist = zeros(L,K); % with exponent 0.5
-    
+    D(l_idx,(1+K_mmW):end) = 0;
     for l = 1:L
-        if (l~=l_idx)
-            %Extract which UEs are served by AP l
-            servedUEs = find(D(l,:)==1);
-            
-            %Compute denominator in (7.47)
-            normalizationAPl = sum(sqrt(gainOverNoise(l,servedUEs)));
-    
-            for ind = 1:length(servedUEs)
-                rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
-            end
+        % if (l~=l_idx)
+        %Extract which UEs are served by AP l
+        servedUEs = find(D(l,:)==1);
+        
+        %Compute denominator in (7.47)
+        normalizationAPl = sum(sqrt(gainOverNoise(l,servedUEs)));
+
+        for ind = 1:length(servedUEs)
+            rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
         end
+        % end
         
     end
     
     %Obtain the expectations for the computation of the terms in
     %(7.25)-(7.26)
-    %before offload sub-6
+    if (l_idx==1)
+        Hhat_new = Hhat_sub6((1+l_idx*N):end,:,:);
+        H_new = H_sub6((1+l_idx*N):end,:,:);
+        C_new = C(:,:,(1+l_idx):end,(1+K_mmW):end);
+    else
+        Hhat_new = [Hhat_sub6(1:(l_idx-1)*N,:,:); Hhat_sub6((1+l_idx*N):end,:,:)];
+        H_new = [H_sub6(1:(l_idx-1)*N,:,:); H_sub6((1+l_idx*N):end,:,:)];
+        C_new = cat(3,C(:,:,1:(l_idx-1),(1+K_mmW):end),C(:,:,(1+l_idx):end,(1+K_mmW):end));
+    end     
+    %after offload sub-6
     [signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
-     functionComputeExpectations(Hhat_sub6,H_sub6,D(:,(1+K_mmW):end),C(:,:,:,(1+K_mmW):end),nbrOfRealizations,N,K-K_mmW,L,p_full((1+K_mmW):end));
+     functionComputeExpectations(Hhat_new,H_new,D(:,(1+K_mmW):end),C_new,nbrOfRealizations,N,K-K_mmW,L-1,p_full((1+K_mmW):end));
     
     %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
     %\tilde{C}_{ki} in (7.26)
     % bk = zeros(L,K);
     % Ck = zeros(L,L,K,K);
-    bk = zeros(L,K-K_mmW);
-    Ck = zeros(L,L,K-K_mmW,K-K_mmW);  
+    bk = zeros(L-1,K-K_mmW);
+    Ck = zeros(L-1,L-1,K-K_mmW,K-K_mmW);  
     %Go through all UEs
     % for k = 1:K
     for k = 1:K-K_mmW
@@ -308,9 +317,15 @@ for n = 1:nbrOfSetups
         servingAPs = find(D(:,k+K_mmW)==1);
         %The number of APs that serve UE k
         La = length(servingAPs);
+        servingAP_idxs = servingAPs;
+        for l = 1:La
+            if (servingAP_idxs(l) > l_idx)
+                servingAP_idxs(l) = servingAP_idxs(l) - 1;
+            end
+        end
         %Compute the vector in (7.25) for UE k (only the non-zero indices correspondig to 
         %serving APs are considered)
-        bk(1:La,k) = real(vec(signal_LP_MMSE(k,k,servingAPs)))./sqrt(scaling_LP_MMSE(servingAPs,k));
+        bk(1:La,k) = real(vec(signal_LP_MMSE(k,k,servingAP_idxs)))./sqrt(scaling_LP_MMSE(servingAP_idxs,k));
         
         %Go through all UEs
         % for i = 1:K
@@ -320,18 +335,24 @@ for n = 1:nbrOfSetups
             servingAPs = find(D(:,i+K_mmW)==1);
             %The number of APs that serve UE i
             La = length(servingAPs);
-            %Compute the matrices in (7.26) (only the non-zero indices are
+            servingAP_idxs = servingAPs;
+            for l = 1:La
+                if (servingAP_idxs(l) > l_idx)
+                    servingAP_idxs(l) = servingAP_idxs(l) - 1;
+                end
+            end
+           %Compute the matrices in (7.26) (only the non-zero indices are
             %considered)
             if i==k
                Ck(1:La,1:La,k,k) = bk(1:La,k)*bk(1:La,k)';
             else
-               Ck(1:La,1:La,k,i) = diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)))...
-                   *(vec(signal_LP_MMSE(k,i,servingAPs))...
-                   *vec(signal_LP_MMSE(k,i,servingAPs))')...
-                   *diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)));
+               Ck(1:La,1:La,k,i) = diag(1./sqrt(scaling_LP_MMSE(servingAP_idxs,i)))...
+                   *(vec(signal_LP_MMSE(k,i,servingAP_idxs))...
+                   *vec(signal_LP_MMSE(k,i,servingAP_idxs))')...
+                   *diag(1./sqrt(scaling_LP_MMSE(servingAP_idxs,i)));
             end            
             for j = 1:La
-                Ck(j,j,k,i) = signal2_LP_MMSE(k,i,servingAPs(j))/scaling_LP_MMSE(servingAPs(j),i);
+                Ck(j,j,k,i) = signal2_LP_MMSE(k,i,servingAP_idxs(j))/scaling_LP_MMSE(servingAP_idxs(j),i);
             end
         end
     end
@@ -353,7 +374,6 @@ for n = 1:nbrOfSetups
         servingAPs = find(D(:,k+K_mmW)==1);
         %The number of APs that serve UE k
         La = length(servingAPs);
-        
         %Compute the numerator and denominator of (7.23) for equal and FPA
         %schemes with two different exponents
         % numm = abs(bk(1:La,k)'*tilrho(servingAPs,k))^2;
