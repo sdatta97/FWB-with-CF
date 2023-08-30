@@ -286,8 +286,8 @@ for n = 1:nbrOfSetups
 
     %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
     %\tilde{C}_{ki} in (7.26)
-    bk = zeros(L,K);
-    Ck = zeros(L,L,K,K);
+    bk = zeros(L,K-K_mmW);
+    Ck = zeros(L,L,K-K_mmW,K-K_mmW);
     %Go through all UEs
     for k = 1:K-K_mmW
         %Find the APs that serve UE k
