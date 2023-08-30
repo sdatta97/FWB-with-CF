@@ -130,6 +130,14 @@ for n = 1:nbrOfSetups
         end
     end
     [~,l_idx] = max(mean(mmW_chgains,1));
+    mmW_gain = 0;
+    for n_idx = 1:nbrOfRealizations
+        H = reshape(H_mmW((l_idx-1)*N+1:l_idx*N,n_idx,:), [N,N_UE_mmW]);
+        Hhat = reshape(Hhat_mmW((l_idx-1)*N+1:l_idx*N,n_idx,:), [N,N_UE_mmW]);
+        [U1, S1, V1] = svd(Hhat');
+        [U2, S2, V2] = svd(H');
+        mmW_gain = mmW_gain + abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2/nbrOfRealizations;
+    end
     % Full uplink power for the computation of precoding vectors using
     % virtual uplink-downlink duality
     p_full = p*ones(K,1);
