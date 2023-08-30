@@ -41,7 +41,7 @@ nbrOfSetups = 10;
         
       
 %Number of channel realizations per setup
-nbrOfRealizations = 100;
+nbrOfRealizations = 1000;
 
 % %Number of APs in the cell-free network
 % L = 10;
