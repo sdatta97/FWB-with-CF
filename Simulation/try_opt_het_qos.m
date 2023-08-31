@@ -51,7 +51,7 @@ N = 10;
 
 %Number of antennas per UE
 N_UE_mmW = 8;
-% N_UE_sub6 = 2;
+N_UE_sub6 = 2;
 
 %Number of UEs in the network
 % K = 40;
@@ -120,8 +120,7 @@ for n = 1:nbrOfSetups
     
     %Generate channel realizations, channel estimates, and estimation
     %error correlation matrices for all UEs to the cell-free APs
-    [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,tau_p,pilotIndex,p);
-    % N_UE_sub6
+    [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
     mmW_chgains = zeros(nbrOfRealizations,L);
     for n_idx = 1:nbrOfRealizations
         for l = 1:L
