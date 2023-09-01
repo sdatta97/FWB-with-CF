@@ -1,4 +1,4 @@
-function [signal,signal2, scaling] = ...
+function [chgain, intgain] = ...
 functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6,H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW,N_UE_sub6,K,K_mmW,L,L_mmW,p)
 %Compute expectatations that appear in the uplink and downlink SE
 %expressions.
@@ -68,6 +68,7 @@ signal2 = zeros(K,K,L);
 scaling = zeros(L,K);
 
 chgain_arr = zeros(nbrOfRealizations,L,K);
+intgain_arr = zeros(nbrOfRealizations,L,K,K);
 
 %% Compute scaling factors for combining/precoding
 
@@ -80,16 +81,55 @@ for n=1:nbrOfRealizations
             Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
             [U1, S1, V1] = svd(Hhat');
             [U2, S2, V2] = svd(H');
-            chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
-        end
-        for k = 1:K-K_mmW
+            % chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
+            chgain_arr(n,l,k) = abs(U2(:,1)'*U2*S2*(V2'*V2(:,1)))^2;
+            for i = 1:K_mmW
+                if (i~=k)
+                    H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
+                    Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
+                    [U3, S3, V3] = svd(Hhat_int');
+                    [U4, S4, V4] = svd(H_int');
+                    % chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
+                    intgain_arr(n,l,k,i) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
+                end
+            end
+            for i = 1:K-K_mmW
+                H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
+                Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
+                [U3, S3, V3] = svd(Hhat_int');
+                [U4, S4, V4] = svd(H_int');
+                % chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
+                intgain_arr(n,l,k,i+K_mmW) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
+            end
+       end
+       for k = 1:K-K_mmW
             H = reshape(H_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
             Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
             [U1, S1, V1] = svd(Hhat');
             [U2, S2, V2] = svd(H');
-            chgain_arr(n,l,k+K_mmW) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
+            % chgain_arr(n,l,k+K_mmW) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
+            chgain_arr(n,l,k+K_mmW) = abs(U2(:,1)'*U2*S2*(V2'*V2(:,1)))^2;
+            for i = 1:K_mmW
+                H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
+                Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
+                [U3, S3, V3] = svd(Hhat_int');
+                [U4, S4, V4] = svd(H_int');
+                % chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
+                intgain_arr(n,l,k+K_mmW,i) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
+            end
+            for i = 1:K-K_mmW
+                if (i~=k)                    
+                    H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
+                    Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
+                    [U3, S3, V3] = svd(Hhat_int');
+                    [U4, S4, V4] = svd(H_int');
+                    % chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
+                    intgain_arr(n,l,k+K_mmW,i+K_mmW) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
+                end
+            end
         end
     end            
 end
 chgain = reshape(mean(chgain_arr,1),[L,K]);
+intgain = reshape(mean(chgain_arr,1),[L,K,K]);
 end
