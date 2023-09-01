@@ -68,6 +68,11 @@ signal2 = zeros(K,K,L);
 scaling = zeros(L,K);
 
 chgain_arr = zeros(nbrOfRealizations,L,K);
+    for n_idx = 1:nbrOfRealizations
+        for l = 1:L
+            
+        end
+    end
 
 %% Compute scaling factors for combining/precoding
 
@@ -90,6 +95,4 @@ for n=1:nbrOfRealizations
             chgain_arr(n_idx,l,k+K_mmW) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
         end
     end            
-end
-chgain = reshape(mean(chgain_arr,1),[L,K]);
 end

@@ -121,26 +121,6 @@ for n = 1:nbrOfSetups
     %Generate channel realizations, channel estimates, and estimation
     %error correlation matrices for all UEs to the cell-free APs
     [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
-    chgain_arr = zeros(nbrOfRealizations,L,K);
-    for n_idx = 1:nbrOfRealizations
-        for l = 1:L
-            for k = 1:K_mmW
-                H = reshape(H_mmW((l-1)*N+1:l*N,n_idx,:,k), [N,N_UE_mmW]);
-                Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n_idx,:,k), [N,N_UE_mmW]);
-                [U1, S1, V1] = svd(Hhat');
-                [U2, S2, V2] = svd(H');
-                chgain_arr(n_idx,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
-            end
-            for k = 1:K-K_mmW
-                H = reshape(H_sub6((l-1)*N+1:l*N,n_idx,:,k), [N,N_UE_sub6]);
-                Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n_idx,:,k), [N,N_UE_sub6]);
-                [U1, S1, V1] = svd(Hhat');
-                [U2, S2, V2] = svd(H');
-                chgain_arr(n_idx,l,k+K_mmW) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
-            end
-        end
-    end
-    chgain = reshape(mean(chgain_arr,1),[L,K]);
     % [~,l_idx] = max(mean(chgains,1));
     % Full uplink power for the computation of precoding vectors using
     % virtual uplink-downlink duality
