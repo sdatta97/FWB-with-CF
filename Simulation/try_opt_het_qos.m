@@ -154,7 +154,7 @@ for n = 1:nbrOfSetups
     % [signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
     %  functionComputeExpectations(Hhat_sub6,H_sub6,D(:,(1+K_mmW):end),C(:,:,:,(1+K_mmW):end),nbrOfRealizations,N,K-K_mmW,L,p_full((1+K_mmW):end));
  [signal,signal2, scaling] = ...
- functionComputeExpectationsv2(Hhat_mmW, Hhat_sub6, H_mmW, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
+ functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
     
     %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
     %\tilde{C}_{ki} in (7.26)
