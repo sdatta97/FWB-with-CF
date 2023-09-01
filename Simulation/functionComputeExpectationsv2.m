@@ -1,5 +1,5 @@
 function [signal,signal2, scaling] = ...
-    functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6,H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,p)
+functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6,H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW,N_UE_sub6,K,K_mmW,L,L_mmW,p)
 %Compute expectatations that appear in the uplink and downlink SE
 %expressions.
 %
