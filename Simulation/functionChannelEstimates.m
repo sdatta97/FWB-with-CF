@@ -120,7 +120,7 @@ for l = 1:L
                 if (k<=K_mmW)
                     Hhat_mmW((l-1)*N+1:l*N,n,:,k) = sqrt(p)*RPsi*reshape(yp_mmW(:,n,:),[N,N_UE_mmW]);
                 else
-                    Hhat_sub6((l-1)*N+1:l*N,n,k-K_mmW) = sqrt(p)*RPsi*yp_sub6(:,n);
+                    Hhat_sub6((l-1)*N+1:l*N,n,:,k-K_mmW) = sqrt(p)*RPsi*reshape(yp_sub6(:,n,:),[N,N_UE_sub6]);
                 end
             end
             if nargout>2
