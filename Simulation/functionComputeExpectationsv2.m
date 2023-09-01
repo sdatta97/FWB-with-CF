@@ -131,5 +131,5 @@ for n=1:nbrOfRealizations
     end            
 end
 chgain = reshape(mean(chgain_arr,1),[L,K]);
-intgain = reshape(mean(chgain_arr,1),[L,K,K]);
+intgain = reshape(mean(intgain_arr,1),[L,K,K]);
 end

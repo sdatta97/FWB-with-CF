@@ -41,7 +41,7 @@ nbrOfSetups = 10;
         
       
 %Number of channel realizations per setup
-nbrOfRealizations = 1000;
+nbrOfRealizations = 10;
 
 % %Number of APs in the cell-free network
 % L = 10;
@@ -158,12 +158,12 @@ for n = 1:nbrOfSetups
     
     %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
     %\tilde{C}_{ki} in (7.26)
-    bk = zeros(L,K-K_mmW);
-    Ck = zeros(L,L,K-K_mmW,K-K_mmW);  
+    bk = zeros(L,K);
+    Ck = zeros(L,L,K,K);  
     %Go through all UEs
-    for k = 1:K-K_mmW
+    for k = 1:K
         %Find the APs that serve UE k
-        servingAPs = find(D(:,k+K_mmW)==1);
+        servingAPs = find(D(:,k)==1);
         %The number of APs that serve UE k
         La = length(servingAPs);
         %Compute the vector in (7.25) for UE k (only the non-zero indices correspondig to 
@@ -171,9 +171,9 @@ for n = 1:nbrOfSetups
         bk(1:La,k) = real(vec(signal_LP_MMSE(k,k,servingAPs)))./sqrt(scaling_LP_MMSE(servingAPs,k));
         
         %Go through all UEs
-        for i = 1:K-K_mmW
+        for i = 1:K
             %Find the APs that serve UE i
-            servingAPs = find(D(:,i+K_mmW)==1);
+            servingAPs = find(D(:,i)==1);
             %The number of APs that serve UE i
             La = length(servingAPs);
             %Compute the matrices in (7.26) (only the non-zero indices are
