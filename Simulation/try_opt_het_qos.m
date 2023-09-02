@@ -153,47 +153,49 @@ for n = 1:nbrOfSetups
     %before offload sub-6
     % [signal_LP_MMSE,signal2_LP_MMSE, scaling_LP_MMSE] = ...
     %  functionComputeExpectations(Hhat_sub6,H_sub6,D(:,(1+K_mmW):end),C(:,:,:,(1+K_mmW):end),nbrOfRealizations,N,K-K_mmW,L,p_full((1+K_mmW):end));
- [chgain, intgain] = ...
- functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
-    
+     
     %Prepare arrays to store the vectors \tilde{b}_k in (7.25) and matrices
     %\tilde{C}_{ki} in (7.26)
     bk = zeros(L,K);
     Ck = zeros(L,L,K,K);  
-    %Go through all UEs
-    for k = 1:K
-        %Find the APs that serve UE k
-        servingAPs = find(D(:,k)==1);
-        %The number of APs that serve UE k
-        La = length(servingAPs);
-        %Compute the vector in (7.25) for UE k (only the non-zero indices correspondig to 
-        %serving APs are considered)
-        bk(1:La,k) = real(vec(signal_LP_MMSE(k,k,servingAPs)))./sqrt(scaling_LP_MMSE(servingAPs,k));
-        
-        %Go through all UEs
-        for i = 1:K
-            %Find the APs that serve UE i
-            servingAPs = find(D(:,i)==1);
-            %The number of APs that serve UE i
-            La = length(servingAPs);
-            %Compute the matrices in (7.26) (only the non-zero indices are
-            %considered)
-            if i==k
-               Ck(1:La,1:La,k,k) = bk(1:La,k)*bk(1:La,k)';
-            else
-               Ck(1:La,1:La,k,i) = diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)))...
-                   *(vec(signal_LP_MMSE(k,i,servingAPs))...
-                   *vec(signal_LP_MMSE(k,i,servingAPs))')...
-                   *diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)));
-            end            
-            for j = 1:La
-                Ck(j,j,k,i) = signal2_LP_MMSE(k,i,servingAPs(j))/scaling_LP_MMSE(servingAPs(j),i);
-            end
-        end
-    end
+    [bk, Ck] = ...
+ functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
+
+    % %Go through all UEs
+    % for k = 1:K
+    %     %Find the APs that serve UE k
+    %     servingAPs = find(D(:,k)==1);
+    %     %The number of APs that serve UE k
+    %     La = length(servingAPs);
+    %     %Compute the vector in (7.25) for UE k (only the non-zero indices correspondig to 
+    %     %serving APs are considered)
+    %     bk(1:La,k) = real(vec(signal_LP_MMSE(k,k,servingAPs)))./sqrt(scaling_LP_MMSE(servingAPs,k));
+    % 
+    %     %Go through all UEs
+    %     for i = 1:K
+    %         %Find the APs that serve UE i
+    %         servingAPs = find(D(:,i)==1);
+    %         %The number of APs that serve UE i
+    %         La = length(servingAPs);
+    %         %Compute the matrices in (7.26) (only the non-zero indices are
+    %         %considered)
+    %         if i==k
+    %            Ck(1:La,1:La,k,k) = bk(1:La,k)*bk(1:La,k)';
+    %         else
+    %            Ck(1:La,1:La,k,i) = diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)))...
+    %                *(vec(signal_LP_MMSE(k,i,servingAPs))...
+    %                *vec(signal_LP_MMSE(k,i,servingAPs))')...
+    %                *diag(1./sqrt(scaling_LP_MMSE(servingAPs,i)));
+    %         end            
+    %         for j = 1:La
+    %             Ck(j,j,k,i) = signal2_LP_MMSE(k,i,servingAPs(j))/scaling_LP_MMSE(servingAPs(j),i);
+    %         end
+    %     end
+    % end
     
     %Take the real part (in the SINR expression,the imaginary terms cancel
     %each other)
+    bk = real(bk);
     Ck = real(Ck);
     
     %Compute hte square roots of the power allocation coefficients

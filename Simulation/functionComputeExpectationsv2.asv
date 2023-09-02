@@ -114,20 +114,20 @@ for n=1:nbrOfRealizations
             for ll = 1:L
                 for i = 1:K_mmW
                     H_int = reshape(H_mmW((ll-1)*N+1:ll*N,n,:,i), [N,N_UE_mmW]);
-                    Hhat_int = reshape(Hhat_mmW((ll-1)*N+1:ll*N,n,:,i), [N,N_UE_mmW]);
+                    Hhat_int = reshape(Hhat_mmW((ll-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                     [U3, S3, V3] = svd(Hhat_int');
                     [U4, S4, V4] = svd(H_int');
                     % chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
-                    intgain_arr(n,l,ll,k+K_mmW,i) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
+                    intgain_arr(n,l,k+K_mmW,i) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
                 end
                 for i = 1:K-K_mmW
                     if (i~=k)                    
-                        H_int = reshape(H_sub6((ll-1)*N+1:ll*N,n,:,i), [N,N_UE_sub6]);
-                        Hhat_int = reshape(Hhat_sub6((ll-1)*N+1:ll*N,n,:,i), [N,N_UE_sub6]);
+                        H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
+                        Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                         [U3, S3, V3] = svd(Hhat_int');
                         [U4, S4, V4] = svd(H_int');
                         % chgain_arr(n,l,k) = abs(U1(:,1)'*U2*S2*(V2'*V1(:,1)))^2;
-                        intgain_arr(n,l,ll,k+K_mmW,i+K_mmW) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
+                        intgain_arr(n,l,k+K_mmW,i+K_mmW) = abs(U2(:,1)'*U2*S2*(V2'*V4(:,1)))^2;
                     end
                 end
             end
