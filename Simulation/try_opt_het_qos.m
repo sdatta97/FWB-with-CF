@@ -158,8 +158,10 @@ for n = 1:nbrOfSetups
     %\tilde{C}_{ki} in (7.26)
     bk = zeros(L,K);
     Ck = zeros(L,L,K,K);  
-    [bk, Ck] = ...
- functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
+ %    [bk, Ck] = ...
+ % functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
+[bk, Ck] = ...
+    functionComputeExpectationsv3(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
 
     % %Go through all UEs
     % for k = 1:K
