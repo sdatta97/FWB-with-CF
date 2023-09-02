@@ -65,15 +65,16 @@ end
 
 chgain_arr = zeros(nbrOfRealizations,L,K);
 intgain_arr = zeros(nbrOfRealizations,L,L,K,K);
-
+D_mmW_mmW = zeros(K_mmW,K_mmW,N_UE_mmW,N_UE_mmW);
+D_mmW_sub6 = zeros(K_mmW,K-K_mmW,N_UE_mmW,N_UE_sub6);
+D_sub6_mmW = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_mmW);
+D_sub6_sub6 = zeros(K-K_mmW,K-K_mmW,N_UE_sub6,N_UE_sub6);
 %% Compute scaling factors for combining/precoding
 
 %Go through all channel realizations
 for n=1:nbrOfRealizations    
     %Go through all APs
     for k = 1:K_mmW
-        D_mmW = zeros(N_UE_mmW,N_UE_mmW);
-        D_sub6 = zeros(N_UE_mmW,N_UE_sub6);
         for i = 1:K_mmW
             if (i~=k)
                 for l = 1:L
@@ -81,7 +82,7 @@ for n=1:nbrOfRealizations
                     Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                     H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                     Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
-                    D_mmW = D_mmW + H'*H_int;
+                    D_mmW_mmW(k,i,:,:) = reshape(D_mmW_mmW(k,i,:,:),[N_UE_mmW,N_UE_mmW]) + H'*H_int;
                 end
             end
         end
@@ -91,20 +92,18 @@ for n=1:nbrOfRealizations
                 Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                 H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                 Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
-                D_sub6 = D_sub6 + H'*H_int;
+                D_mmW_sub6(k,i,:,:) = reshape(D_mmW_sub6(k,i,:,:),[N_UE_mmW,N_UE_sub6]) + H'*H_int;
             end
         end
     end
     for k = 1:K-K_mmW            
-        D_mmW = zeros(N_UE_sub6,N_UE_mmW);
-        D_sub6 = zeros(N_UE_sub6,N_UE_sub6);
         for i = 1:K_mmW
             for l = 1:L
                 H = reshape(H_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                 Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
-                D_mmW = D_mmW + H'*H_int;
+                D_sub6_mmW(k,i,:,:) = reshape(D_sub6_mmW(k,i,:,:),[N_UE_sub6,N_UE_mmW]) + H'*H_int;
             end
         end
         for i = 1:K-K_mmW
@@ -114,7 +113,7 @@ for n=1:nbrOfRealizations
                     Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                     H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                     Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
-                    D_sub6 = D_sub6 + H'*H_int;
+                    D_sub6_sub6(k,i,:,:) = reshape(D_sub6_sub6(k,i,:,:),[N_UE_sub6,N_UE_sub6]) + H'*H_int;
                 end
             end
         end
