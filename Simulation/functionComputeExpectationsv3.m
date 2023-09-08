@@ -67,6 +67,10 @@ D_mmW_mmW = zeros(K_mmW,K_mmW,N_UE_mmW,N_UE_mmW);
 D_mmW_sub6 = zeros(K_mmW,K-K_mmW,N_UE_mmW,N_UE_sub6);
 D_sub6_mmW = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_mmW);
 D_sub6_sub6 = zeros(K-K_mmW,K-K_mmW,N_UE_sub6,N_UE_sub6);
+D_mmW_mmW_wo_p = zeros(K_mmW,K_mmW,N_UE_mmW,N_UE_mmW);
+D_mmW_sub6_wo_p = zeros(K_mmW,K-K_mmW,N_UE_mmW,N_UE_sub6);
+D_sub6_mmW_wo_p = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_mmW);
+D_sub6_sub6_wo_p = zeros(K-K_mmW,K-K_mmW,N_UE_sub6,N_UE_sub6);
 Psi_mmW = zeros(K_mmW,N_UE_mmW,N_UE_mmW);
 Psi_sub6 = zeros(K-K_mmW,N_UE_sub6,N_UE_sub6);
 Psi_mmW_2 = zeros(K_mmW,N_UE_mmW,N_UE_mmW);
@@ -80,26 +84,32 @@ for n=1:nbrOfRealizations
         Psi_mmW (k,:,:) = eye(N_UE_mmW);
         for i = 1:K_mmW
             D_tmp = zeros(N_UE_mmW,N_UE_mmW);
+            D_tmp_wo_p = zeros(N_UE_mmW,N_UE_mmW);
             for l = 1:L
                 H = reshape(H_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                 Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                 H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                 Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                 D_tmp = D_tmp + sqrt(eta_eq_power(l))*(H'*H_int);
+                D_tmp_wo_p = D_tmp_wo_p + H'*H_int;
             end
             D_mmW_mmW(k,i,:,:) = reshape(D_mmW_mmW(k,i,:,:),[N_UE_mmW,N_UE_mmW]) + D_tmp./nbrOfRealizations;
+            D_mmW_mmW_wo_p(k,i,:,:) = reshape(D_mmW_mmW_wo_p(k,i,:,:),[N_UE_mmW,N_UE_mmW]) + D_tmp_wo_p./nbrOfRealizations;
             Psi_mmW (k,:,:) = reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) + p(k)*(D_tmp*D_tmp')./nbrOfRealizations;
         end
         for i = 1:K-K_mmW
             D_tmp = zeros(N_UE_mmW,N_UE_sub6);
+            D_tmp_wo_p = zeros(N_UE_mmW,N_UE_sub6);
             for l = 1:L
                 H = reshape(H_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                 Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                 H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                 Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                 D_tmp = D_tmp + sqrt(eta_eq_power(l))*(H'*H_int);
+                D_tmp_wo_p = D_tmp_wo_p + H'*H_int;
             end
             D_mmW_sub6(k,i,:,:) = reshape(D_mmW_sub6(k,i,:,:),[N_UE_mmW,N_UE_sub6]) + D_tmp./nbrOfRealizations;
+            D_mmW_sub6_wo_p(k,i,:,:) = reshape(D_mmW_sub6_wo_p(k,i,:,:),[N_UE_mmW,N_UE_sub6]) + D_tmp_wo_p./nbrOfRealizations;
             Psi_mmW (k,:,:) = reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) + p(k)*(D_tmp*D_tmp')./nbrOfRealizations;
         end
     end
@@ -108,26 +118,32 @@ for n=1:nbrOfRealizations
         Psi_sub6 (k,:,:) = eye(N_UE_sub6);
         for i = 1:K_mmW
             D_tmp = zeros(N_UE_sub6,N_UE_mmW);
+            D_tmp_wo_p = zeros(N_UE_sub6,N_UE_mmW);
             for l = 1:L
                 H = reshape(H_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                 Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                 D_tmp = D_tmp + sqrt(eta_eq_power(l))*(H'*H_int);
+                D_tmp_wo_p = D_tmp_wo_p + H'*H_int;
             end
             D_sub6_mmW(k,i,:,:) = reshape(D_sub6_mmW(k,i,:,:),[N_UE_sub6,N_UE_mmW]) + D_tmp./nbrOfRealizations;
+            D_sub6_mmW_wo_p(k,i,:,:) = reshape(D_sub6_mmW_wo_p(k,i,:,:),[N_UE_sub6,N_UE_mmW]) + D_tmp_wo_p./nbrOfRealizations;
             Psi_sub6 (k,:,:) = reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) + p(k)*(D_tmp*D_tmp')./nbrOfRealizations;
         end
         for i = 1:K-K_mmW
             D_tmp = zeros(N_UE_sub6,N_UE_sub6);
+            D_tmp_wo_p = zeros(N_UE_sub6,N_UE_sub6);
             for l = 1:L
                 H = reshape(H_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                 Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                 D_tmp = D_tmp + sqrt(eta_eq_power(l))*(H'*H_int);
+                D_tmp_wo_p = D_tmp_wo_p + H'*H_int;
             end
             D_sub6_sub6(k,i,:,:) = reshape(D_sub6_sub6(k,i,:,:),[N_UE_sub6,N_UE_sub6]) + D_tmp./nbrOfRealizations;
+            D_sub6_sub6_wo_p(k,i,:,:) = reshape(D_sub6_sub6_wo_p(k,i,:,:),[N_UE_sub6,N_UE_sub6]) + D_tmp_wo_p./nbrOfRealizations;
             Psi_sub6 (k,:,:) = reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) + p(k)*(D_tmp*D_tmp')./nbrOfRealizations;
         end  
     end
