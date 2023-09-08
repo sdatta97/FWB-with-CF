@@ -134,9 +134,11 @@ for n=1:nbrOfRealizations
 end
 for k = 1:K_mmW
     Psi_mmW (k,:,:) = reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) - p(k)*reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])';
+    Psi_mmW_2 (k,:,:) = inv(reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW])) + reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])';
 end
 for k = 1:K-K_mmW
     Psi_sub6 (k,:,:) = reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) - p(k)*reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])';
+    Psi_sub6_2 (k,:,:) = inv(reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6])) + reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])';
 end
 bk = reshape(mean(chgain_arr,1),[L,K]);
 Ck = reshape(mean(intgain_arr,1),[L,L,K,K]);
