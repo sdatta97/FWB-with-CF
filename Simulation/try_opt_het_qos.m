@@ -161,7 +161,7 @@ for n = 1:nbrOfSetups
  %    [bk, Ck] = ...
  % functionComputeExpectationsv2(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
 [bk, Ck] = ...
-    functionComputeExpectationsv3(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full);
+    functionComputeExpectationsv3(Hhat_mmW, H_mmW, Hhat_sub6, H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW, N_UE_sub6,K,K_mmW,L,L_mmW,p_full, gainOverNoisedB);
 
     % %Go through all UEs
     % for k = 1:K
