@@ -84,7 +84,7 @@ for n=1:nbrOfRealizations
                 Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                 H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                 Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
-                D_mmW_mmW(k,i,:,:) = reshape(D_mmW_mmW(k,i,:,:),[N_UE_mmW,N_UE_mmW]) + (p(k)/(N*L*sum(gainOverNoisedB(:,l))))*(H'*H_int)./nbrOfRealizations;
+                D_mmW_mmW(k,i,:,:) = reshape(D_mmW_mmW(k,i,:,:),[N_UE_mmW,N_UE_mmW]) + (p(k)/(N*L*sum(gainOverNoisedB(l,:))))*(H'*H_int)./nbrOfRealizations;
             end
 %             if (i~=k)
 %                 Psi_mmW (k,:,:) = reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) + p(k)*reshape(D_mmW_mmW(k,i,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,i,:,:),[N_UE_mmW,N_UE_mmW])';
@@ -96,7 +96,7 @@ for n=1:nbrOfRealizations
                 Hhat = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,k), [N,N_UE_mmW]);
                 H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                 Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
-                D_mmW_sub6(k,i,:,:) = reshape(D_mmW_sub6(k,i,:,:),[N_UE_mmW,N_UE_sub6]) + (p(k)/(N*L*sum(gainOverNoisedB(:,l))))*(H'*H_int)./nbrOfRealizations;
+                D_mmW_sub6(k,i,:,:) = reshape(D_mmW_sub6(k,i,:,:),[N_UE_mmW,N_UE_sub6]) + (p(k)/(N*L*sum(gainOverNoisedB(l,:))))*(H'*H_int)./nbrOfRealizations;
             end
 %             Psi_mmW (k,:,:) = reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) + p(k)*reshape(D_mmW_sub6(k,i,:,:),[N_UE_mmW,N_UE_sub6])*reshape(D_mmW_sub6(k,i,:,:),[N_UE_mmW,N_UE_sub6])';
         end
@@ -111,7 +111,7 @@ for n=1:nbrOfRealizations
                 Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 H_int = reshape(H_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
                 Hhat_int = reshape(Hhat_mmW((l-1)*N+1:l*N,n,:,i), [N,N_UE_mmW]);
-                D_sub6_mmW(k,i,:,:) = reshape(D_sub6_mmW(k,i,:,:),[N_UE_sub6,N_UE_mmW]) + (p(k)/(N*L*sum(gainOverNoisedB(:,l))))*(H'*H_int)./nbrOfRealizations;
+                D_sub6_mmW(k,i,:,:) = reshape(D_sub6_mmW(k,i,:,:),[N_UE_sub6,N_UE_mmW]) + (p(k)/(N*L*sum(gainOverNoisedB(l,:))))*(H'*H_int)./nbrOfRealizations;
             end
 %             Psi_sub6 (k,:,:) = reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) + p(k)*reshape(D_sub6_mmW(k,i,:,:),[N_UE_sub6,N_UE_mmW])*reshape(D_sub6_mmW(k,i,:,:),[N_UE_sub6,N_UE_mmW])';
         end
@@ -121,7 +121,7 @@ for n=1:nbrOfRealizations
                 Hhat = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,k), [N,N_UE_sub6]);
                 H_int = reshape(H_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
                 Hhat_int = reshape(Hhat_sub6((l-1)*N+1:l*N,n,:,i), [N,N_UE_sub6]);
-                D_sub6_sub6(k,i,:,:) = reshape(D_sub6_sub6(k,i,:,:),[N_UE_sub6,N_UE_sub6]) + (p(k)/(N*L*sum(gainOverNoisedB(:,l))))*(H'*H_int)./nbrOfRealizations;
+                D_sub6_sub6(k,i,:,:) = reshape(D_sub6_sub6(k,i,:,:),[N_UE_sub6,N_UE_sub6]) + (p(k)/(N*L*sum(gainOverNoisedB(l,:))))*(H'*H_int)./nbrOfRealizations;
             end
 %             if (i~=k)
 %                 Psi_sub6 (k,:,:) = reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) + p(k)*reshape(D_sub6_sub6(k,i,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,i,:,:),[N_UE_sub6,N_UE_sub6])';
