@@ -145,6 +145,13 @@ for k = 1:K_mmW
     Psi_mmW_2 (k,:,:) = inv(reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW])) + reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])';
     for n = 1:N_UE_mmW
         bk_mmW(:,k,n) = (reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,k,:,n),[N_UE_mmW,1]))'*(reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW])).';
+        Ck_mmW(:,:,k,k,n) = (reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW]))*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))'*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))*(reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW])).';
+%         for i = 1:K_mmW
+%             Ck_mmW(:,:,k,i,n) = (reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW]))*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))'*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))*(reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW])).';
+%         end
+%         for i = 1:K-K_mmW
+%             Ck_mmW(:,:,k,i+K_mmW,n) = (reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW]))*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))'*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))*(reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW]))*(reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW])).';
+%         end
     end
 end
 for k = 1:K-K_mmW
@@ -152,6 +159,7 @@ for k = 1:K-K_mmW
     Psi_sub6_2 (k,:,:) = inv(reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6])) + reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])';
     for n = 1:N_UE_sub6
         bk_sub6(:,k,n) = (reshape(Psi_sub6_2 (k,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,k,:,n),[N_UE_sub6,1]))'*(reshape(D_sub6_sub6_wo_p(k,:,:,n),[L,N_UE_sub6])).';
+        Ck_sub6(:,:,k,k+K_mmW,n) = (reshape(D_sub6_sub6_wo_p(k,:,:,n),[L,N_UE_sub6]))*(reshape(Psi_sub6_2(k,:,:),[N_UE_sub6,N_UE_sub6]))'*(reshape(Psi_sub6_2(k,:,:),[N_UE_sub6,N_UE_sub6]))*(reshape(Psi_sub6_2(k,:,:),[N_UE_sub6,N_UE_sub6]))*(reshape(D_sub6_sub6_wo_p(k,:,:,n),[L,N_UE_sub6])).';
     end
 end
 end

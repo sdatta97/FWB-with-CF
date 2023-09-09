@@ -194,9 +194,12 @@ for n = 1:nbrOfSetups
     
     %Take the real part (in the SINR expression,the imaginary terms cancel
     %each other)
-    bk = real(bk);
-    Ck = real(Ck);
-    
+%     bk = real(bk);
+%     Ck = real(Ck);
+    bk_mmW = real(bk_mmW);
+    Ck_mmW = real(Ck_mmW);
+    bk_sub6 = real(bk_sub6);
+    Ck_sub6 = real(Ck_sub6);
     %Compute hte square roots of the power allocation coefficients
     %corresponding to (7.24)
     tilrho = sqrt(rho_dist_equal);
