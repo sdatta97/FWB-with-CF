@@ -1,4 +1,4 @@
-function [bk, Ck] = ...
+function [bk_mmW, Ck_mmW, bk_sub6, Ck_sub6] = ...
     functionComputeExpectationsv3(Hhat_mmW, H_mmW, Hhat_sub6,H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW,N_UE_sub6,K,K_mmW,L,L_mmW,p,gainOverNoise)
 %Compute expectatations that appear in the uplink and downlink SE
 %expressions.
@@ -73,6 +73,10 @@ Psi_mmW = zeros(K_mmW,N_UE_mmW,N_UE_mmW);
 Psi_sub6 = zeros(K-K_mmW,N_UE_sub6,N_UE_sub6);
 Psi_mmW_2 = zeros(K_mmW,N_UE_mmW,N_UE_mmW);
 Psi_sub6_2 = zeros(K-K_mmW,N_UE_sub6,N_UE_sub6);
+bk_mmW = zeros(L,K_mmW,N_UE_mmW);
+Ck_mmW = zeros(L,L,K_mmW,K,N_UE_mmW);
+bk_sub6 = zeros(L,K-K_mmW,N_UE_sub6);
+Ck_sub6 = zeros(L,L,K-K_mmW,K,N_UE_sub6);
 %% Compute scaling factors for combining/precoding
 
 %Go through all channel realizations
@@ -139,11 +143,15 @@ end
 for k = 1:K_mmW
     Psi_mmW (k,:,:) = reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) - p(k)*reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])';
     Psi_mmW_2 (k,:,:) = inv(reshape(Psi_mmW(k,:,:),[N_UE_mmW,N_UE_mmW])) + reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,k,:,:),[N_UE_mmW,N_UE_mmW])';
+    for n = 1:N_UE_mmW
+        bk_mmW(:,k,n) = (reshape(Psi_mmW_2 (k,:,:),[N_UE_mmW,N_UE_mmW])*reshape(D_mmW_mmW(k,k,:,n),[N_UE_mmW,1]))'*(reshape(D_mmW_mmW_wo_p(k,:,:,n),[L,N_UE_mmW])).';
+    end
 end
 for k = 1:K-K_mmW
     Psi_sub6 (k,:,:) = reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) - p(k)*reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])';
     Psi_sub6_2 (k,:,:) = inv(reshape(Psi_sub6(k,:,:),[N_UE_sub6,N_UE_sub6])) + reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,k,:,:),[N_UE_sub6,N_UE_sub6])';
+    for n = 1:N_UE_sub6
+        bk_sub6(:,k,n) = (reshape(Psi_sub6_2 (k,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_sub6_sub6(k,k,:,n),[N_UE_sub6,1]))'*(reshape(D_sub6_sub6_wo_p(k,:,:,n),[L,N_UE_sub6])).';
+    end
 end
-bk = reshape(mean(chgain_arr,1),[L,K]);
-Ck = reshape(mean(intgain_arr,1),[L,L,K,K]);
 end
