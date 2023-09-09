@@ -146,4 +146,7 @@ for k = 1:K-K_mmW
 end
 bk = reshape(mean(chgain_arr,1),[L,K]);
 Ck = reshape(mean(intgain_arr,1),[L,L,K,K]);
+
+
+
 end
