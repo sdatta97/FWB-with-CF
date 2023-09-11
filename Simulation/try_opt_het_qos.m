@@ -211,34 +211,39 @@ for n = 1:nbrOfSetups
         servingAPs = find(D(:,k+K_mmW)==1);
         %The number of APs that serve UE k
         La = length(servingAPs);
-        
-        %Compute the numerator and denominator of (7.23) for equal and FPA
-        %schemes with two different exponents
-        numm = abs(bk(1:La,k)'*tilrho(servingAPs,k+K_mmW))^2;
-        denomm = 1-numm;
-        
-        % numm1 = abs(bk(1:La,k)'*tilrho1(servingAPs,k))^2;
-        numm1 = abs(bk(1:La,k)'*tilrho1(servingAPs,k+K_mmW))^2;
-        denomm1 = 1-numm1;
-        
-        for i = 1:K-K_mmW
-            servingAPs = find(D(:,i+K_mmW)==1);
-            La = length(servingAPs);
-            denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho(servingAPs,i+K_mmW);
-            denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho1(servingAPs,i+K_mmW);        
+        for nn = 1:N_UE_sub6
+            %Compute the numerator and denominator of (7.23) for equal and FPA
+            %schemes with two different exponents
+            % numm = abs(bk(1:La,k)'*tilrho(servingAPs,k))^2;
+            numm = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho(servingAPs,k+K_mmW))^2;
+            denomm = 1-numm;
+            
+            % numm1 = abs(bk(1:La,k)'*tilrho1(servingAPs,k))^2;
+            numm1 = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho1(servingAPs,k+K_mmW))^2;
+            denomm1 = 1-numm1;
+
+            for i = 1:K-K_mmW
+                servingAPs = find(D(:,i+K_mmW)==1);
+                La = length(servingAPs);
+%                 denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho(servingAPs,i+K_mmW);
+%                 denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho1(servingAPs,i+K_mmW);        
+                denomm = denomm+tilrho(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho(servingAPs,i+K_mmW);
+                denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho1(servingAPs,i+K_mmW);        
+            end
+            %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
+            %FPA schemes with two different exponents
+            SE_DL_LPMMSE_equal(k+K_mmW,n) = SE_DL_LPMMSE_equal(k+K_mmW,n) + preLogFactor*log2(1+numm/denomm);
+            SE_DL_LPMMSE_fractional(k+K_mmW,n) = SE_DL_LPMMSE_fractional(k+K_mmW,n) + preLogFactor*log2(1+numm1/denomm1);
         end
-        %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
-        %FPA schemes with two different exponents
-        SE_DL_LPMMSE_equal(k+K_mmW,n) = preLogFactor*log2(1+numm/denomm);
-        SE_DL_LPMMSE_fractional(k+K_mmW,n) = preLogFactor*log2(1+numm1/denomm1);
     end
     
     %Compute SE according to Corollary 6.3 with max-min fair power
     %allocation in Algorithm 7.5
-    SE_DL_LPMMSE_maxmin((1+K_mmW):end,n) = functionDownlinkSE_maxmin_dist(bk,Ck,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot);  
+%     SE_DL_LPMMSE_maxmin((1+K_mmW):end,n) = functionDownlinkSE_maxmin_dist(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot);  
     %Compute SE according to Corollary 6.3 with sum SE maximizing power
     %allocation in Algorithm 7.6
-    SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_dist(bk,Ck,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot,tau_p);   
+%     SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_dist(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot,tau_p);   
+SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_distv2(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p);   
 
     %% 
     %excluding mmW serving gNB
