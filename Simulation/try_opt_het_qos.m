@@ -195,12 +195,12 @@ for n = 1:nbrOfSetups
     
     %Take the real part (in the SINR expression,the imaginary terms cancel
     %each other)
-%     bk = real(bk);
-%     Ck = real(Ck);
-    bk_mmW = real(bk_mmW);
-    Ck_mmW = real(Ck_mmW);
-    bk_sub6 = real(bk_sub6);
-    Ck_sub6 = real(Ck_sub6);
+    bk = real(bk);
+    Ck = real(Ck);
+%     bk_mmW = real(bk_mmW);
+%     Ck_mmW = real(Ck_mmW);
+%     bk_sub6 = real(bk_sub6);
+%     Ck_sub6 = real(Ck_sub6);
     %Compute hte square roots of the power allocation coefficients
     %corresponding to (7.24)
     tilrho = sqrt(rho_dist_equal);
@@ -215,21 +215,21 @@ for n = 1:nbrOfSetups
         for nn = 1:N_UE_sub6
             %Compute the numerator and denominator of (7.23) for equal and FPA
             %schemes with two different exponents
-            % numm = abs(bk(1:La,k)'*tilrho(servingAPs,k))^2;
-            numm = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho(servingAPs,k+K_mmW))^2;
+            numm = abs(bk(1:La,k+K_mmW)'*tilrho(servingAPs,k+K_mmW))^2;
+%             numm = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho(servingAPs,k+K_mmW))^2;
             denomm = 1-numm;
             
-            % numm1 = abs(bk(1:La,k)'*tilrho1(servingAPs,k))^2;
-            numm1 = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho1(servingAPs,k+K_mmW))^2;
+            numm1 = abs(bk(1:La,k+K_mmW)'*tilrho1(servingAPs,k+K_mmW))^2;
+%             numm1 = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho1(servingAPs,k+K_mmW))^2;
             denomm1 = 1-numm1;
 
             for i = 1:K-K_mmW
                 servingAPs = find(D(:,i+K_mmW)==1);
                 La = length(servingAPs);
-%                 denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho(servingAPs,i+K_mmW);
-%                 denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k,i)*tilrho1(servingAPs,i+K_mmW);        
-                denomm = denomm+tilrho(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho(servingAPs,i+K_mmW);
-                denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho1(servingAPs,i+K_mmW);        
+                denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k+K_mmW,i+K_mmW)*tilrho(servingAPs,i+K_mmW);
+                denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k+K_mmW,i+K_mmW)*tilrho1(servingAPs,i+K_mmW);        
+%                 denomm = denomm+tilrho(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho(servingAPs,i+K_mmW);
+%                 denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho1(servingAPs,i+K_mmW);        
             end
             %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
             %FPA schemes with two different exponents
@@ -243,8 +243,9 @@ for n = 1:nbrOfSetups
 %     SE_DL_LPMMSE_maxmin((1+K_mmW):end,n) = functionDownlinkSE_maxmin_dist(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot);  
     %Compute SE according to Corollary 6.3 with sum SE maximizing power
     %allocation in Algorithm 7.6
+    SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_dist(bk(:,(1+K_mmW):end),Ck(:,:,(1+K_mmW):end,(1+K_mmW):end),preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot,tau_p);   
 %     SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_dist(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot,tau_p);   
-SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_distv2(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p);   
+% SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_distv2(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p);   
 
     %% 
     %excluding mmW serving gNB
