@@ -1,4 +1,4 @@
-function [bk_mmW, Ck_mmW, bk_sub6, Ck_sub6] = ...
+function [bk, Ck] = ...
     functionComputeExpectationsv4(Hhat_mmW, H_mmW, Hhat_sub6,H_sub6,D,C,nbrOfRealizations,N,N_UE_mmW,N_UE_sub6,K,K_mmW,L,L_mmW,p,gainOverNoise)
 %Compute expectatations that appear in the uplink and downlink SE
 %expressions.
@@ -63,4 +63,22 @@ end
 
 %Prepare to store simulation results
 eta_eq_power = 1./(N*L*sum(gainOverNoise,2));
+bk = gainOverNoise;
+Ck = zeros(L,L,K,K);
+for k = 1:K_mmW
+    for i = 1:K_mmW
+        Ck (:,:,k,i) = (N_UE_mmW/N)*gainOverNoise(:,k)*gainOverNoise(:,i)';
+    end
+    for i = 1:K-K_mmW
+        Ck (:,:,k,i+K_mmW) = (N_UE_sub6/N)*gainOverNoise(:,k)*gainOverNoise(:,i+K_mmW)';
+    end
+end
+for k = 1:K-K_mmW
+    for i = 1:K_mmW
+        Ck (:,:,k+K_mmW,i) = (N_UE_mmW/N)*gainOverNoise(:,k+K_mmW)*gainOverNoise(:,i)';
+    end
+    for i = 1:K-K_mmW
+        Ck (:,:,k+K_mmW,i+K_mmW) = (N_UE_sub6/N)*gainOverNoise(:,k+K_mmW)*gainOverNoise(:,i+K_mmW)';
+    end
+end
 end
