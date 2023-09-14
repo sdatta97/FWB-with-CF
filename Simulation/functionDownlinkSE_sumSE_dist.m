@@ -68,7 +68,8 @@ for k = 1:K
         Ck2(sum(La(1:i-1))+1:sum(La(1:i)),sum(La(1:i-1))+1:sum(La(1:i)),k) = Ck(1:La(i),1:La(i),k,i);
     end
 end
-
+Ck2 = real(Ck2);
+bk2 = real(bk2);
 %Initialize the power allocation coefficients randomly (\tilde{rho})
 rho = sqrt(rhomax/tau_p)*rand(sum(La),1);
 
@@ -112,9 +113,7 @@ while (diff>0.1) || (diff<0)
     subject to
     
     for k=1:K
-            quad_form(rho2,ddd(k,1)*uuu(k,1)^2*Ck2(:,:,k))...
-            -2*ddd(k,1)*uuu(k,1)*bk2(:,k)'*rho2<=sss(k,1);
-        
+        quad_form(rho2,ddd(k,1)*uuu(k,1)^2*Ck2(:,:,k))-2*ddd(k,1)*uuu(k,1)*bk2(:,k)'*rho2<=sss(k,1);        
         rho3(Serv{k},k) == rho2(sum(La(1:k-1))+1:sum(La(1:k)),1);
         rho3(NoServ{k},k) == zeros(length(NoServ{k}),1);
     end
