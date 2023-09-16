@@ -78,7 +78,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     objec_old = objec_new;
     %Solve the convex problem in (7.33) with CVX
     cvx_begin quiet
-    variable t(K)
+    variable t(K) 
     variable zeta(K)
     variable lambda(K)
     variable c(L,K)
@@ -94,7 +94,6 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     end
     t >= zeros(K,1);
     c >= zeros(L,K);
-    
     cvx_end
     
     %Update the power allocation coefficients 
@@ -112,6 +111,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
 
     %Obtain the difference between current and previous objective values
     diff = objec_old - objec_new;
+    clear c t zeta lambda
 end
 %Compute SEs
 lambda = sum(sqrt(eta).*beta,1)';
@@ -120,4 +120,5 @@ for k = 1:K
     zeta(k) = (lambda(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
 end
 SE = preLogFactor*log(1+zeta)/log(2);
+% SE = objec_new;
 end
