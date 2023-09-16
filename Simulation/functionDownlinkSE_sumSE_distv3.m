@@ -103,7 +103,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     lambda_old = sum(sqrt(eta).*beta,1)';
     zeta_old = zeros(K,1);
     for k = 1:K
-        zeta_old(k) = (lambda_old(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+        zeta_old(k) = (lambda_old(k)^2)/(1/(N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
     end
 %     zeta_old = zeta;
 %     lambda_old = lambda;
