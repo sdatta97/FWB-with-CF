@@ -1,4 +1,4 @@
-function SE = functionDownlinkSE_sumSE_dist(bk,Ck,preLogFactor,L,K,D,rhomax,tau_p)
+function SE = functionDownlinkSE_sumSE_distv3(bk,Ck,preLogFactor,L,K,D,rhomax,tau_p)
 %Compute downlink SE according to Corollary 6.3 with sum SE maximizing power allocation
 %in Algorithm 7.6
 %
