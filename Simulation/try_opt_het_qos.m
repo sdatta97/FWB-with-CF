@@ -50,8 +50,8 @@ nbrOfRealizations = 10;
 N = 10;
 
 %Number of antennas per UE
-N_UE_mmW = 8;
-N_UE_sub6 = 2;
+N_UE_mmW = 4;
+N_UE_sub6 = 4;
 
 %Number of UEs in the network
 % K = 40;
@@ -212,30 +212,32 @@ for n = 1:nbrOfSetups
         servingAPs = find(D(:,k+K_mmW)==1);
         %The number of APs that serve UE k
         La = length(servingAPs);
-        for nn = 1:N_UE_sub6
-            %Compute the numerator and denominator of (7.23) for equal and FPA
-            %schemes with two different exponents
-            numm = abs(bk(1:La,k+K_mmW)'*tilrho(servingAPs,k+K_mmW))^2;
+%         for nn = 1:N_UE_sub6
+        %Compute the numerator and denominator of (7.23) for equal and FPA
+        %schemes with two different exponents
+        numm = abs(bk(1:La,k+K_mmW)'*tilrho(servingAPs,k+K_mmW))^2;
 %             numm = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho(servingAPs,k+K_mmW))^2;
-            denomm = 1-numm;
-            
-            numm1 = abs(bk(1:La,k+K_mmW)'*tilrho1(servingAPs,k+K_mmW))^2;
+        denomm = 1-numm;
+        
+        numm1 = abs(bk(1:La,k+K_mmW)'*tilrho1(servingAPs,k+K_mmW))^2;
 %             numm1 = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho1(servingAPs,k+K_mmW))^2;
-            denomm1 = 1-numm1;
+        denomm1 = 1-numm1;
 
-            for i = 1:K-K_mmW
-                servingAPs = find(D(:,i+K_mmW)==1);
-                La = length(servingAPs);
-                denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k+K_mmW,i+K_mmW)*tilrho(servingAPs,i+K_mmW);
-                denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k+K_mmW,i+K_mmW)*tilrho1(servingAPs,i+K_mmW);        
+        for i = 1:K-K_mmW
+            servingAPs = find(D(:,i+K_mmW)==1);
+            La = length(servingAPs);
+%             denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k+K_mmW,i+K_mmW)*tilrho(servingAPs,i+K_mmW);
+%             denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(1:La,1:La,k+K_mmW,i+K_mmW)*tilrho1(servingAPs,i+K_mmW);        
+            denomm = denomm+tilrho(servingAPs,i+K_mmW)'*Ck(servingAPs,servingAPs,k+K_mmW,i+K_mmW)*tilrho(servingAPs,i+K_mmW);
+            denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*Ck(servingAPs,servingAPs,k+K_mmW,i+K_mmW)*tilrho1(servingAPs,i+K_mmW);             
 %                 denomm = denomm+tilrho(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho(servingAPs,i+K_mmW);
 %                 denomm1 = denomm1+tilrho1(servingAPs,i+K_mmW)'*reshape(Ck_sub6(servingAPs,servingAPs,k,i,nn),[La,La])*tilrho1(servingAPs,i+K_mmW);        
-            end
-            %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
-            %FPA schemes with two different exponents
-            SE_DL_LPMMSE_equal(k+K_mmW,n) = SE_DL_LPMMSE_equal(k+K_mmW,n) + preLogFactor*log2(1+numm/denomm);
-            SE_DL_LPMMSE_fractional(k+K_mmW,n) = SE_DL_LPMMSE_fractional(k+K_mmW,n) + preLogFactor*log2(1+numm1/denomm1);
         end
+        %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
+        %FPA schemes with two different exponents
+        SE_DL_LPMMSE_equal(k+K_mmW) = preLogFactor*log2(1+numm/denomm);
+        SE_DL_LPMMSE_fractional(k+K_mmW) = preLogFactor*log2(1+numm1/denomm1);
+%         end
     end
     
     %Compute SE according to Corollary 6.3 with max-min fair power
