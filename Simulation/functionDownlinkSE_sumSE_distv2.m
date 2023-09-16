@@ -60,11 +60,11 @@ end
 %the concatenated vectors whose portions are the non-zero elements of
 %\tilde{b}_k in (7.33)
 Ck2 = zeros(sum(La),sum(La),K,N);
-bk2 = zeros(sum(La),K,N);
-for n = 1:N
-    for k = 1:K
-        bk2(sum(La(1:k-1))+1:sum(La(1:k)),k,n) = bk(1:La(k),k,n);
-        for i = 1:K 
+bk2 = zeros(sum(La),K);
+for k = 1:K
+    bk2(sum(La(1:k-1))+1:sum(La(1:k)),k) = bk(1:La(k),k);
+    for i = 1:K 
+        for n = 1:N
             Ck2(sum(La(1:i-1))+1:sum(La(1:i)),sum(La(1:i-1))+1:sum(La(1:i)),k,n) = Ck(1:La(i),1:La(i),k,i,n);
         end
     end
@@ -93,7 +93,7 @@ while (diff>0.1) || (diff<0)
     for n = 1:N
         for k = 1:K
             %Compute the numerator and denominator in Line 4 of Algorithm 7.6
-            numm = reshape(bk2(:,k,n),[sum(La),1])'*rho;
+            numm = reshape(bk2(:,k),[sum(La),1])'*rho;
             denomm = 1+rho'*reshape(Ck2(:,:,k,n),[sum(La),sum(La)])*rho;
             
             %Update u_k according to Line 4
@@ -114,7 +114,7 @@ while (diff>0.1) || (diff<0)
         for k=1:K
 %             quad_form(rho2(:,n),ddd(k,n)*uuu(k,n)^2*reshape(Ck2(:,:,k,n),[sum(La),sum(La)]))-2*ddd(k,n)*uuu(k,n)*(reshape(bk2(:,k,n),[sum(La),1]))'*rho2(:,n)<=sss(k,n);
             S2 = ddd(k,n)*uuu(k,n)^2*reshape(Ck2(:,:,k,n),[sum(La),sum(La)]);
-            norm(sqrtm(S2)*rho2(:,n))-2*ddd(k,n)*uuu(k,n)*(reshape(bk2(:,k,n),[sum(La),1]))'*rho2(:,n)<=sss(k,n);           
+            norm(sqrtm(S2)*rho2(:,n))-2*ddd(k,n)*uuu(k,n)*(reshape(bk2(:,k),[sum(La),1]))'*rho2(:,n)<=sss(k,n);           
             rho3(Serv{k},k,n) == rho2(sum(La(1:k-1))+1:sum(La(1:k)),n);
             rho3(NoServ{k},k,n) == zeros(length(NoServ{k}),1);
         end
