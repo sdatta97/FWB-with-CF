@@ -102,11 +102,22 @@ while (diff>0.1) || (diff<0) || (iter > n_sca)
     eta = c.^2;
     %Update the current objective value
     objec_new = sum(t);
-    zeta_old = zeta;
-    lambda_old = lambda;
+
+    lambda_old = sum(sqrt(eta).*beta,1)';
+    zeta_old = zeros(K,1);
+    for k = 1:K
+        zeta_old(k) = (lambda_old(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+    end
+%     zeta_old = zeta;
+%     lambda_old = lambda;
     %Obtain the difference between current and previous objective values
     diff = objec_old - objec_new;
 end
 %Compute SEs
-SE = preLogFactor*log2(ddd);
+lambda = sum(sqrt(eta).*beta,1)';
+zeta = zeros(K,1);
+for k = 1:K
+    zeta(k) = (lambda(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+end
+SE = preLogFactor*log2(1+zeta);
 end
