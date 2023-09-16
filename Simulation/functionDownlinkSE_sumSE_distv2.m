@@ -112,9 +112,9 @@ while (diff>0.1) || (diff<0)
     subject to
     for n = 1:N
         for k=1:K
-                quad_form(rho2(:,n),ddd(k,n)*uuu(k,n)^2*reshape(Ck2(:,:,k,n),[sum(La),sum(La)]))...
-                -2*ddd(k,n)*uuu(k,n)*(reshape(bk2(:,k,n),[sum(La),1]))'*rho2(:,n)<=sss(k,n);
-            
+%             quad_form(rho2(:,n),ddd(k,n)*uuu(k,n)^2*reshape(Ck2(:,:,k,n),[sum(La),sum(La)]))-2*ddd(k,n)*uuu(k,n)*(reshape(bk2(:,k,n),[sum(La),1]))'*rho2(:,n)<=sss(k,n);
+            S2 = ddd(k,n)*uuu(k,n)^2*reshape(Ck2(:,:,k,n),[sum(La),sum(La)]);
+            norm(sqrtm(S2)*rho2(:,n))-2*ddd(k,n)*uuu(k,n)*(reshape(bk2(:,k,n),[sum(La),1]))'*rho2(:,n)<=sss(k,n);           
             rho3(Serv{k},k,n) == rho2(sum(La(1:k-1))+1:sum(La(1:k)),n);
             rho3(NoServ{k},k,n) == zeros(length(NoServ{k}),1);
         end
