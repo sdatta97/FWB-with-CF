@@ -61,7 +61,7 @@ eta_eq = repmat(1./(N_AP*N_UE*sum(beta,2)),[1,K]);
 lambda_eq = sum(sqrt(eta_eq).*beta,1)';
 zeta_eq = zeros(K,1);
 for k = 1:K
-    zeta_eq(k) = (lambda_eq(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta*eta_eq,2));
+    zeta_eq(k) = (lambda_eq(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta_eq,2));
 end
 lambda_old = lambda_eq;
 zeta_old = zeta_eq;
@@ -82,16 +82,15 @@ while (diff>0.1) || (diff<0) || (iter > n_sca)
     variable zeta(K)
     variable lambda(K)
     variable c(L,K)
-    variable t(K,1)
     maximize sum(t)
     subject to
     
     for k=1:K
         t(k) - preLogFactor*log(1+zeta(k))<=0;
-        ((N_UE/N_AP)*beta(:,k)'*sum(beta*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
+        ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
     end
     for l = 1:L
-        beta(l,:)*(c(:,k).^2)'<= 1/(N_AP*N_UE);            
+        beta(l,:)*(c(l,:).^2)'<= 1/(N_AP*N_UE);            
     end
     t >= zeros(K,1);
     c >= zeros(L,K);
