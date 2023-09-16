@@ -68,10 +68,10 @@ zeta_old = zeta_eq;
 
 %Initizalize the iteration counter to zero
 iterr = 0;
-n_sca = 10;
+n_sca = 2;
 %Go through the algorithm steps if the objective function is improved
 %more than 0.1 or not improved at all
-while (diff>0.1) || (diff<0) || (iter > n_sca)
+while (diff>0.1) || (diff<0) || (iterr > n_sca)
     %Increase iteration counter by one
     iterr = iterr+1;
     %Update the previous objective value by the current objective value
@@ -86,7 +86,7 @@ while (diff>0.1) || (diff<0) || (iter > n_sca)
     subject to
     
     for k=1:K
-        t(k) - preLogFactor*log(1+zeta(k))<=0;
+        t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
     end
     for l = 1:L
@@ -101,8 +101,6 @@ while (diff>0.1) || (diff<0) || (iter > n_sca)
     %obtained by CVX
     eta = c.^2;
     %Update the current objective value
-    objec_new = sum(t);
-
     lambda_old = sum(sqrt(eta).*beta,1)';
     zeta_old = zeros(K,1);
     for k = 1:K
@@ -110,6 +108,8 @@ while (diff>0.1) || (diff<0) || (iter > n_sca)
     end
 %     zeta_old = zeta;
 %     lambda_old = lambda;
+    objec_new = sum(preLogFactor*log(1+zeta_old)/log(2));
+
     %Obtain the difference between current and previous objective values
     diff = objec_old - objec_new;
 end
@@ -119,5 +119,5 @@ zeta = zeros(K,1);
 for k = 1:K
     zeta(k) = (lambda(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
 end
-SE = preLogFactor*log2(1+zeta);
+SE = preLogFactor*log(1+zeta)/log(2);
 end
