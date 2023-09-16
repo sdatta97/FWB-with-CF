@@ -115,14 +115,14 @@ while (diff>0.1) || (diff<0)
     for k=1:K
 %         quad_form(rho2,ddd(k,1)*uuu(k,1)^2*Ck2(:,:,k))-2*ddd(k,1)*uuu(k,1)*bk2(:,k)'*rho2<=sss(k,1); 
 %         S2 = nearestSPD(real(ddd(k,1)*uuu(k,1)^2*Ck2(:,:,k)));
-        S2 = ddd(k,1)*uuu(k,1)^2*Ck2(:,:,k);
+        S2 = real(ddd(k,1)*uuu(k,1)^2*Ck2(:,:,k));
 %         [VV, DD] = eig(S2);
 %         S3 = abs(VV*max(DD,0)/VV);
         try
 %             quad_form(rho2,S2)-2*ddd(k,1)*uuu(k,1)*bk2(:,k)'*rho2<=sss(k,1);  
             norm(sqrtm(S2)*rho2)-2*ddd(k,1)*uuu(k,1)*bk2(:,k)'*rho2<=sss(k,1);  
-        catch
-            disp("error")
+        catch ME
+            disp(ME)
 
         end
         rho3(Serv{k},k) == rho2(sum(La(1:k-1))+1:sum(La(1:k)),1);
