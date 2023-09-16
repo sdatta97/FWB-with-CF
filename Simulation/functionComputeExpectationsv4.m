@@ -68,6 +68,18 @@ Ck = zeros(L,L,K,K);
 for k = 1:K_mmW
     for i = 1:K_mmW
         Ck (:,:,k,i) = (N_UE_mmW/N)*gainOverNoise(:,k)*gainOverNoise(:,i)';
+        if (i==k)
+            for l = 1:L
+                for ll = 1:L
+                    if (ll == l)
+                        Ck (l,ll,k,i) = Ck (l,ll,k,i) + (gainOverNoise(l,k))^2;
+                    else 
+                        Ck (l,ll,k,i) = Ck (l,ll,k,i) + 2*gainOverNoise(l,k)*gainOverNoise(ll,k);
+                    end
+
+                end
+            end
+        end
     end
     for i = 1:K-K_mmW
         Ck (:,:,k,i+K_mmW) = (N_UE_sub6/N)*gainOverNoise(:,k)*gainOverNoise(:,i+K_mmW)';
@@ -79,6 +91,17 @@ for k = 1:K-K_mmW
     end
     for i = 1:K-K_mmW
         Ck (:,:,k+K_mmW,i+K_mmW) = (N_UE_sub6/N)*gainOverNoise(:,k+K_mmW)*gainOverNoise(:,i+K_mmW)';
+        if (i==k)
+            for l = 1:L
+                for ll = 1:L
+                    if (ll == l)
+                        Ck (l,ll,k+K_mmW,i+K_mmW) = Ck (l,ll,k+K_mmW,i+K_mmW) + (gainOverNoise(l,k+K_mmW))^2;
+                    else 
+                        Ck (l,ll,k+K_mmW,i+K_mmW) = Ck (l,ll,k+K_mmW,i+K_mmW) + 2*gainOverNoise(l,k+K_mmW)*gainOverNoise(ll,k+K_mmW);
+                    end
+                end
+            end
+        end
     end
 end
 end

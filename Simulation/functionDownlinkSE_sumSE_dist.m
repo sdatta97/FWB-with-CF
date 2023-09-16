@@ -65,7 +65,7 @@ for k = 1:K
     bk2(sum(La(1:k-1))+1:sum(La(1:k)),k) = bk(1:La(k),k);
     for i = 1:K      
 %         Ck2(sum(La(1:i-1))+1:sum(La(1:i)),sum(La(1:i-1))+1:sum(La(1:i)),k) = Ck(1:La(i),1:La(i),k,i);
-        Ck2(sum(La(1:i-1))+1:sum(La(1:i)),sum(La(1:i-1))+1:sum(La(1:i)),k) = Ck(Serv{k},Serv{k},k,i);
+        Ck2(sum(La(1:i-1))+1:sum(La(1:i)),sum(La(1:i-1))+1:sum(La(1:i)),k) = Ck(Serv{i},Serv{i},k,i);
     end
 end
 Ck2 = real(Ck2);

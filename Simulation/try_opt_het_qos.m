@@ -217,12 +217,10 @@ for n = 1:nbrOfSetups
         %schemes with two different exponents
         numm = abs(bk(1:La,k+K_mmW)'*tilrho(servingAPs,k+K_mmW))^2;
 %             numm = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho(servingAPs,k+K_mmW))^2;
-        denomm = 1-numm;
-        
+        denomm = 1/(p*L*L)-numm;
         numm1 = abs(bk(1:La,k+K_mmW)'*tilrho1(servingAPs,k+K_mmW))^2;
 %             numm1 = abs(reshape(bk_sub6(servingAPs,k,nn),[La,1])'*tilrho1(servingAPs,k+K_mmW))^2;
-        denomm1 = 1-numm1;
-
+        denomm1 = 1/(p*L*L)-numm1;
         for i = 1:K-K_mmW
             servingAPs = find(D(:,i+K_mmW)==1);
             La = length(servingAPs);
@@ -235,6 +233,9 @@ for n = 1:nbrOfSetups
         end
         %Compute SEs using SINRs in (7.23) and Corollary 6.3 for equal and
         %FPA schemes with two different exponents
+        if (denomm < 0)
+            disp("Something is wrong");
+        end
         SE_DL_LPMMSE_equal(k+K_mmW) = preLogFactor*log2(1+numm/denomm);
         SE_DL_LPMMSE_fractional(k+K_mmW) = preLogFactor*log2(1+numm1/denomm1);
 %         end
