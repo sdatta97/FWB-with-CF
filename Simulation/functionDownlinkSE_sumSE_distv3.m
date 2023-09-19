@@ -66,6 +66,7 @@ lambda_old = lambda_eq;
 zeta_old = zeta_eq;
 eta = eta_eq;
 SE_eq = preLogFactor*log(1+zeta_eq)/log(2);
+SE = zeros(K,1);
 %Initizalize the iteration counter to zero
 iterr = 0;
 n_sca = 2;
@@ -111,19 +112,19 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
         objec_new = sum(preLogFactor*log(1+zeta_old)/log(2));
     
         %Obtain the difference between current and previous objective values
-        diff = objec_old - objec_new;
+        diff = objec_new - objec_old;
+        %Compute SEs
+        lambda = sum(sqrt(eta).*beta,1)';
+        zeta = zeros(K,1);
+        for k = 1:K
+            zeta(k) = (lambda(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+        end
+        SE = preLogFactor*log(1+zeta)/log(2);
         clear c t zeta lambda
     else
         break;
     end
 end
-%Compute SEs
-lambda = sum(sqrt(eta).*beta,1)';
-zeta = zeros(K,1);
-for k = 1:K
-    zeta(k) = (lambda(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
-end
-SE = preLogFactor*log(1+zeta)/log(2);
 if (sum(SE) < sum(SE_eq))
     SE=SE_eq;
 % SE = objec_new;
