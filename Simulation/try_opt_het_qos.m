@@ -35,9 +35,7 @@ areaDimensions_sub6 = [width_area_sub6, length_area_sub6, ht_sub6];
 
 
 %Number of setups with random UE locations
-nbrOfSetups = 10;
-
-
+nbrOfSetups = 1;
         
       
 %Number of channel realizations per setup
