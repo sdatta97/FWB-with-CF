@@ -91,6 +91,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     end
     for l = 1:L
         beta(l,:)*(c(l,:).^2)'<= 1/(N_AP*N_UE);            
+%         norm(sqrt(beta(l,:))*(c(l,:))')<= 1/sqrt(N_AP*N_UE);            
     end
     t >= zeros(K,1);
     c >= zeros(L,K);
