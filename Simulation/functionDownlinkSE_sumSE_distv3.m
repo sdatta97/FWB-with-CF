@@ -98,17 +98,20 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     subject to
     
     for k=1:K
-        t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
-%         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
-%         ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
-        sum1 = cvx_zeros([1,1]);
-        sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
-        for i = 1:K
-            if(La(i) > 0)
-                sum1 = sum1 + zeta_old(k)^2*((N_UE/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+        if(La(K) > 0)
+            t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
+    %         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
+    %         ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));       
+            sum1 = cvx_zeros([1,1]);
+            sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
+            for i = 1:K
+                if(La(i) > 0)
+                    sum1 = sum1 + zeta_old(k)^2*((N_UE/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+                end
             end
+            sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
+            lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
         end
-        sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
     end
     for l = 1:L
         sum2 = cvx_zeros([1,1]);
