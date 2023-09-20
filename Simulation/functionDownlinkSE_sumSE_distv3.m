@@ -146,13 +146,13 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
         end
     %     zeta_old = zeta;
     %     lambda_old = lambda;
-        objec_new = sum(preLogFactor*log(1+zeta_old)/log(2));
+        %Compute SEs
+        SE = preLogFactor*log(1+zeta_old)/log(2);
+        objec_new = sum(SE);
     
         %Obtain the difference between current and previous objective values
         diff = objec_new - objec_old;
-        %Compute SEs
-        SE = objec_new;
-        clear c t zeta lambda
+        clear c2 t zeta lambda
     else
         break;
     end
