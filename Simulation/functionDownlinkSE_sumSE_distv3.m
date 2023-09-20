@@ -70,7 +70,7 @@ lambda_eq = zeros(K,1); %sum((sqrt(eta_eq)*D).*beta,1)';
 zeta_eq = zeros(K,1);
 for k = 1:K
     lambda_eq(k) = (sqrt(eta_eq).*D(:,k))'*beta(:,k);
-    zeta_eq(k) = (lambda_eq(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta_eq,2));
+    zeta_eq(k) = (lambda_eq(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*repmat(eta_eq,[1,K]),2));
 end
 lambda_old = lambda_eq;
 zeta_old = zeta_eq;
