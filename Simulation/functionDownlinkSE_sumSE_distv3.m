@@ -53,13 +53,23 @@ for k = 1:K
     La(k) = length(servingAPs);
     beta(:,k) = beta(:,k).*D(:,k);
 end
+beta_opt = zeros(sum(La),K);
+for k=1:K
+    if (k==1)
+        beta_opt(1:La(k),k) = beta(Serv{k},k);
+    else
+        beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k) = beta(Serv{k},k);
+    end
+end
 %Intialize the difference between current and previous objective values 
 diff = 100;
 %Initialize iterates
-eta_eq = repmat(1./(N_AP*N_UE*sum(beta,2)),[1,K]);
-lambda_eq = sum(sqrt(eta_eq).*beta,1)';
+% eta_eq = repmat(1./(N_AP*N_UE*sum(beta,2)),[1,K]);
+eta_eq = 1./(N_AP*N_UE*sum(beta,2));
+lambda_eq = zeros(K,1); %sum((sqrt(eta_eq)*D).*beta,1)';
 zeta_eq = zeros(K,1);
 for k = 1:K
+    lambda_eq(k) = (sqrt(eta_eq).*D(:,k))'*beta(:,k);
     zeta_eq(k) = (lambda_eq(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta_eq,2));
 end
 lambda_old = lambda_eq;
@@ -82,25 +92,46 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     variable t(K) 
     variable zeta(K)
     variable lambda(K)
-    variable c(L,K)
+    variable c2(sum(La),K)
+%     variable c(L,K)
     maximize sum(t)
     subject to
     
     for k=1:K
         t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
-        ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
+%         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
+        ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
     end
     for l = 1:L
-        beta(l,:)*(c(l,:).^2)'<= 1/(N_AP*N_UE);            
-%         norm(sqrt(beta(l,:))*(c(l,:))')<= 1/sqrt(N_AP*N_UE);            
+        summ = cvx_zeros([1,1]);
+%     for l = 1:sum(La)
+        for k = 1:K
+%             beta(l,:)*(c(l,:).^2)'<= 1/(N_AP*N_UE);            
+%         norm(sqrt(beta(l,:))*(c(l,:))')<= 1/sqrt(N_AP*N_UE); 
+            [a,b] = ismember(l,Serv{k});
+            if a
+                summ = summ + beta(l,k)*c2(b,k)^2;
+            end
+        end
+        summ<= 1/(N_AP*N_UE);            
     end
     t >= zeros(K,1);
-    c >= zeros(L,K);
+%     c >= zeros(L,K);
+    c2 >= zeros(sum(La),K);
+    for k=1:K 
+%         c(Serv{k},k) == c2(1+sum(La(1:k-1)):sum(La(1:k)),k);
+%         c(NoServ{k},k) == zeros(length(NoServ{k}),1);
+        c2(1:sum(La(1:k-1)),k) == zeros(sum(La(1:k-1)),1);
+        c2(1+sum(La(1:k)):sum(La),k) == zeros(sum(La)-sum(La(1:k)),1);
+    end
     cvx_end
     if (cvx_status == 'Solved')
         %Update the power allocation coefficients 
         %obtained by CVX
-        eta = c.^2;
+        eta = zeros(L,K);
+        for k=1:K
+            eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k)),k).^2;
+        end
         %Update the current objective value
         lambda_old = sum(sqrt(eta).*beta,1)';
         zeta_old = zeros(K,1);
