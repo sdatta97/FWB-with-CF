@@ -129,6 +129,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     t >= zeros(K,1);
 %     c >= zeros(L,K);
     c2 >= zeros(sum(La),1);
+    lambda>=zeros(K,1);
 %     for k=1:K 
 % %         c(Serv{k},k) == c2(1+sum(La(1:k-1)):sum(La(1:k)),k);
 % %         c(NoServ{k},k) == zeros(length(NoServ{k}),1);
