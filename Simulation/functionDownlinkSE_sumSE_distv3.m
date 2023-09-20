@@ -116,7 +116,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
 %         norm(sqrt(beta(l,:))*(c(l,:))')<= 1/sqrt(N_AP*N_UE); 
             [a,b] = ismember(l,Serv{k});
             if a
-                sum2 = sum2 + beta(l,k)*c2(b,k)^2;
+                sum2 = sum2 + beta(l,k)*c2(sum(La(1:k-1))+b)^2;
             end
         end
         sum2 <= 1/(N_AP*N_UE);            
