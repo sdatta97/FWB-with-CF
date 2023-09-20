@@ -104,7 +104,9 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
         sum1 = cvx_zeros([1,1]);
         sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
         for i = 1:K
-            sum1 = sum1 + zeta_old(k)^2*((N_UE/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+            if(La(i) > 0)
+                sum1 = sum1 + zeta_old(k)^2*((N_UE/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+            end
         end
         sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
     end
@@ -131,30 +133,58 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
 %         c2(1+sum(La(1:k)):sum(La),k) == zeros(sum(La)-sum(La(1:k)),1);
 %     end
     cvx_end
-    if (cvx_status == 'Solved')
-        %Update the power allocation coefficients 
-        %obtained by CVX
-        eta = zeros(L,K);
-        for k=1:K
-            eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
+    try
+        if (cvx_status == 'Solved')
+            %Update the power allocation coefficients 
+            %obtained by CVX
+            eta = zeros(L,K);
+            for k=1:K
+                eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
+            end
+            %Update the current objective value
+            lambda_old = sum(sqrt(eta).*beta,1)';
+            zeta_old = zeros(K,1);
+            for k = 1:K
+                zeta_old(k) = (lambda_old(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+            end
+        %     zeta_old = zeta;
+        %     lambda_old = lambda;
+            %Compute SEs
+            SE = preLogFactor*log(1+zeta_old)/log(2);
+            objec_new = sum(SE);
+        
+            %Obtain the difference between current and previous objective values
+            diff = objec_new - objec_old;
+            clear c2 t zeta lambda
+        else
+            break;
         end
-        %Update the current objective value
-        lambda_old = sum(sqrt(eta).*beta,1)';
-        zeta_old = zeros(K,1);
-        for k = 1:K
-            zeta_old(k) = (lambda_old(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+    catch 
+        if (cvx_status == 'Inaccurate/Solved')
+            %Update the power allocation coefficients 
+            %obtained by CVX
+            eta = zeros(L,K);
+            for k=1:K
+                eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
+            end
+            %Update the current objective value
+            lambda_old = sum(sqrt(eta).*beta,1)';
+            zeta_old = zeros(K,1);
+            for k = 1:K
+                zeta_old(k) = (lambda_old(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+            end
+        %     zeta_old = zeta;
+        %     lambda_old = lambda;
+            %Compute SEs
+            SE = preLogFactor*log(1+zeta_old)/log(2);
+            objec_new = sum(SE);
+        
+            %Obtain the difference between current and previous objective values
+            diff = objec_new - objec_old;
+            clear c2 t zeta lambda
+        else
+            break;
         end
-    %     zeta_old = zeta;
-    %     lambda_old = lambda;
-        %Compute SEs
-        SE = preLogFactor*log(1+zeta_old)/log(2);
-        objec_new = sum(SE);
-    
-        %Obtain the difference between current and previous objective values
-        diff = objec_new - objec_old;
-        clear c2 t zeta lambda
-    else
-        break;
     end
 end
 if (sum(SE) < sum(SE_eq))
