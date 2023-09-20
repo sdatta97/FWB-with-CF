@@ -251,10 +251,10 @@ for n = 1:nbrOfSetups
 
     %% 
     %excluding mmW serving gNB
-    [~,l_idx] = max(gainOverNoise(:,1).*D(:,1));
-    D(l_idx,(1+K_mmW):end) = 0;
-    D(1:(l_idx-1),1) = 0;
-    D((1+l_idx):L,1) = 0;
+%     [~,l_idx] = max(gainOverNoise(:,1).*D(:,1));
+%     D(l_idx,(1+K_mmW):end) = 0;
+%     D(1:(l_idx-1),1) = 0;
+%     D((1+l_idx):L,1) = 0;
     SE_DL_LPMMSE_sumSE_after_handoff =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,N,N_UE_sub6,D,rho_tot,tau_p);   
 end
 
@@ -263,12 +263,13 @@ figure;
 hold on; box on;
 set(gca,'fontsize',16);
 
-plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
-plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
-plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
+% plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
+% plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
+% plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
 plot(sort(SE_DL_LPMMSE_sumSE(:)),linspace(0,1,K*nbrOfSetups),'r--','LineWidth',2);
+plot(sort(SE_DL_LPMMSE_sumSE_after_handoff(:)),linspace(0,1,K*nbrOfSetups),'b--','LineWidth',2);
 
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
-legend({'Equal', 'FPA, $\upsilon=0.5$', 'MMF','SumSE' },'Interpreter','Latex','Location','SouthEast');
-xlim([0 12]);
+legend({'Equal', 'Equal after handoff' },'Interpreter','Latex','Location','SouthEast');
+% xlim([0 12]);
