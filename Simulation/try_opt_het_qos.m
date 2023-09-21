@@ -17,7 +17,7 @@ clear;
 
 
 %% Define simulation setup
-lambda_BS = 1; %25;
+lambda_BS = 5; %25;
 lambda_UE = 0; %10;
 lambda_UE_sub6 = 10; %50; %:10:50;
 coverageRange = 100;
@@ -35,7 +35,7 @@ areaDimensions_sub6 = [width_area_sub6, length_area_sub6, ht_sub6];
 
 
 %Number of setups with random UE locations
-nbrOfSetups = 1;
+nbrOfSetups = 10;
         
       
 %Number of channel realizations per setup
