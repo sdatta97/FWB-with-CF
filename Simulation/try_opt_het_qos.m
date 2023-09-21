@@ -266,8 +266,8 @@ set(gca,'fontsize',16);
 % plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
 % plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
 % plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
-plot(sort(SE_DL_LPMMSE_sumSE(:)),linspace(0,1,K*nbrOfSetups),'r--','LineWidth',2);
-plot(sort(SE_DL_LPMMSE_sumSE_after_handoff(:)),linspace(0,1,K*nbrOfSetups),'b--','LineWidth',2);
+plot(sort(SE_DL_LPMMSE_sumSE((1+K_mmW):end)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r--','LineWidth',2);
+plot(sort(SE_DL_LPMMSE_sumSE_after_handoff((1+K_mmW):end)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b--','LineWidth',2);
 
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
