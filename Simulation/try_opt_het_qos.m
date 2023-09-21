@@ -54,15 +54,6 @@ N_UE_sub6 = 4;
 %Number of UEs in the network
 % K = 40;
 
-%Length of the coherence block
-tau_c = 200;
-
-%Compute number of pilots per coherence block
-tau_p = 10;
-
-%Compute the prelog factor assuming only downlink data transmission
-preLogFactor = (tau_c-tau_p)/tau_c;
-
 %Angular standard deviation in the local scattering model (in radians)
 ASD_varphi = deg2rad(15); %azimuth angle
 ASD_theta = deg2rad(15);  %elevation angle
@@ -109,16 +100,25 @@ for n = 1:nbrOfSetups
     K_mmW = 1;
     K_sub6 = poissrnd(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
     K = K_mmW+K_sub6;
+    %Length of the coherence block
+    tau_c = 200;
+    
+    %Compute number of pilots per coherence block
+    tau_p = K;
+    
+    %Compute the prelog factor assuming only downlink data transmission
+    preLogFactor = (tau_c-tau_p)/tau_c;
     SE_DL_LPMMSE_equal = zeros(K,1); %Equal
     SE_DL_LPMMSE_fractional = zeros(K,1); %FPA, \upsilon = 0.5
     SE_DL_LPMMSE_maxmin = zeros(K,1); %MMF
     SE_DL_LPMMSE_sumSE = zeros(K,1); %SumSE
     %Generate one setup with UEs at random locations
-    [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,ASD_varphi,ASD_theta);
+%     [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,ASD_varphi,ASD_theta);
+    [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0);
     
     %Generate channel realizations, channel estimates, and estimation
     %error correlation matrices for all UEs to the cell-free APs
-    [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
+%     [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
 %     [~,l_idx] = max(mean(gainOverNoisedB,1));
     % Full uplink power for the computation of precoding vectors using
     % virtual uplink-downlink duality
@@ -126,25 +126,25 @@ for n = 1:nbrOfSetups
    
     gainOverNoise = db2pow(gainOverNoisedB);
 
-    %Equal power allocation
-    rho_dist_equal = (rho_tot/tau_p)*ones(L,K);
-
-    %Compute the power allocation in (7.47) for distributed precoding
-    rho_dist = zeros(L,K); % with exponent 0.5
-    
-    for l = 1:L
-        
-        %Extract which UEs are served by AP l
-        servedUEs = find(D(l,:)==1);
-        
-        %Compute denominator in (7.47)
-        normalizationAPl = sum(sqrt(gainOverNoise(l,servedUEs)));
-
-        for ind = 1:length(servedUEs)
-            rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
-        end
-        
-    end
+%     %Equal power allocation
+%     rho_dist_equal = (rho_tot/tau_p)*ones(L,K);
+% 
+%     %Compute the power allocation in (7.47) for distributed precoding
+%     rho_dist = zeros(L,K); % with exponent 0.5
+%     
+%     for l = 1:L
+%         
+%         %Extract which UEs are served by AP l
+%         servedUEs = find(D(l,:)==1);
+%         
+%         %Compute denominator in (7.47)
+%         normalizationAPl = sum(sqrt(gainOverNoise(l,servedUEs)));
+% 
+%         for ind = 1:length(servedUEs)
+%             rho_dist(l,servedUEs(ind)) = rho_tot*sqrt(gainOverNoise(l,servedUEs(ind)))/normalizationAPl;
+%         end
+%         
+%     end
     
     %Obtain the expectations for the computation of the terms in
     %(7.25)-(7.26)
@@ -247,7 +247,7 @@ for n = 1:nbrOfSetups
 %     SE_DL_LPMMSE_sumSE((1+K_mmW):end) =  functionDownlinkSE_sumSE_dist(bk(:,(1+K_mmW):end),Ck(:,:,(1+K_mmW):end,(1+K_mmW):end),preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot,tau_p);   
 %     SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_dist(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot,tau_p);   
 %     SE_DL_LPMMSE_sumSE((1+K_mmW):end) =  sum(functionDownlinkSE_sumSE_distv2(bk(:,(1+K_mmW):end),Ck(:,:,(1+K_mmW):end,(1+K_mmW):end),preLogFactor,L,K-K_mmW,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p),2);   
-    SE_DL_LPMMSE_sumSE((1+K_mmW):end) =  functionDownlinkSE_sumSE_distv3(gainOverNoise(:,(1+K_mmW):end),preLogFactor,L,K-K_mmW,N,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p);   
+    SE_DL_LPMMSE_sumSE((1+K_mmW):end) =  functionDownlinkSE_sumSE_distv3(gainOverNoise(:,(1+K_mmW):end),preLogFactor,L,K-K_mmW,N,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p,0);   
 
     %% 
     %excluding mmW serving gNB
@@ -255,7 +255,7 @@ for n = 1:nbrOfSetups
 %     D(l_idx,(1+K_mmW):end) = 0;
 %     D(1:(l_idx-1),1) = 0;
 %     D((1+l_idx):L,1) = 0;
-    SE_DL_LPMMSE_sumSE_after_handoff =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,N,N_UE_sub6,D,rho_tot,tau_p);   
+    SE_DL_LPMMSE_sumSE_after_handoff =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,N,N_UE_sub6,D,rho_tot,tau_p,1);   
 end
 
 % Plot Figure 7.3

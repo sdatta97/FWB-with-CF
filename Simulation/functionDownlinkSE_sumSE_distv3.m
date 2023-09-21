@@ -1,4 +1,4 @@
-function SE = functionDownlinkSE_sumSE_distv3(beta,preLogFactor,L,K,N_AP,N_UE,D,rhomax,tau_p)
+function SE = functionDownlinkSE_sumSE_distv3(beta,preLogFactor,L,K,N_AP,N_UE,D,rhomax,tau_p,mmW)
 %Compute downlink SE according to Corollary 6.3 with sum SE maximizing power allocation
 %in Algorithm 7.6
 %
@@ -41,7 +41,7 @@ La = zeros(K,1);
 Serv = cell(K,1);
 %Prepare cell to store the AP indices not serving a specficic UE
 NoServ = cell(K,1);
-
+p_fac=2; %ratio of mmW to sub-6 powers
 %Construc the above array and cells
 for k = 1:K
     servingAPs = find(D(:,k)==1);
@@ -65,7 +65,28 @@ end
 diff = 100;
 %Initialize iterates
 % eta_eq = repmat(1./(N_AP*N_UE*sum(beta,2)),[1,K]);
-eta_eq = 1./(N_AP*N_UE*sum(beta,2));
+if (mmW == 0)
+    eta_eq = 1./(N_AP*N_UE*sum(beta,2));
+    lambda_eq = zeros(K,1); %sum((sqrt(eta_eq)*D).*beta,1)';
+    zeta_eq = zeros(K,1);
+    for k = 1:K
+        lambda_eq(k) = (sqrt(eta_eq).*D(:,k))'*beta(:,k);
+        zeta_eq(k) = (lambda_eq(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*repmat(eta_eq,[1,K]),2));
+    end
+else
+    eta_eq = zeros(L,K);
+    for l = 1:L
+        for k = 1:K
+            if ismember(l,Serv{k})
+                if (k==1)
+                    eta_eq(l,k) = p_fac./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
+                else
+                    eta_eq(l,k) = 1./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
+                end
+            end
+        end
+    end
+end
 lambda_eq = zeros(K,1); %sum((sqrt(eta_eq)*D).*beta,1)';
 zeta_eq = zeros(K,1);
 for k = 1:K
@@ -87,56 +108,109 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
     iterr = iterr+1;
     %Update the previous objective value by the current objective value
     objec_old = objec_new;
-    %Solve the convex problem in (7.33) with CVX
-    cvx_begin quiet
-    variable t(K) 
-    variable zeta(K)
-    variable lambda(K)
-    variable c2(sum(La),1)
-%     variable c(L,K)
-    maximize sum(t)
-    subject to
-    
-    for k=1:K
-        if(La(K) > 0)
-            t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
-    %         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
-    %         ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));       
-            sum1 = cvx_zeros([1,1]);
-            sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
-            for i = 1:K
-                if(La(i) > 0)
-                    sum1 = sum1 + zeta_old(k)^2*((N_UE/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+    if (mmW == 0)
+        %Solve the convex problem in (7.33) with CVX
+        cvx_begin quiet
+        variable t(K) 
+        variable zeta(K)
+        variable lambda(K)
+        variable c2(sum(La),1)
+    %     variable c(L,K)
+        maximize sum(t)
+        subject to
+        
+        for k=1:K
+            if(La(K) > 0)
+                t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
+        %         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
+        %         ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));       
+                sum1 = cvx_zeros([1,1]);
+                sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
+                for i = 1:K
+                    if(La(i) > 0)
+                        sum1 = sum1 + zeta_old(k)^2*((N_UE/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+                    end
+                end
+                sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
+                lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
+            end
+        end
+        for l = 1:L
+            sum2 = cvx_zeros([1,1]);
+    %     for l = 1:sum(La)
+            for k = 1:K
+    %             beta(l,:)*(c(l,:).^2)'<= 1/(N_AP*N_UE);            
+    %         norm(sqrt(beta(l,:))*(c(l,:))')<= 1/sqrt(N_AP*N_UE); 
+                [a,b] = ismember(l,Serv{k});
+                if a
+                    sum2 = sum2 + beta(l,k)*c2(sum(La(1:k-1))+b)^2;
                 end
             end
-            sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
-            lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
+            sum2 <= 1/(N_AP*N_UE);            
         end
-    end
-    for l = 1:L
-        sum2 = cvx_zeros([1,1]);
-%     for l = 1:sum(La)
-        for k = 1:K
-%             beta(l,:)*(c(l,:).^2)'<= 1/(N_AP*N_UE);            
-%         norm(sqrt(beta(l,:))*(c(l,:))')<= 1/sqrt(N_AP*N_UE); 
-            [a,b] = ismember(l,Serv{k});
-            if a
-                sum2 = sum2 + beta(l,k)*c2(sum(La(1:k-1))+b)^2;
+        t >= zeros(K,1);
+    %     c >= zeros(L,K);
+        c2 >= zeros(sum(La),1);
+        lambda>=zeros(K,1);
+    %     for k=1:K 
+    % %         c(Serv{k},k) == c2(1+sum(La(1:k-1)):sum(La(1:k)),k);
+    % %         c(NoServ{k},k) == zeros(length(NoServ{k}),1);
+    %         c2(1:sum(La(1:k-1)),k) == zeros(sum(La(1:k-1)),1);
+    %         c2(1+sum(La(1:k)):sum(La),k) == zeros(sum(La)-sum(La(1:k)),1);
+    %     end
+        cvx_end
+    else
+       %Solve the convex problem in (7.33) with CVX
+        cvx_begin quiet
+        variable t(K) 
+        variable zeta(K)
+        variable lambda(K)
+        variable c2(sum(La),1)
+    %     variable c(L,K)
+        maximize sum(t)
+        subject to
+        
+        for k=1:K
+            if(La(K) > 0)
+                t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
+        %         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
+        %         ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));       
+                sum1 = cvx_zeros([1,1]);
+                sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
+                for i = 1:K
+                    if(La(i) > 0)
+                        sum1 = sum1 + zeta_old(k)^2*((N_UE/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+                    end
+                end
+                sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));
+                lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
             end
         end
-        sum2 <= 1/(N_AP*N_UE);            
+        for l = 1:L
+            sum2 = cvx_zeros([1,1]);
+    %     for l = 1:sum(La)
+            for k = 1:K
+    %             beta(l,:)*(c(l,:).^2)'<= 1/(N_AP*N_UE);            
+    %         norm(sqrt(beta(l,:))*(c(l,:))')<= 1/sqrt(N_AP*N_UE); 
+                [a,b] = ismember(l,Serv{k});
+                if a
+                    sum2 = sum2 + beta(l,k)*c2(sum(La(1:k-1))+b)^2;
+                end
+            end
+            sum2 <= 1/(N_AP*N_UE);            
+        end
+        t >= zeros(K,1);
+    %     c >= zeros(L,K);
+        c2 >= zeros(sum(La),1);
+        lambda>=zeros(K,1);
+    %     for k=1:K 
+    % %         c(Serv{k},k) == c2(1+sum(La(1:k-1)):sum(La(1:k)),k);
+    % %         c(NoServ{k},k) == zeros(length(NoServ{k}),1);
+    %         c2(1:sum(La(1:k-1)),k) == zeros(sum(La(1:k-1)),1);
+    %         c2(1+sum(La(1:k)):sum(La),k) == zeros(sum(La)-sum(La(1:k)),1);
+    %     end
+        cvx_end
     end
-    t >= zeros(K,1);
-%     c >= zeros(L,K);
-    c2 >= zeros(sum(La),1);
-    lambda>=zeros(K,1);
-%     for k=1:K 
-% %         c(Serv{k},k) == c2(1+sum(La(1:k-1)):sum(La(1:k)),k);
-% %         c(NoServ{k},k) == zeros(length(NoServ{k}),1);
-%         c2(1:sum(La(1:k-1)),k) == zeros(sum(La(1:k-1)),1);
-%         c2(1+sum(La(1:k)):sum(La),k) == zeros(sum(La)-sum(La(1:k)),1);
-%     end
-    cvx_end
     try
         if (cvx_status == 'Solved')
             %Update the power allocation coefficients 

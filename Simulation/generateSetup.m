@@ -54,7 +54,7 @@ function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distanc
 %% Define simulation setup
 
 %Set the seed number if it is specified other than zero
-if (nargin>5)&&(seed>0)
+if (nargin>9)&&(seed>0)
     rng(seed)
 end
 
@@ -231,7 +231,7 @@ for n = 1:nbrOfSetups
             %Generate spatial correlation matrix using the local
             %scattering model in (2.18) and Gaussian angular distribution
             %by scaling the normalized matrices with the channel gain
-            if nargin>6
+            if nargin>10
                 R(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
             else
                 R(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N);  %If angular standard deviations are not specified, set i.i.d. fading
