@@ -41,7 +41,7 @@ La = zeros(K,1);
 Serv = cell(K,1);
 %Prepare cell to store the AP indices not serving a specficic UE
 NoServ = cell(K,1);
-p_fac= 100; %ratio of mmW to sub-6 powers
+p_fac= 1; %100; %ratio of mmW to sub-6 powers
 %Construc the above array and cells
 for k = 1:K
     servingAPs = find(D(:,k)==1);
@@ -213,8 +213,11 @@ while (diff>0.1) || (diff<0)  %|| (iterr > n_sca)
         %     lambda_old = lambda;
             %Compute SEs
             SE = preLogFactor*log(1+zeta_old)/log(2);
-            objec_new = sum(SE);
-        
+            if (K_mmW == 0)
+                objec_new = sum(SE);
+            else
+                objec_new = 100*SE(1) + sum(SE(2:K));
+            end
             %Obtain the difference between current and previous objective values
             diff = objec_new - objec_old;
             clear c2 t zeta lambda
@@ -240,8 +243,11 @@ while (diff>0.1) || (diff<0)  %|| (iterr > n_sca)
             %     lambda_old = lambda;
                 %Compute SEs
                 SE = preLogFactor*log(1+zeta_old)/log(2);
-                objec_new = sum(SE);
-            
+                if (K_mmW == 0)
+                    objec_new = sum(SE);
+                else
+                    objec_new = 100*SE(1) + sum(SE(2:K));
+                end            
                 %Obtain the difference between current and previous objective values
                 diff = objec_new - objec_old;
                 clear c2 t zeta lambda
