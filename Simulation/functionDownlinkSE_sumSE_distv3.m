@@ -97,6 +97,7 @@ zeta_old = zeta_eq;
 % eta = eta_eq;
 SE_eq = preLogFactor*log(1+zeta_eq)/log(2);
 SE = zeros(K,1);
+cvx_precision low
 %Initizalize the iteration counter to zero
 iterr = 0;
 n_sca = 2;
@@ -119,7 +120,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
         subject to
         
         for k=1:K
-            if(La(K) > 0)
+            if(La(k) > 0)
                 t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
         %         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
         %         ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));       
@@ -170,7 +171,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
         subject to
         
         for k=1:K
-            if(La(K) > 0)
+            if(La(k) > 0)
                 t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
         %         ((N_UE/N_AP)*beta(:,k)'*sum(beta.*(c.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k))
         %         ((N_UE/N_AP)*beta_opt(:,k)'*sum(beta_opt.*(c2.^2),2) + (1/(rhomax*N_AP*N_AP)))*zeta_old(k)^2 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - lambda_old(k)*(zeta(k)-zeta_old(k));       
@@ -237,29 +238,33 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
             break;
         end
     catch 
-        if (cvx_status == 'Inaccurate/Solved')
-            %Update the power allocation coefficients 
-            %obtained by CVX
-            eta = zeros(L,K);
-            for k=1:K
-                eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
+        try 
+            if (cvx_status == 'Inaccurate/Solved')
+                %Update the power allocation coefficients 
+                %obtained by CVX
+                eta = zeros(L,K);
+                for k=1:K
+                    eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
+                end
+                %Update the current objective value
+                lambda_old = sum(sqrt(eta).*beta,1)';
+                zeta_old = zeros(K,1);
+                for k = 1:K
+                    zeta_old(k) = (lambda_old(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
+                end
+            %     zeta_old = zeta;
+            %     lambda_old = lambda;
+                %Compute SEs
+                SE = preLogFactor*log(1+zeta_old)/log(2);
+                objec_new = sum(SE);
+            
+                %Obtain the difference between current and previous objective values
+                diff = objec_new - objec_old;
+                clear c2 t zeta lambda
+            else
+                break;
             end
-            %Update the current objective value
-            lambda_old = sum(sqrt(eta).*beta,1)';
-            zeta_old = zeros(K,1);
-            for k = 1:K
-                zeta_old(k) = (lambda_old(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta,2));
-            end
-        %     zeta_old = zeta;
-        %     lambda_old = lambda;
-            %Compute SEs
-            SE = preLogFactor*log(1+zeta_old)/log(2);
-            objec_new = sum(SE);
-        
-            %Obtain the difference between current and previous objective values
-            diff = objec_new - objec_old;
-            clear c2 t zeta lambda
-        else
+        catch 
             break;
         end
     end

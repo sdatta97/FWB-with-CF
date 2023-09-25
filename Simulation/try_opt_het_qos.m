@@ -43,7 +43,7 @@ K_mmW = 1;
 K_sub6 = 19;
 K = K_mmW+K_sub6;
 %Length of the coherence block
-tau_c = 1000;
+tau_c = 200;
 
 %Compute number of pilots per coherence block
 tau_p = K;
