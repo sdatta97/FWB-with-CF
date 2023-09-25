@@ -1,4 +1,4 @@
-function SE = functionDownlinkSE_sumSE_distv3(beta,preLogFactor,L,K,K_mmW,N_AP,N_UE,D,rhomax,tau_p)
+function [SE_eq, SE] = functionDownlinkSE_sumSE_distv3(beta,preLogFactor,L,K,K_mmW,N_AP,N_UE,D,rhomax,tau_p)
 %Compute downlink SE according to Corollary 6.3 with sum SE maximizing power allocation
 %in Algorithm 7.6
 %
@@ -65,27 +65,27 @@ end
 diff = 100;
 %Initialize iterates
 eta_eq = zeros(L,K);
-if (K_mmW == 0)
-    for l = 1:L
-        for k = 1:K
-            if ismember(l,Serv{k})
-                eta_eq(l,k) = 1./(N_AP*N_UE*sum(beta(l,:)));
-            end
-        end
-    end
-else
-    for l = 1:L
-        for k = 1:K
-            if ismember(l,Serv{k})
-                if (k<=K_mmW)
-                    eta_eq(l,k) = p_fac./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
-                else
-                    eta_eq(l,k) = 1./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
-                end
-            end
+% if (K_mmW == 0)
+for l = 1:L
+    for k = 1:K
+        if ismember(l,Serv{k})
+            eta_eq(l,k) = 1./(N_AP*N_UE*sum(beta(l,:)));
         end
     end
 end
+% else
+%     for l = 1:L
+%         for k = 1:K
+%             if ismember(l,Serv{k})
+%                 if (k<=K_mmW)
+%                     eta_eq(l,k) = p_fac./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
+%                 else
+%                     eta_eq(l,k) = 1./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
+%                 end
+%             end
+%         end
+%     end
+% end
 lambda_eq = zeros(K,1); %sum((sqrt(eta_eq)*D).*beta,1)';
 zeta_eq = zeros(K,1);
 for k = 1:K
@@ -145,6 +145,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
+%         t >= 0.1*ones(K,1); 
         t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
@@ -185,7 +186,10 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
-        t >= zeros(K,1);
+        t(1:K_mmW)   >= 1;
+%         t(2:K) >= 0.1*ones(K-1,1);
+        t(2:K) >= zeros(K-1,1);
+%         t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
         lambda>=zeros(K,1);
