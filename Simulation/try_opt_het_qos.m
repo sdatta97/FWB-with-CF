@@ -52,11 +52,11 @@ tau_p = K;
 preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
-nbrOfSetups = 1; %100;
+nbrOfSetups = 10; %100;
         
       
 %Number of channel realizations per setup
-nbrOfRealizations = 1; %100;
+nbrOfRealizations = 10; %100;
 
 % %Number of APs in the cell-free network
 % L = 10;

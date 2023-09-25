@@ -99,8 +99,8 @@ SE_eq = preLogFactor*log(1+zeta_eq)/log(2);
 SE = zeros(K,1);
 cvx_precision low
 %Initizalize the iteration counter to zero
-iterr = 0;
-n_sca = 2;
+iterr = 1;
+n_sca = 10;
 %Go through the algorithm steps if the objective function is improved
 %more than 0.1 or not improved at all
 while (diff>0.1) || (diff<0) || (iterr > n_sca)
