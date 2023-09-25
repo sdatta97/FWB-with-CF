@@ -17,7 +17,7 @@ clear;
 
 
 %% Define simulation setup
-lambda_BS = 25; %25;
+lambda_BS = 10; %25;
 lambda_UE = 0; %10;
 lambda_UE_sub6 = 50; %:10:50;
 coverageRange = 100;
@@ -34,10 +34,13 @@ areaDimensions = [width_area, length_area, ht];
 areaDimensions_sub6 = [width_area_sub6, length_area_sub6, ht_sub6];
 
 %Number of APs and UEs 
-L_mmW = floor(lambda_BS*pi*(coverageRange/1000)^2);
-L = floor(lambda_BS*pi*(coverageRange_sub6/1000)^2);
+% L_mmW = floor(lambda_BS*pi*(coverageRange/1000)^2);
+% L = floor(lambda_BS*pi*(coverageRange_sub6/1000)^2);
+L_mmW = 1;
+L = 32;
 K_mmW = 1;
-K_sub6 = floor(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
+% K_sub6 = floor(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
+K_sub6 = 19;
 K = K_mmW+K_sub6;
 %Length of the coherence block
 tau_c = 1000;
@@ -49,11 +52,11 @@ tau_p = K;
 preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
-nbrOfSetups = 10;
+nbrOfSetups = 1; %100;
         
       
 %Number of channel realizations per setup
-nbrOfRealizations = 10;
+nbrOfRealizations = 1; %100;
 
 % %Number of APs in the cell-free network
 % L = 10;
@@ -299,7 +302,7 @@ set(gca,'fontsize',16);
 % plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
 plot(sort(SE_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r--','LineWidth',2);
 plot(sort(SE_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b--','LineWidth',2);
-
+disp(mean(SE_DL_LPMMSE_sumSE_after_handoff(1,:))*100);
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
 legend({'Equal', 'Equal after handoff' },'Interpreter','Latex','Location','SouthEast');
