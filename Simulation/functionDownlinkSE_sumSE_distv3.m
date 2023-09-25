@@ -41,7 +41,7 @@ La = zeros(K,1);
 Serv = cell(K,1);
 %Prepare cell to store the AP indices not serving a specficic UE
 NoServ = cell(K,1);
-p_fac=1000; %ratio of mmW to sub-6 powers
+p_fac=100; %ratio of mmW to sub-6 powers
 %Construc the above array and cells
 for k = 1:K
     servingAPs = find(D(:,k)==1);
@@ -65,27 +65,27 @@ end
 diff = 100;
 %Initialize iterates
 eta_eq = zeros(L,K);
-% if (K_mmW == 0)
-for l = 1:L
-    for k = 1:K
-        if ismember(l,Serv{k})
-            eta_eq(l,k) = 1./(N_AP*N_UE*sum(beta(l,:)));
+if (K_mmW == 0)
+    for l = 1:L
+        for k = 1:K
+            if ismember(l,Serv{k})
+                eta_eq(l,k) = 1./(N_AP*N_UE*sum(beta(l,:)));
+            end
+        end
+    end
+else
+    for l = 1:L
+        for k = 1:K
+            if ismember(l,Serv{k})
+                if (k<=K_mmW)
+                    eta_eq(l,k) = p_fac./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
+                else
+                    eta_eq(l,k) = 1./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
+                end
+            end
         end
     end
 end
-% else
-%     for l = 1:L
-%         for k = 1:K
-%             if ismember(l,Serv{k})
-%                 if (k<=K_mmW)
-%                     eta_eq(l,k) = p_fac./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
-%                 else
-%                     eta_eq(l,k) = 1./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
-%                 end
-%             end
-%         end
-%     end
-% end
 lambda_eq = zeros(K,1); %sum((sqrt(eta_eq)*D).*beta,1)';
 zeta_eq = zeros(K,1);
 for k = 1:K
@@ -159,7 +159,7 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
         variable lambda(K)
         variable c2(sum(La),1)
     %     variable c(L,K)
-        maximize sum(t)
+        maximize 100*t(1)+sum(t(2:K))
         subject to
         
         for k=1:K
@@ -186,10 +186,10 @@ while (diff>0.1) || (diff<0) || (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
-        t(1:K_mmW)   >= 1;
+%         t(1:K_mmW)   >= 0.5;
 %         t(2:K) >= 0.1*ones(K-1,1);
-        t(2:K) >= zeros(K-1,1);
-%         t >= zeros(K,1);
+%         t(2:K) >= zeros(K-1,1);
+        t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
         lambda>=zeros(K,1);
