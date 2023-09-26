@@ -52,7 +52,7 @@ tau_p = K;
 preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
-nbrOfSetups = 1; %100;
+nbrOfSetups = 10; %100;
         
       
 %Number of channel realizations per setup
@@ -138,9 +138,9 @@ for n = 1:nbrOfSetups
 %     SE_DL_LPMMSE_sumSE = zeros(K,1); %SumSE
     %Generate one setup with UEs at random locations
 %     [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,ASD_varphi,ASD_theta);
-    [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0);
-    
-    %Generate channel realizations, channel estimates, and estimation
+    [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0);
+    [gainOverNoisedB_col,R_col,pilotIndex_col,D_col,APposition_col,distances_col] = generateSetup_col(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,APpositions,UEpositions);
+ %Generate channel realizations, channel estimates, and estimation
     %error correlation matrices for all UEs to the cell-free APs
 %     [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
 %     [~,l_idx] = max(mean(gainOverNoisedB,1));
