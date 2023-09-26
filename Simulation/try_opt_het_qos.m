@@ -52,7 +52,7 @@ tau_p = K;
 preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
-nbrOfSetups = 1; %100;
+nbrOfSetups = 10; %100;
         
       
 %Number of channel realizations per setup
@@ -315,17 +315,24 @@ set(gca,'fontsize',16);
 % plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
 plot(sort(SE_eq_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k-','LineWidth',2);
 plot(sort(SE_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r--','LineWidth',2);
-plot(sort(SE_eq_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k-','LineWidth',2);
-plot(sort(SE_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r--','LineWidth',2);
+plot(sort(SE_eq_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
+plot(sort(SE_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r-','LineWidth',2);
+xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
+ylabel('CDF','Interpreter','Latex');
+legend({'Equal', 'Opt', 'Equal small', 'Opt small'},'Interpreter','Latex','Location','SouthEast')
+
+figure;
+hold on; box on;
+set(gca,'fontsize',16);
 plot(sort(SE_eq_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o:','LineWidth',2);
 plot(sort(SE_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b--','LineWidth',2);
-plot(sort(SE_eq_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o:','LineWidth',2);
-plot(sort(SE_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b--','LineWidth',2);
+plot(sort(SE_eq_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
+plot(sort(SE_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b-','LineWidth',2);
 disp(mean(SE_DL_LPMMSE_equal_after_handoff(1,:))*100);
 disp(mean(SE_DL_LPMMSE_sumSE_after_handoff(1,:))*100);
 disp(mean(SE_DL_LPMMSE_equal_after_handoff_small(1,:))*100);
 disp(mean(SE_DL_LPMMSE_sumSE_after_handoff_small(1,:))*100);
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
-legend({'Equal', 'Opt', 'Equal small', 'Opt small', 'Equal after handoff', 'Opt after handoff', 'Equal after handoff small', 'Opt after handoffs small'},'Interpreter','Latex','Location','SouthEast');
+legend({'Equal after handoff', 'Opt after handoff', 'Equal after handoff small', 'Opt after handoffs small'},'Interpreter','Latex','Location','SouthEast');
 % xlim([0 12]);
