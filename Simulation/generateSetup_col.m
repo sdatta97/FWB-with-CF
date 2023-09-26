@@ -88,11 +88,11 @@ antennaSpacing = 1/2; %Half wavelength distance
 
 
 %Prepare to save results
-gainOverNoisedB_col = zeros(K,nbrOfSetups);
-R_col = zeros(N*L,N*L,K,nbrOfSetups);
-distances_col = zeros(K,nbrOfSetups);
+gainOverNoisedB_col = zeros(1,K,nbrOfSetups);
+R_col = zeros(N*L,N*L,1,K,nbrOfSetups);
+distances_col = zeros(1,K,nbrOfSetups);
 pilotIndex_col = zeros(K,nbrOfSetups);
-D_col = ones(K,nbrOfSetups);
+D_col = ones(1,K,nbrOfSetups);
 masterAPs = ones(K,1); %the indices of master AP of each UE k 
 
 %% Go through all setups
@@ -117,7 +117,7 @@ for n = 1:nbrOfSetups
         UEposition = UEpositions(k);  
         %Compute distances assuming that the APs are 10 m above the UEs
         [distanceAPstoUE,whichpos] = min(abs(APpositionsWrapped - repmat(UEposition,size(APpositionsWrapped))),[],2);
-        distances_col(k,n) = sqrt(distanceVertical^2+distanceAPstoUE.^2);
+        distances_col(1,k,n) = sqrt(distanceVertical^2+distanceAPstoUE.^2);
         %If this is not the first UE
         if k-1>0
             
@@ -151,7 +151,7 @@ for n = 1:nbrOfSetups
         shadowing = meanvalues + stdvalue*randn;
         
         %Compute the channel gain divided by noise power
-        gainOverNoisedB_col(k,n) = constantTerm - alpha*log10(distances_col(k,n)) + shadowing' - noiseVariancedBm;
+        gainOverNoisedB_col(1,k,n) = constantTerm - alpha*log10(distances_col(1,k,n)) + shadowing' - noiseVariancedBm;
         
         
         
@@ -194,14 +194,14 @@ for n = 1:nbrOfSetups
 
         %Compute nominal angle between UE k and AP 1
         angletoUE_varphi = angle(UEpositions(k)-APpositionsWrapped(whichpos)); %azimuth angle
-        angletoUE_theta = asin(distanceVertical/distances_col(k,n));  %elevation angle
+        angletoUE_theta = asin(distanceVertical/distances_col(1,k,n));  %elevation angle
         %Generate spatial correlation matrix using the local
         %scattering model in (2.18) and Gaussian angular distribution
         %by scaling the normalized matrices with the channel gain
         if nargin>12
-            R_col(:,:,k,n) = db2pow(gainOverNoisedB_col(k,n))*functionRlocalscattering_mod(N*L,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
+            R_col(:,:,1,k,n) = db2pow(gainOverNoisedB_col(1,k,n))*functionRlocalscattering_mod(N*L,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
         else
-            R_col(:,:,k,n) = db2pow(gainOverNoisedB_col(k,n))*eye(L*N);  %If angular standard deviations are not specified, set i.i.d. fading
+            R_col(:,:,1,k,n) = db2pow(gainOverNoisedB_col(1,k,n))*eye(L*N);  %If angular standard deviations are not specified, set i.i.d. fading
         end        
     end        
 end
