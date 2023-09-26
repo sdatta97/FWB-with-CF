@@ -97,7 +97,7 @@ zeta_old = zeta_eq;
 % eta = eta_eq;
 SE_eq = preLogFactor*log(1+zeta_eq)/log(2);
 SE = zeros(K,1);
-cvx_precision low
+cvx_precision high
 %Initizalize the iteration counter to zero
 iterr = 1;
 n_sca = 10;
