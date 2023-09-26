@@ -33,7 +33,7 @@ function [SE_eq, SE] = functionDownlinkSE_sumSE_distv3(beta,preLogFactor,L,K,K_m
 %monograph as described above.
 
 %Initialize the current objective function
-objec_new = inf;
+objec_new = 0; % inf;
 
 %Prepare array to store the number of APs serving a specficic UE
 La = zeros(K,1);
@@ -103,7 +103,7 @@ iterr = 1;
 n_sca = 10;
 %Go through the algorithm steps if the objective function is improved
 %more than 0.1 or not improved at all
-while (diff>0.1) || (diff<0)  %|| (iterr > n_sca)
+while (diff>0.1) %|| (diff<0)  %|| (iterr > n_sca)
     %Increase iteration counter by one
     iterr = iterr+1;
     %Update the previous objective value by the current objective value
