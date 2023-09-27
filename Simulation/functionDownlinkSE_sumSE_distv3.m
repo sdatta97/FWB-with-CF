@@ -145,8 +145,8 @@ while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
-        t >= 0.001*ones(K,1); 
-%         t >= zeros(K,1);
+%         t >= 0.0001*ones(K,1); 
+        t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
         lambda>=zeros(K,1);
@@ -186,10 +186,10 @@ while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
-        t(1:K_mmW)   >= 0.5;
-        t(2:K) >= 0.001*ones(K-1,1);
+%         t(1:K_mmW)   >= 0.01;
+%         t(2:K) >= 0.001*ones(K-1,1);
 %         t(2:K) >= zeros(K-1,1);
-%         t >= zeros(K,1);
+        t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
         lambda>=zeros(K,1);
