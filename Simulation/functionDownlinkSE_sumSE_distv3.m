@@ -97,7 +97,7 @@ zeta_old = zeta_eq;
 % eta = eta_eq;
 SE_eq = preLogFactor*log(1+zeta_eq)/log(2);
 SE = zeros(K,1);
-cvx_precision high
+cvx_precision low
 %Initizalize the iteration counter to zero
 iterr = 1;
 n_sca = 10;
@@ -145,8 +145,8 @@ while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
-%         t >= 0.1*ones(K,1); 
-        t >= zeros(K,1);
+        t >= 0.1*ones(K,1); 
+%         t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
         lambda>=zeros(K,1);
@@ -186,10 +186,10 @@ while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
-%         t(1:K_mmW)   >= 0.5;
-%         t(2:K) >= 0.1*ones(K-1,1);
+        t(1:K_mmW)   >= 0.5;
+        t(2:K) >= 0.1*ones(K-1,1);
 %         t(2:K) >= zeros(K-1,1);
-        t >= zeros(K,1);
+%         t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
         lambda>=zeros(K,1);
