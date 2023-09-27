@@ -145,7 +145,7 @@ while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
             end
             sum2 <= 1/(N_AP*N_UE);            
         end
-        t >= 0.1*ones(K,1); 
+        t >= 0.001*ones(K,1); 
 %         t >= zeros(K,1);
     %     c >= zeros(L,K);
         c2 >= zeros(sum(La),1);
