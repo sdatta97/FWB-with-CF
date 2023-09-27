@@ -187,7 +187,7 @@ while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
             sum2 <= 1/(N_AP*N_UE);            
         end
         t(1:K_mmW)   >= 0.5;
-        t(2:K) >= 0.1*ones(K-1,1);
+        t(2:K) >= 0.001*ones(K-1,1);
 %         t(2:K) >= zeros(K-1,1);
 %         t >= zeros(K,1);
     %     c >= zeros(L,K);
