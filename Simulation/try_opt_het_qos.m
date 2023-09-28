@@ -52,7 +52,7 @@ tau_p = K;
 preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
-nbrOfSetups = 10; %100;
+nbrOfSetups = 1; %100;
         
       
 %Number of channel realizations per setup
@@ -79,7 +79,7 @@ ASD_theta = deg2rad(15);  %elevation angle
 p = 100;
 
 %Total downlink transmit power per AP (mW)
-rho_tot = 200;
+rho_tot = 1000;
 
 %min-QoS reqs
 rmin = 1e9;
