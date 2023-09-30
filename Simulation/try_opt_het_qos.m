@@ -51,11 +51,11 @@ tau_p = K;
 preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
-nbrOfSetups = 1;
+nbrOfSetups = 10;
         
       
 %Number of channel realizations per setup
-nbrOfRealizations = 10;
+nbrOfRealizations = 100;
 
 % %Number of APs in the cell-free network
 % L = 10;
@@ -78,7 +78,7 @@ ASD_theta = deg2rad(15);  %elevation angle
 p = 100;
 
 %Total downlink transmit power per AP (mW)
-rho_tot = 100;
+rho_tot = 200;
 
 %min-QoS reqs
 rmin = 1e9;
@@ -330,38 +330,38 @@ set(gca,'fontsize',16);
 % plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
 % plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
 % plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
-% plot(sort(SE_eq_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k-','LineWidth',2);
+plot(sort(SE_eq_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k-','LineWidth',2);
 plot(sort(SE_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r--','LineWidth',2);
-% plot(sort(SE_eq_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o:','LineWidth',2);
+plot(sort(SE_eq_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o:','LineWidth',2);
 plot(sort(SE_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b--','LineWidth',2);
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
-% legend({'Equal', 'Opt', 'Equal after handoff', 'Opt after handoff'},'Interpreter','Latex','Location','SouthEast')
-legend({'Equal','Equal after handoff'}, 'Interpreter','latex','Location','southeast')
+legend({'Equal', 'Opt', 'Equal after handoff', 'Opt after handoff'},'Interpreter','Latex','Location','SouthEast')
+% legend({'Equal','Equal after handoff'}, 'Interpreter','latex','Location','southeast')
 
 figure;
 hold on; box on;
 set(gca,'fontsize',16);
-% plot(sort(SE_eq_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
+plot(sort(SE_eq_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
 plot(sort(SE_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r-','LineWidth',2);
-% plot(sort(SE_eq_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
+plot(sort(SE_eq_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
 plot(sort(SE_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b-','LineWidth',2);
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
-% legend({'Equal small', 'Opt small', 'Equal after handoff small', 'Opt after handoffs small'},'Interpreter','Latex','Location','SouthEast');
-legend({'Equal small', 'Equal after handoff small'},'Interpreter','latex','Location','southeast')
+legend({'Equal small', 'Opt small', 'Equal after handoff small', 'Opt after handoffs small'},'Interpreter','Latex','Location','SouthEast');
+% legend({'Equal small', 'Equal after handoff small'},'Interpreter','latex','Location','southeast')
 
 figure;
 hold on; box on;
 set(gca,'fontsize',16);
-% plot(sort(SE_eq_before_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
+plot(sort(SE_eq_before_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
 plot(sort(SE_before_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r-','LineWidth',2);
-% plot(sort(SE_eq_after_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
+plot(sort(SE_eq_after_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
 plot(sort(SE_after_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b-','LineWidth',2);
 xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
 ylabel('CDF','Interpreter','Latex');
-% legend({'Equal col', 'Opt col', 'Equal after handoff col', 'Opt after handoffs col'},'Interpreter','Latex','Location','SouthEast');
-legend({'Equal col','Equal after handoff col'},'Interpreter','latex','Location','southeast')
+legend({'Equal col', 'Opt col', 'Equal after handoff col', 'Opt after handoffs col'},'Interpreter','Latex','Location','SouthEast');
+% legend({'Equal col','Equal after handoff col'},'Interpreter','latex','Location','southeast')
 
 disp(mean(SE_DL_LPMMSE_equal_after_handoff(1,:))*100);
 disp(mean(SE_DL_LPMMSE_sumSE_after_handoff(1,:))*100);

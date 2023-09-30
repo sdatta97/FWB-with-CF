@@ -101,8 +101,8 @@ cvx_precision low
 %Initizalize the iteration counter to zero
 iterr = 1;
 n_sca = 10;
-%Go through the algorithm steps if the objective function is improved
-%more than 0.1 or not improved at all
+% Go through the algorithm steps if the objective function is improved
+% more than 0.1 or not improved at all
 while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
     %Increase iteration counter by one
     iterr = iterr+1;

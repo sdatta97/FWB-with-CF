@@ -265,6 +265,12 @@ for n = 1:nbrOfSetups
         end
         D(l,idxs_not_chosen,n) = 0;
     end
+    for k = 1:K
+        if (sum(D(:,k,n)) == 0)
+            [~, idx] = max(gainOverNoise(:,k));
+            D(idx,k,n) = 1;
+        end
+    end
     
     %Determine the AP serving each UE in the small-cell setup according to
     %(5.47) by considering only the APs from the set M_k for UE k, i.e.,
