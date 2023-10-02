@@ -117,10 +117,13 @@ end
 % zeta_old = zeta_eq;
 % eta = eta_eq;
 SE_eq = preLogFactor*log(1+zeta_eq)/log(2);
-if (k<=K_mmW)
-    SE_eq(k) = N_UE_mmW*SE_eq(k);
-else
-    SE_eq(k) = N_UE_sub6*SE_eq(k);
+for k=1:K
+    if (k<=K_mmW)
+        SE_eq(k) = N_UE_mmW*SE_eq(k);
+    else
+        SE_eq(k) = N_UE_sub6*SE_eq(k);
+    end
+end
 SE = zeros(K,1);
 % cvx_precision low
 % %Initizalize the iteration counter to zero
