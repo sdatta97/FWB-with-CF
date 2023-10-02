@@ -41,7 +41,7 @@ La = zeros(K,1);
 Serv = cell(K,1);
 %Prepare cell to store the AP indices not serving a specficic UE
 NoServ = cell(K,1);
-p_fac= 1; %ratio of mmW to sub-6 powers
+p_fac= 100; %ratio of mmW to sub-6 powers
 %Construc the above array and cells
 for k = 1:K
     servingAPs = find(D(:,k)==1);

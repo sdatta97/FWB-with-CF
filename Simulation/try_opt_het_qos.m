@@ -18,7 +18,7 @@ clear;
 %% Define simulation setup
 lambda_BS = 25;
 lambda_UE = 0; %10;
-lambda_UE_sub6 = 150; %:10:50;
+lambda_UE_sub6 = 50; %:10:50;
 coverageRange = 100;
 length_area = 2*coverageRange;   
 width_area = 2*coverageRange;
@@ -61,7 +61,7 @@ nbrOfRealizations = 100;
 % L = 10;
 
 %Number of antennas per AP
-N = 10;
+N = 32;
 
 %Number of antennas per UE
 N_UE_mmW = 16;
@@ -78,7 +78,7 @@ ASD_theta = deg2rad(15);  %elevation angle
 p = 100;
 
 %Total downlink transmit power per AP (mW)
-rho_tot = 200;
+rho_tot = 1000;
 
 %min-QoS reqs
 rmin = 1e9;
