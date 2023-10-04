@@ -108,6 +108,8 @@ SE_DL_LPMMSE_sumSE_after_handoff = zeros(K,nbrOfSetups); %SumSE
 SE_mmW_UE = zeros(size(N_UE_mmW_arr));
 SE_setback_AP_sharing_UEs = zeros(size(N_UE_mmW_arr));
 SE_setback_AP_not_sharing_UEs = zeros(size(N_UE_mmW_arr));
+num_sharing_UEs = 0;
+num_not_sharing_UEs = 0;
 %% Go through all setups
 for n_ant = 1:length(N_UE_mmW_arr)
     N_UE_mmW = N_UE_mmW_arr(n_ant);
@@ -303,6 +305,8 @@ for n_ant = 1:length(N_UE_mmW_arr)
 %         disp(sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))
         SE_setback_AP_sharing_UEs(n_ant) = SE_setback_AP_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
         not_ue_idxs = setdiff(1:K,ue_idxs);
+        num_sharing_UEs = num_sharing_UEs + length(ue_idxs)/(length(N_UE_mmW_arr)*nbrOfSetups);
+        num_not_sharing_UEs = num_not_sharing_UEs + (K-length(ue_idxs))/(length(N_UE_mmW_arr)*nbrOfSetups);
 %         disp(sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))
         SE_setback_AP_not_sharing_UEs(n_ant) = SE_setback_AP_not_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
     %     [SE_DL_LPMMSE_equal_after_handoff_small(:,n), SE_DL_LPMMSE_sumSE_after_handoff_small(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_small,rho_tot,tau_p);   
