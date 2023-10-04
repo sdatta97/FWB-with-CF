@@ -18,7 +18,7 @@ clear;
 %% Define simulation setup
 lambda_BS = 25;
 lambda_UE = 0; %10;
-lambda_UE_sub6 = 50; %:10:50;
+lambda_UE_sub6 = 10; %:10:50;
 coverageRange = 100;
 length_area = 2*coverageRange;   
 width_area = 2*coverageRange;
