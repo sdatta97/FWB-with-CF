@@ -42,6 +42,7 @@ Serv = cell(K,1);
 %Prepare cell to store the AP indices not serving a specficic UE
 NoServ = cell(K,1);
 p_fac= 100; %ratio of mmW to sub-6 powers
+beta_uc = zeros(size(beta));
 %Construc the above array and cells
 for k = 1:K
     servingAPs = find(D(:,k)==1);
@@ -51,7 +52,8 @@ for k = 1:K
     NoServ{k} = NoservingAPs;
     
     La(k) = length(servingAPs);
-    beta(:,k) = beta(:,k).*D(:,k);
+%     beta(:,k) = beta(:,k).*D(:,k);
+    beta_uc(:,k) = beta(:,k).*D(:,k);
 end
 beta_opt = zeros(sum(La),K);
 for k=1:K
@@ -80,10 +82,12 @@ else
             if ismember(l,Serv{k})
                 if (k<=K_mmW)
 %                     eta_eq(l,k) = p_fac./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
-                    eta_eq(l,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta(l,1:K_mmW)+N_UE_sub6*sum(beta(l,2:K))));
+%                     eta_eq(l,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta(l,1:K_mmW)+N_UE_sub6*sum(beta(l,2:K))));
+                    eta_eq(l,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(l,1:K_mmW)+N_UE_sub6*sum(beta_uc(l,2:K))));
                 else
 %                     eta_eq(l,k) = 1./(N_AP*N_UE*(p_fac*beta(l,1)+sum(beta(l,2:K))));
-                    eta_eq(l,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta(l,1:K_mmW)+N_UE_sub6*sum(beta(l,2:K))));
+%                     eta_eq(l,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta(l,1:K_mmW)+N_UE_sub6*sum(beta(l,2:K))));
+                    eta_eq(l,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(l,1:K_mmW)+N_UE_sub6*sum(beta_uc(l,2:K))));
                 end
 %                 eta_eq(l,k) = 1./(N_AP*(N_UE_mmW*sum(beta(l,1:K_mmW))+N_UE_sub6*sum(beta(l,(1+K_mmW):K))));
             end
@@ -93,21 +97,26 @@ end
 lambda_eq = zeros(K,1); %sum((sqrt(eta_eq)*D).*beta,1)';
 zeta_eq = zeros(K,1);
 for k = 1:K
-    lambda_eq(k) = (sqrt(eta_eq(:,k)))'*beta(:,k);
+%     lambda_eq(k) = (sqrt(eta_eq(:,k)))'*beta(:,k);
+    lambda_eq(k) = (sqrt(eta_eq(:,k)))'*beta_uc(:,k);
 %     zeta_eq(k) = (lambda_eq(k)^2)/(1/(rhomax*N_AP*N_AP) + (N_UE/N_AP)*beta(:,k)'*sum(beta.*eta_eq,2));
     zeta_nr = lambda_eq(k)^2;
     zeta_dr = 1/(rhomax*N_AP*N_AP);
     if (k<=K_mmW)
-        zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,k).*eta_eq(:,k));
+%         zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,k).*eta_eq(:,k));
+        zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta_uc(:,k).*eta_eq(:,k));
     else
-        zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,k).*eta_eq(:,k)); 
+%         zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,k).*eta_eq(:,k)); 
+        zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta_uc(:,k).*eta_eq(:,k)); 
     end
     for kk=1:K
         if (kk~=k)
             if (kk <= K_mmW)
-                zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,kk).*eta_eq(:,kk));
+%                 zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,kk).*eta_eq(:,kk));
+                zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta_uc(:,kk).*eta_eq(:,kk));
             else
-                zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,kk).*eta_eq(:,kk));
+%                 zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,kk).*eta_eq(:,kk));
+                zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta_uc(:,kk).*eta_eq(:,kk));
             end
         end
     end

@@ -18,7 +18,7 @@ clear;
 %% Define simulation setup
 lambda_BS = 25;
 lambda_UE = 0; %10;
-lambda_UE_sub6 = 10; %:10:50;
+lambda_UE_sub6 = 50; %:10:50;
 coverageRange = 100;
 length_area = 2*coverageRange;   
 width_area = 2*coverageRange;
@@ -64,7 +64,7 @@ nbrOfRealizations = 100;
 N = 128;
 
 %Number of antennas per UE
-N_UE_mmW = 64;
+N_UE_mmW = 128;
 N_UE_sub6 = 2;
 
 %Number of UEs in the network
