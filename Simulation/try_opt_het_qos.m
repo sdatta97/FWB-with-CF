@@ -42,7 +42,7 @@ K_sub6 = floor(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
 % K_sub6 = 19;
 K = K_mmW+K_sub6;
 %Length of the coherence block
-tau_c = 1000;
+tau_c = 200;
 
 %Compute number of pilots per coherence block
 tau_p = K;
@@ -61,10 +61,10 @@ nbrOfRealizations = 100;
 % L = 10;
 
 %Number of antennas per AP
-N = 32;
+N = 128;
 
 %Number of antennas per UE
-N_UE_mmW = 8;
+N_UE_mmW = 64;
 N_UE_sub6 = 2;
 
 %Number of UEs in the network
@@ -149,7 +149,7 @@ for n = 1:nbrOfSetups
 %     load("gain.mat")
 %     load("pilot_idx.mat")
 %     load("UE_pos.mat")
-    [gainOverNoisedB_col,R_col,pilotIndex_col,D_col,APposition_col,distances_col] = generateSetup_col(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,APpositions,UEpositions);
+%     [gainOverNoisedB_col,R_col,pilotIndex_col,D_col,APposition_col,distances_col] = generateSetup_col(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,APpositions,UEpositions);
  %Generate channel realizations, channel estimates, and estimation
     %error correlation matrices for all UEs to the cell-free APs
 %     [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
@@ -159,7 +159,7 @@ for n = 1:nbrOfSetups
     p_full = p*ones(K,1);
    
     gainOverNoise = db2pow(gainOverNoisedB);
-    gainOverNoise_col = db2pow(gainOverNoisedB_col);
+%     gainOverNoise_col = db2pow(gainOverNoisedB_col);
 
 %     %Equal power allocation
 %     rho_dist_equal = (rho_tot/tau_p)*ones(L,K);
