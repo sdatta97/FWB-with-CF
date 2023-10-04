@@ -18,7 +18,7 @@ clear;
 %% Define simulation setup
 lambda_BS = 25;
 lambda_UE = 0; %10;
-lambda_UE_sub6 = 10; %:10:50;
+lambda_UE_sub6 = 50; %:10:50;
 coverageRange = 100;
 length_area = 2*coverageRange;   
 width_area = 2*coverageRange;
@@ -51,7 +51,7 @@ tau_p = K;
 preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
-nbrOfSetups = 100;
+nbrOfSetups = 1;
         
       
 %Number of channel realizations per setup
@@ -64,8 +64,8 @@ nbrOfRealizations = 100;
 N = 32;
 
 %Number of antennas per UE
-N_UE_mmW_arr = 2.^(1:1:5);
-N_UE_sub6 = 2;
+N_UE_mmW_arr = 2.^(0:1:5);
+N_UE_sub6 = 1;
 
 %Number of UEs in the network
 % K = 40;
