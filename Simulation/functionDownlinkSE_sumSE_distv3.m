@@ -1,4 +1,4 @@
-function [SE_eq, SE] = functionDownlinkSE_sumSE_distv3(beta,preLogFactor,L,K,K_mmW,N_AP,N_UE_mmW,N_UE_sub6,D,rhomax,tau_p)
+function [SE_eq, SE] = functionDownlinkSE_sumSE_distv3(beta,preLogFactor,L,K,K_mmW,N_AP,N_UE_mmW,N_UE_sub6,D,rhomax,tau_p,p_fac)
 %Compute downlink SE according to Corollary 6.3 with sum SE maximizing power allocation
 %in Algorithm 7.6
 %
@@ -41,7 +41,7 @@ La = zeros(K,1);
 Serv = cell(K,1);
 %Prepare cell to store the AP indices not serving a specficic UE
 NoServ = cell(K,1);
-p_fac= 100; %ratio of mmW to sub-6 powers
+% p_fac= 1; %ratio of mmW to sub-6 powers
 beta_uc = zeros(size(beta));
 %Construc the above array and cells
 for k = 1:K
@@ -138,9 +138,9 @@ SE = zeros(K,1);
 %Initizalize the iteration counter to zero
 % iterr = 1;
 % n_sca = 10;
-% Go through the algorithm steps if the objective function is improved
-% more than 0.1 or not improved at all
-% while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
+% %Go through the algorithm steps if the objective function is improved
+% %more than 0.1 or not improved at all
+% while (diff>0.1) || (iterr > n_sca) %|| (diff<0) 
 %     %Increase iteration counter by one
 %     iterr = iterr+1;
 %     %Update the previous objective value by the current objective value
