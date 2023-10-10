@@ -134,215 +134,215 @@ for k=1:K
     end
 end
 SE = zeros(K,1);
-cvx_precision low
+% cvx_precision low
 %Initizalize the iteration counter to zero
-iterr = 1;
-n_sca = 10;
+% iterr = 1;
+% n_sca = 10;
 % Go through the algorithm steps if the objective function is improved
 % more than 0.1 or not improved at all
-while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
-    %Increase iteration counter by one
-    iterr = iterr+1;
-    %Update the previous objective value by the current objective value
-    objec_old = objec_new;
-    if (K_mmW == 0)
-        %Solve the convex problem in (7.33) with CVX
-        cvx_begin quiet
-        variable t(K) 
-        variable zeta(K)
-        variable lambda(K)
-        variable c2(sum(La),1)
-    %     variable c(L,K)
-        maximize sum(t)
-        subject to
-        
-        for k=1:K
-            if(La(k) > 0)
-                t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
-                sum1 = cvx_zeros([1,1]);
-                sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
-                for i = 1:K
-                    if(La(i) > 0)
-                        sum1 = sum1 + zeta_old(k)^2*((N_UE_sub6/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
-                    end
-                end
-                sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - (lambda_old(k))^2*(zeta(k)-zeta_old(k));
-                lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
-            end
-        end
-        for l = 1:L
-            sum2 = cvx_zeros([1,1]);
-            for k = 1:K
-                if(La(k) > 0)
-                    [a,b] = ismember(l,Serv{k});
-                    if a
-                        sum2 = sum2 + beta(l,k)*c2(sum(La(1:k-1))+b)^2;
-                    end
-                end
-            end
-            sum2 <= 1/(N_AP*N_UE_sub6);            
-        end
-%         t >= 0.0001*ones(K,1); 
-        t >= zeros(K,1);
-    %     c >= zeros(L,K);
-        c2 >= zeros(sum(La),1);
-        lambda>=zeros(K,1);
-        cvx_end
-    else
-       %Solve the convex problem in (7.33) with CVX
-        cvx_begin quiet
-        variable t(K) 
-        variable zeta(K)
-        variable lambda(K)
-        variable c2(sum(La),1)
-    %     variable c(L,K)
-        maximize 100*t(1)+sum(t(2:K))
-        subject to
-        
-        for k=1:K
-            if(La(k) > 0)
-                t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
-                sum1 = cvx_zeros([1,1]);
-                sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
-                if (k<=K_mmW)
-                    sum1 = sum1 + zeta_old(k)^2*((N_UE_mmW/N_AP)*beta(Serv{k},k)'*(beta(Serv{k},k).*(c2(1+sum(La(1:k-1)):sum(La(1:k))).^2)));
-                else
-                    sum1 = sum1 + zeta_old(k)^2*((N_UE_sub6/N_AP)*beta(Serv{k},k)'*(beta(Serv{k},k).*(c2(1+sum(La(1:k-1)):sum(La(1:k))).^2)));
-                end
-                for i = 1:K
-                    if(La(i) > 0)
-                        if (i~=k)
-                            if (i<=K_mmW)
-                                sum1 = sum1 + zeta_old(k)^2*((N_UE_mmW/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
-                            else
-                                sum1 = sum1 + zeta_old(k)^2*((N_UE_sub6/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
-                            end
-                        end
-                    end
-                end
-                sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - (lambda_old(k))^2*(zeta(k)-zeta_old(k));
-                lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
-            end
-        end
-        for l = 1:L
-            sum2 = cvx_zeros([1,1]);
-            for k = 1:K
-                [a,b] = ismember(l,Serv{k});
-                if a
-                    if k<=K_mmW
-                        sum2 = sum2 + N_UE_mmW*beta(l,k)*c2(sum(La(1:k-1))+b)^2;
-                    else
-                        sum2 = sum2 + N_UE_sub6*beta(l,k)*c2(sum(La(1:k-1))+b)^2;
-                    end
-                end
-            end
-            sum2 <= 1/N_AP;            
-        end
-%         t(1:K_mmW)   >= 0.01;
-%         t(2:K) >= 0.001*ones(K-1,1);
-%         t(2:K) >= zeros(K-1,1);
-        t >= zeros(K,1);
-    %     c >= zeros(L,K);
-        c2 >= zeros(sum(La),1);
-        lambda>=zeros(K,1);
-        cvx_end
-    end
-    try
-        if (cvx_status == 'Solved')
-            %Update the power allocation coefficients 
-            %obtained by CVX
-            eta = zeros(L,K);
-            for k=1:K
-                eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
-            end
-            %Update the current objective value
-            lambda_old = sum(sqrt(eta).*beta,1)';
-            zeta_old = zeros(K,1);
-            for k = 1:K
-                zeta_nr = lambda_old(k)^2;
-                zeta_dr = 1/(rhomax*N_AP*N_AP);
-                if k<=K_mmW
-                    zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
-                else
-                    zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
-                end
-                for i = 1:K
-                    if (i~=k)
-                        if i<=K_mmW
-                            zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
-                        else
-                            zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
-                        end
-                    end
-                end
-                zeta_old(k) = zeta_nr/zeta_dr;
-            end
-        %     zeta_old = zeta;
-        %     lambda_old = lambda;
-            %Compute SEs
-            SE = preLogFactor*log(1+zeta_old)/log(2);
-            if (K_mmW == 0)
-                objec_new = sum(SE);
-            else
-                objec_new = 100*SE(1) + sum(SE(2:K));
-            end
-            %Obtain the difference between current and previous objective values
-            diff = objec_new - objec_old;
-            clearvars c2 t zeta lambda
-        else
-            break;
-        end
-    catch 
-        try 
-            if (cvx_status == 'Inaccurate/Solved')
-                %Update the power allocation coefficients 
-                %obtained by CVX
-                eta = zeros(L,K);
-                for k=1:K
-                    eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
-                end
-                %Update the current objective value
-                lambda_old = sum(sqrt(eta).*beta,1)';
-                zeta_old = zeros(K,1);
-                for k = 1:K
-                    zeta_nr = lambda_old(k)^2;
-                    zeta_dr = 1/(rhomax*N_AP*N_AP);
-                    if k<=K_mmW
-                        zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
-                    else
-                        zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
-                    end
-                    for i = 1:K
-                        if (i~=k)
-                            if i<=K_mmW
-                                zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
-                            else
-                                zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
-                            end
-                        end
-                    end
-                    zeta_old(k) = zeta_nr/zeta_dr;
-                end
-            %     zeta_old = zeta;
-            %     lambda_old = lambda;
-                %Compute SEs
-                SE = preLogFactor*log(1+zeta_old)/log(2);
-                if (K_mmW == 0)
-                    objec_new = sum(SE);
-                else
-                    objec_new = 100*SE(1) + sum(SE(2:K));
-                end            
-                %Obtain the difference between current and previous objective values
-                diff = objec_new - objec_old;
-                clearvars c2 t zeta lambda
-            else
-                break;
-            end
-        catch 
-            break;
-        end
-    end
-end
+% while (diff>0.01) %|| (diff<0)  %|| (iterr > n_sca)
+%     %Increase iteration counter by one
+%     iterr = iterr+1;
+%     %Update the previous objective value by the current objective value
+%     objec_old = objec_new;
+%     if (K_mmW == 0)
+%         %Solve the convex problem in (7.33) with CVX
+%         cvx_begin quiet
+%         variable t(K) 
+%         variable zeta(K)
+%         variable lambda(K)
+%         variable c2(sum(La),1)
+%     %     variable c(L,K)
+%         maximize sum(t)
+%         subject to
+%         
+%         for k=1:K
+%             if(La(k) > 0)
+%                 t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
+%                 sum1 = cvx_zeros([1,1]);
+%                 sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
+%                 for i = 1:K
+%                     if(La(i) > 0)
+%                         sum1 = sum1 + zeta_old(k)^2*((N_UE_sub6/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+%                     end
+%                 end
+%                 sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - (lambda_old(k))^2*(zeta(k)-zeta_old(k));
+%                 lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
+%             end
+%         end
+%         for l = 1:L
+%             sum2 = cvx_zeros([1,1]);
+%             for k = 1:K
+%                 if(La(k) > 0)
+%                     [a,b] = ismember(l,Serv{k});
+%                     if a
+%                         sum2 = sum2 + beta(l,k)*c2(sum(La(1:k-1))+b)^2;
+%                     end
+%                 end
+%             end
+%             sum2 <= 1/(N_AP*N_UE_sub6);            
+%         end
+% %         t >= 0.0001*ones(K,1); 
+%         t >= zeros(K,1);
+%     %     c >= zeros(L,K);
+%         c2 >= zeros(sum(La),1);
+%         lambda>=zeros(K,1);
+%         cvx_end
+%     else
+%        %Solve the convex problem in (7.33) with CVX
+%         cvx_begin quiet
+%         variable t(K) 
+%         variable zeta(K)
+%         variable lambda(K)
+%         variable c2(sum(La),1)
+%     %     variable c(L,K)
+%         maximize 100*t(1)+sum(t(2:K))
+%         subject to
+%         
+%         for k=1:K
+%             if(La(k) > 0)
+%                 t(k) - preLogFactor*log(1+zeta(k))/log(2)<=0;
+%                 sum1 = cvx_zeros([1,1]);
+%                 sum1 = sum1 + (1/(rhomax*N_AP*N_AP))*zeta_old(k)^2;
+%                 if (k<=K_mmW)
+%                     sum1 = sum1 + zeta_old(k)^2*((N_UE_mmW/N_AP)*beta(Serv{k},k)'*(beta(Serv{k},k).*(c2(1+sum(La(1:k-1)):sum(La(1:k))).^2)));
+%                 else
+%                     sum1 = sum1 + zeta_old(k)^2*((N_UE_sub6/N_AP)*beta(Serv{k},k)'*(beta(Serv{k},k).*(c2(1+sum(La(1:k-1)):sum(La(1:k))).^2)));
+%                 end
+%                 for i = 1:K
+%                     if(La(i) > 0)
+%                         if (i~=k)
+%                             if (i<=K_mmW)
+%                                 sum1 = sum1 + zeta_old(k)^2*((N_UE_mmW/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+%                             else
+%                                 sum1 = sum1 + zeta_old(k)^2*((N_UE_sub6/N_AP)*beta(Serv{i},k)'*(beta(Serv{i},i).*(c2(1+sum(La(1:i-1)):sum(La(1:i))).^2)));
+%                             end
+%                         end
+%                     end
+%                 end
+%                 sum1 <= 2*lambda_old(k)*zeta_old(k)*(lambda(k)-lambda_old(k)) - (lambda_old(k))^2*(zeta(k)-zeta_old(k));
+%                 lambda(k) <= c2(1+sum(La(1:k-1)):sum(La(1:k)))'*beta_opt(1+sum(La(1:k-1)):sum(La(1:k)),k);
+%             end
+%         end
+%         for l = 1:L
+%             sum2 = cvx_zeros([1,1]);
+%             for k = 1:K
+%                 [a,b] = ismember(l,Serv{k});
+%                 if a
+%                     if k<=K_mmW
+%                         sum2 = sum2 + N_UE_mmW*beta(l,k)*c2(sum(La(1:k-1))+b)^2;
+%                     else
+%                         sum2 = sum2 + N_UE_sub6*beta(l,k)*c2(sum(La(1:k-1))+b)^2;
+%                     end
+%                 end
+%             end
+%             sum2 <= 1/N_AP;            
+%         end
+% %         t(1:K_mmW)   >= 0.01;
+% %         t(2:K) >= 0.001*ones(K-1,1);
+% %         t(2:K) >= zeros(K-1,1);
+%         t >= zeros(K,1);
+%     %     c >= zeros(L,K);
+%         c2 >= zeros(sum(La),1);
+%         lambda>=zeros(K,1);
+%         cvx_end
+%     end
+%     try
+%         if (cvx_status == 'Solved')
+%             %Update the power allocation coefficients 
+%             %obtained by CVX
+%             eta = zeros(L,K);
+%             for k=1:K
+%                 eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
+%             end
+%             %Update the current objective value
+%             lambda_old = sum(sqrt(eta).*beta,1)';
+%             zeta_old = zeros(K,1);
+%             for k = 1:K
+%                 zeta_nr = lambda_old(k)^2;
+%                 zeta_dr = 1/(rhomax*N_AP*N_AP);
+%                 if k<=K_mmW
+%                     zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
+%                 else
+%                     zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
+%                 end
+%                 for i = 1:K
+%                     if (i~=k)
+%                         if i<=K_mmW
+%                             zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
+%                         else
+%                             zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
+%                         end
+%                     end
+%                 end
+%                 zeta_old(k) = zeta_nr/zeta_dr;
+%             end
+%         %     zeta_old = zeta;
+%         %     lambda_old = lambda;
+%             %Compute SEs
+%             SE = preLogFactor*log(1+zeta_old)/log(2);
+%             if (K_mmW == 0)
+%                 objec_new = sum(SE);
+%             else
+%                 objec_new = 100*SE(1) + sum(SE(2:K));
+%             end
+%             %Obtain the difference between current and previous objective values
+%             diff = objec_new - objec_old;
+%             clearvars c2 t zeta lambda
+%         else
+%             break;
+%         end
+%     catch 
+%         try 
+%             if (cvx_status == 'Inaccurate/Solved')
+%                 %Update the power allocation coefficients 
+%                 %obtained by CVX
+%                 eta = zeros(L,K);
+%                 for k=1:K
+%                     eta(Serv{k},k) = c2(1+sum(La(1:k-1)):sum(La(1:k))).^2;
+%                 end
+%                 %Update the current objective value
+%                 lambda_old = sum(sqrt(eta).*beta,1)';
+%                 zeta_old = zeros(K,1);
+%                 for k = 1:K
+%                     zeta_nr = lambda_old(k)^2;
+%                     zeta_dr = 1/(rhomax*N_AP*N_AP);
+%                     if k<=K_mmW
+%                         zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
+%                     else
+%                         zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,k).*eta(:,k));
+%                     end
+%                     for i = 1:K
+%                         if (i~=k)
+%                             if i<=K_mmW
+%                                 zeta_dr = zeta_dr + (N_UE_mmW/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
+%                             else
+%                                 zeta_dr = zeta_dr + (N_UE_sub6/N_AP)*beta(:,k)'*(beta(:,i).*eta(:,i));
+%                             end
+%                         end
+%                     end
+%                     zeta_old(k) = zeta_nr/zeta_dr;
+%                 end
+%             %     zeta_old = zeta;
+%             %     lambda_old = lambda;
+%                 %Compute SEs
+%                 SE = preLogFactor*log(1+zeta_old)/log(2);
+%                 if (K_mmW == 0)
+%                     objec_new = sum(SE);
+%                 else
+%                     objec_new = 100*SE(1) + sum(SE(2:K));
+%                 end            
+%                 %Obtain the difference between current and previous objective values
+%                 diff = objec_new - objec_old;
+%                 clearvars c2 t zeta lambda
+%             else
+%                 break;
+%             end
+%         catch 
+%             break;
+%         end
+%     end
+% end
 if (sum(SE) < sum(SE_eq))
     SE=SE_eq;
 % SE = objec_new;
