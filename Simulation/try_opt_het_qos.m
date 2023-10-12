@@ -84,7 +84,7 @@ rho_tot = 1000;
 % rho_tot_arr = 10^3; %10.^(2:1:7);
 
 %Power factor division
-p_fac_arr = 10:10:100; %10.^(0:1:5);
+p_fac_arr = [1:1:10, 10:10:100]; %10.^(0:1:5);
 % p_fac = 100;
 %min-QoS reqs
 rmin = 1e9;
@@ -92,18 +92,17 @@ rmin_sub6 = 1e7;
 %Prepare to save simulation results
 
 SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_equal_small = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_equal_col = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_maxmin = zeros(K,nbrOfSetups); %MMF
+% SE_DL_LPMMSE_equal_small = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_equal_col = zeros(K,nbrOfSetups); %Equal
 SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
-SE_DL_LPMMSE_sumSE_small = zeros(K,nbrOfSetups); %SumSE
-SE_DL_LPMMSE_sumSE_col = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE_small = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE_col = zeros(K,nbrOfSetups); %SumSE
 SE_DL_LPMMSE_equal_after_handoff = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_equal_after_handoff_small = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_equal_after_handoff_col = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_equal_after_handoff_small = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_equal_after_handoff_col = zeros(K,nbrOfSetups); %Equal
 SE_DL_LPMMSE_sumSE_after_handoff = zeros(K,nbrOfSetups); %SumSE
-SE_DL_LPMMSE_sumSE_after_handoff_small = zeros(K,nbrOfSetups); %SumSE
-SE_DL_LPMMSE_sumSE_after_handoff_col = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE_after_handoff_small = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE_after_handoff_col = zeros(K,nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_equal_mean = zeros(nbrOfSetups); %Equal
 % SE_DL_LPMMSE_maxmin_mean = zeros(nbrOfSetups); %MMF
 % SE_DL_LPMMSE_sumSE_mean = zeros(nbrOfSetups); %SumSE
