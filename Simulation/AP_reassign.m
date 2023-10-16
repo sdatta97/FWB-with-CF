@@ -11,7 +11,7 @@ for k = 1:(K-K_mmW)
     ap_idxs_affected = intersect(ap_idxs,ap_idxs_k);
     for m = 1:length(ap_idxs_affected)
         D_after_handoff(other_ap_idxs(m),k+K_mmW) = 1;
-        D_after_handoff(ap_idxs_affected(m),k+K_mmW) = 0;
+%         D_after_handoff(ap_idxs_affected(m),k+K_mmW) = 0;
     end
 end
 end
