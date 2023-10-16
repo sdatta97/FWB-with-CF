@@ -258,7 +258,7 @@ for n = 1:nbrOfSetups
     for l = 1:L
         [gains, idxs] = sort(gainOverNoise(l,:), 'descend');
         for k = 1:K
-            if ((sum(gains(1:k))/sum(gains))*100 > 95)
+            if ((sum(gains(1:k))/sum(gains))*100 > 99)
                 idxs_not_chosen = idxs((k+1):end);
                 break;
             end

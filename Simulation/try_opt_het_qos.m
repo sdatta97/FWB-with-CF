@@ -85,7 +85,7 @@ rho_tot = 1000;
 
 %Power factor division
 % p_fac_arr = [1:1:10, 10:10:100]; %10.^(0:1:5);
-p_fac = 1;%100;
+p_fac = 10;
 %min-QoS reqs
 rmin = 1e9;
 rmin_sub6 = 1e7;
