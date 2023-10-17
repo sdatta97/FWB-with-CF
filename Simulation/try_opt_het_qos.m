@@ -80,12 +80,12 @@ ASD_theta = deg2rad(15);  %elevation angle
 p = 100;
 
 %Total downlink transmit power per AP (mW)
-rho_tot = 1000;
+rho_tot = 200;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
 % p_fac_arr = [1:1:10, 10:10:100]; %10.^(0:1:5);
-p_fac = 10;
+p_fac = 1;
 %min-QoS reqs
 rmin = 1e9;
 rmin_sub6 = 1e7;
@@ -344,7 +344,7 @@ for n_ant = 1:length(N_UE_mmW_arr)
 %         num_sharing_UEs = num_sharing_UEs + length(ue_idxs)/(length(rho_tot_arr)*nbrOfSetups);
 %         num_not_sharing_UEs = num_not_sharing_UEs + (K-length(ue_idxs))/(length(rho_tot_arr)*nbrOfSetups);%         disp(sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))
         SE_setback_AP_not_sharing_UEs(n_ant) = SE_setback_AP_not_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
-        D_after_handoff =  AP_reassign(D, gainOverNoise, K_mmW, 1);
+        D_after_handoff =  AP_reassign(D, gainOverNoise, K_mmW, 1, p_fac);
         [SE_DL_LPMMSE_equal_after_handoff_improved(:,n), SE_DL_LPMMSE_sumSE_after_handoff_improved(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_after_handoff,rho_tot,tau_p,p_fac);   
         SE_setback_AP_sharing_UEs_improved(n_ant) = SE_setback_AP_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
         SE_setback_AP_not_sharing_UEs_improved(n_ant) = SE_setback_AP_not_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;

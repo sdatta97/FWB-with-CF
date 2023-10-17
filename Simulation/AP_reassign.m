@@ -1,4 +1,4 @@
-function D_after_handoff =  AP_reassign(D, chgains, K_mmW, k_idx)
+function D_after_handoff =  AP_reassign(D, chgains, K_mmW, k_idx, p_fac)
 D_after_handoff = D;
 M = size(chgains,1);
 K = size(chgains,2);
@@ -11,7 +11,9 @@ for k = 1:(K-K_mmW)
     ap_idxs_affected = intersect(ap_idxs,ap_idxs_k);
     for m = 1:length(ap_idxs_affected)
         D_after_handoff(other_ap_idxs(m),k+K_mmW) = 1;
-%         D_after_handoff(ap_idxs_affected(m),k+K_mmW) = 0;
+        if (p_fac == 1)
+            D_after_handoff(ap_idxs_affected(m),k+K_mmW) = 0;
+        end
     end
 end
 end
