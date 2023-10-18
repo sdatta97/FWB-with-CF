@@ -9,7 +9,7 @@ for kk_idx = 1:length(ue_idxs)
     k = ue_idxs(kk_idx);
     ap_idxs_k = find(D(:,k));
     ap_idxs_affected = intersect(ap_idxs,ap_idxs_k);
-    loss_pc_arr(kk_idx) = 100*(sum(chgains(ap_idxs_affected,kk_idx))/sum(chgains(:,kk_idx)));
+    loss_pc_arr(kk_idx) = 100*(sum(chgains(ap_idxs_affected,k))/sum(chgains(ap_idxs_k,k)));
 end
 ue_idxs = ue_idxs(loss_pc_arr > 10);
 for kk_idx = 1:length(ue_idxs)
