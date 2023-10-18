@@ -1,9 +1,11 @@
-function D_after_handoff =  AP_reassign(D, chgains, K_mmW, k_idx, p_fac)
+function D_after_handoff =  AP_reassign(D, chgains, K_mmW, k_idx, p_fac, ue_idxs)
 D_after_handoff = D;
 M = size(chgains,1);
 K = size(chgains,2);
 ap_idxs = find(D(:,k_idx));
-for k = 1:(K-K_mmW)
+% for k = 1:(K-K_mmW)
+for kk_idx = 1:length(ue_idxs)
+    k = ue_idxs(kk_idx);
     ap_idxs_k = find(D(:,k+K_mmW));
     other_ap_idxs = setdiff(1:M,union(ap_idxs,ap_idxs_k));
     [~,other_ap_idxs_idxs] = sort(chgains(other_ap_idxs,k+K_mmW),'descend'); 
