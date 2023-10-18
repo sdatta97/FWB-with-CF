@@ -18,8 +18,8 @@ clear;
 %% Define simulation setup
 lambda_BS = 25;
 lambda_UE = 0; %10;
-lambda_UE_sub6 = 50; 
-% lambda_UE_sub6_arr = 10:10:50;
+% lambda_UE_sub6 = 50; 
+lambda_UE_sub6_arr = 10:10:50;
 coverageRange = 100;
 length_area = 2*coverageRange;   
 width_area = 2*coverageRange;
@@ -38,18 +38,18 @@ L_mmW = floor(lambda_BS*pi*(coverageRange/1000)^2);
 L = floor(lambda_BS*pi*(coverageRange_sub6/1000)^2);
 % L_mmW = 1;
 % L = 8;
-K_mmW = 1;
-K_sub6 = floor(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
-% K_sub6 = 19;
-K = K_mmW+K_sub6;
-%Length of the coherence block
-tau_c = 200;
-
-%Compute number of pilots per coherence block
-tau_p = K;
-
-%Compute the prelog factor assuming only downlink data transmission
-preLogFactor = (tau_c-tau_p)/tau_c;
+% K_mmW = 1;
+% K_sub6 = floor(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
+% % K_sub6 = 19;
+% K = K_mmW+K_sub6;
+% %Length of the coherence block
+% tau_c = 200;
+% 
+% %Compute number of pilots per coherence block
+% tau_p = K;
+% 
+% %Compute the prelog factor assuming only downlink data transmission
+% preLogFactor = (tau_c-tau_p)/tau_c;
 
 %Number of setups with random UE locations
 nbrOfSetups = 100;
@@ -65,8 +65,8 @@ nbrOfRealizations = 100;
 N = 32;
 
 %Number of antennas per UE
-N_UE_mmW_arr = 2.^(0:1:5);
-% N_UE_mmW = 8;
+% N_UE_mmW_arr = 2.^(0:1:5);
+N_UE_mmW = 8;
 N_UE_sub6 = 2;
 
 %Number of UEs in the network
@@ -85,72 +85,77 @@ rho_tot = 200;
 
 %Power factor division
 % p_fac_arr = [1:1:10, 10:10:100]; %10.^(0:1:5);
-p_fac = 1;
+p_fac = 10;
 %min-QoS reqs
 rmin = 1e9;
 rmin_sub6 = 1e7;
 %Prepare to save simulation results
 
-SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
 % SE_DL_LPMMSE_equal_small = zeros(K,nbrOfSetups); %Equal
 % SE_DL_LPMMSE_equal_col = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_sumSE_small = zeros(K,nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_sumSE_col = zeros(K,nbrOfSetups); %SumSE
-SE_DL_LPMMSE_equal_after_handoff = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_equal_after_handoff_improved = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_equal_after_handoff = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_equal_after_handoff_improved = zeros(K,nbrOfSetups); %Equal
 % SE_DL_LPMMSE_equal_after_handoff_small = zeros(K,nbrOfSetups); %Equal
 % SE_DL_LPMMSE_equal_after_handoff_col = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_sumSE_after_handoff = zeros(K,nbrOfSetups); %SumSE
-SE_DL_LPMMSE_sumSE_after_handoff_improved = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE_after_handoff = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE_after_handoff_improved = zeros(K,nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_sumSE_after_handoff_small = zeros(K,nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_sumSE_after_handoff_col = zeros(K,nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_equal_mean = zeros(nbrOfSetups); %Equal
 % SE_DL_LPMMSE_maxmin_mean = zeros(nbrOfSetups); %MMF
 % SE_DL_LPMMSE_sumSE_mean = zeros(nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_sumSE_after_handoff_mean = zeros(nbrOfSetups); %SumSE
-SE_mmW_UE = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_sharing_UEs = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_not_sharing_UEs = zeros(size(N_UE_mmW_arr));
-SE_mmW_UE_improved = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_not_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
+% SE_mmW_UE = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_sharing_UEs = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_not_sharing_UEs = zeros(size(N_UE_mmW_arr));
+% SE_mmW_UE_improved = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_not_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
 % SE_mmW_UE = zeros(size(rho_tot_arr));
 % SE_setback_AP_sharing_UEs = zeros(size(rho_tot_arr));
 % SE_setback_AP_not_sharing_UEs = zeros(size(rho_tot_arr));
-% SE_mmW_UE = zeros(size(lambda_UE_sub6_arr));
-% SE_setback_AP_sharing_UEs = zeros(size(lambda_UE_sub6_arr));
-% SE_setback_AP_not_sharing_UEs = zeros(size(lambda_UE_sub6_arr));
+SE_mmW_UE = zeros(size(lambda_UE_sub6_arr));
+SE_setback_AP_sharing_UEs = zeros(size(lambda_UE_sub6_arr));
+SE_setback_AP_not_sharing_UEs = zeros(size(lambda_UE_sub6_arr));
+SE_mmW_UE_improved = zeros(size(lambda_UE_sub6_arr));
+SE_setback_AP_sharing_UEs_improved = zeros(size(lambda_UE_sub6_arr));
+SE_setback_AP_not_sharing_UEs_improved = zeros(size(lambda_UE_sub6_arr));
 % SE_mmW_UE = zeros(size(p_fac_arr));
 % SE_setback_AP_sharing_UEs = zeros(size(p_fac_arr));
 % SE_setback_AP_not_sharing_UEs = zeros(size(p_fac_arr));
 num_sharing_UEs = 0;
 num_not_sharing_UEs = 0;
 %% Go through all setups
-for n_ant = 1:length(N_UE_mmW_arr)
-    N_UE_mmW = N_UE_mmW_arr(n_ant);
+% for n_ant = 1:length(N_UE_mmW_arr)
+%     N_UE_mmW = N_UE_mmW_arr(n_ant);
 % for rho_n = 1:length(rho_tot_arr)
 %     rho_tot = rho_tot_arr(rho_n);
-% for lambda_n = 1:length(lambda_UE_sub6_arr)
-%     lambda_UE_sub6 = lambda_UE_sub6_arr(lambda_n);
+for lambda_n = 1:length(lambda_UE_sub6_arr)
+    lambda_UE_sub6 = lambda_UE_sub6_arr(lambda_n);
 % for n_p = 1:length(p_fac_arr)
 %     p_fac = p_fac_arr(n_p);
-%     K_mmW = 1;
-%     K_sub6 = floor(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
-% %     K_sub6 = 19;
-%     K = K_mmW+K_sub6;
-%     %Length of the coherence block
-%     tau_c = 200;
-%     
-%     %Compute number of pilots per coherence block
-%     tau_p = K;
-%     
-%     %Compute the prelog factor assuming only downlink data transmission
-%     preLogFactor = (tau_c-tau_p)/tau_c;
-%     SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
-%     SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
-%     SE_DL_LPMMSE_equal_after_handoff = zeros(K,nbrOfSetups); %Equal
-%     SE_DL_LPMMSE_sumSE_after_handoff = zeros(K,nbrOfSetups); %SumSE
+    K_mmW = 1;
+    K_sub6 = floor(lambda_UE_sub6*pi*(coverageRange_sub6/1000)^2);
+%     K_sub6 = 19;
+    K = K_mmW+K_sub6;
+    %Length of the coherence block
+    tau_c = 200;
+    
+    %Compute number of pilots per coherence block
+    tau_p = K;
+    
+    %Compute the prelog factor assuming only downlink data transmission
+    preLogFactor = (tau_c-tau_p)/tau_c;
+    SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
+    SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
+    SE_DL_LPMMSE_equal_after_handoff = zeros(K,nbrOfSetups); %Equal
+    SE_DL_LPMMSE_sumSE_after_handoff = zeros(K,nbrOfSetups); %SumSE
+    SE_DL_LPMMSE_equal_after_handoff_improved = zeros(K,nbrOfSetups); %Equal
+    SE_DL_LPMMSE_sumSE_after_handoff_improved = zeros(K,nbrOfSetups); %SumSE
 
     for n = 1:nbrOfSetups
         %Display simulation progress
@@ -334,22 +339,28 @@ for n_ant = 1:length(N_UE_mmW_arr)
     %     D(1:(l_idx-1),1) = 0;
     %     D((1+l_idx):L,1) = 0;
         [SE_DL_LPMMSE_equal_after_handoff(:,n), SE_DL_LPMMSE_sumSE_after_handoff(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D,rho_tot,tau_p,p_fac);   
-        SE_setback_AP_sharing_UEs(n_ant) = SE_setback_AP_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
+%         SE_setback_AP_sharing_UEs(n_ant) = SE_setback_AP_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
 %         SE_setback_AP_sharing_UEs(rho_n) = SE_setback_AP_sharing_UEs(rho_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
-%         SE_setback_AP_sharing_UEs(lambda_n) = SE_setback_AP_sharing_UEs(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
+        SE_setback_AP_sharing_UEs(lambda_n) = SE_setback_AP_sharing_UEs(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
 %         SE_setback_AP_sharing_UEs(n_p) = SE_setback_AP_sharing_UEs(n_p) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
         not_ue_idxs = setdiff(1:K,ue_idxs);
 %         num_sharing_UEs = num_sharing_UEs + length(ue_idxs)/(length(N_UE_mmW_arr)*nbrOfSetups);
 %         num_not_sharing_UEs = num_not_sharing_UEs + (K-length(ue_idxs))/(length(N_UE_mmW_arr)*nbrOfSetups);
 %         num_sharing_UEs = num_sharing_UEs + length(ue_idxs)/(length(rho_tot_arr)*nbrOfSetups);
-%         num_not_sharing_UEs = num_not_sharing_UEs + (K-length(ue_idxs))/(length(rho_tot_arr)*nbrOfSetups);%         disp(sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))
-        SE_setback_AP_not_sharing_UEs(n_ant) = SE_setback_AP_not_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+%         num_not_sharing_UEs = num_not_sharing_UEs + (K-length(ue_idxs))/(length(rho_tot_arr)*nbrOfSetups);        
+%         disp(sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))
+%         SE_setback_AP_not_sharing_UEs(n_ant) = SE_setback_AP_not_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+%         SE_setback_AP_not_sharing_UEs(rho_n) = SE_setback_AP_not_sharing_UEs(rho_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+        SE_setback_AP_not_sharing_UEs(lambda_n) = SE_setback_AP_not_sharing_UEs(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+%         SE_setback_AP_not_sharing_UEs(n_p) = SE_setback_AP_not_sharing_UEs(n_p) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
         D_after_handoff =  AP_reassign(D, gainOverNoise, K_mmW, 1, p_fac);
         [SE_DL_LPMMSE_equal_after_handoff_improved(:,n), SE_DL_LPMMSE_sumSE_after_handoff_improved(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_after_handoff,rho_tot,tau_p,p_fac);   
-        SE_setback_AP_sharing_UEs_improved(n_ant) = SE_setback_AP_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
-        SE_setback_AP_not_sharing_UEs_improved(n_ant) = SE_setback_AP_not_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+%         SE_setback_AP_sharing_UEs_improved(n_ant) = SE_setback_AP_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
+        SE_setback_AP_sharing_UEs_improved(lambda_n) = SE_setback_AP_sharing_UEs_improved(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
+%         SE_setback_AP_not_sharing_UEs_improved(n_ant) = SE_setback_AP_not_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(rho_n) = SE_setback_AP_not_sharing_UEs(rho_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(lambda_n) = SE_setback_AP_not_sharing_UEs(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+        SE_setback_AP_not_sharing_UEs_improved(lambda_n) = SE_setback_AP_not_sharing_UEs_improved(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(n_p) = SE_setback_AP_not_sharing_UEs(n_p) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
     %     [SE_DL_LPMMSE_equal_after_handoff_small(:,n), SE_DL_LPMMSE_sumSE_after_handoff_small(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_small,rho_tot,tau_p);   
     %     [SE_DL_LPMMSE_equal_after_handoff_col(:,n), SE_DL_LPMMSE_sumSE_after_handoff_col(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise_col,preLogFactor,1,K,K_mmW,N*L,N_UE_mmW,N_UE_sub6,D_col,rho_tot,tau_p);   
@@ -370,10 +381,11 @@ for n_ant = 1:length(N_UE_mmW_arr)
     end
 %     SE_eq_before_handoff = SE_DL_LPMMSE_equal((1+K_mmW):end,:);
 %     SE_eq_after_handoff = SE_DL_LPMMSE_equal_after_handoff((1+K_mmW):end,:);
-    SE_mmW_UE(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
-    SE_mmW_UE_improved(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff_improved(1,:));
+%     SE_mmW_UE(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
+%     SE_mmW_UE_improved(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff_improved(1,:));
 %     SE_mmW_UE(rho_n) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
-%     SE_mmW_UE(lambda_n) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
+    SE_mmW_UE(lambda_n) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
+    SE_mmW_UE_improved(lambda_n) = mean(SE_DL_LPMMSE_equal_after_handoff_improved(1,:));
 %     SE_mmW_UE(n_p) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
     % SE_eq_before_handoff_small = SE_DL_LPMMSE_equal_small((1+K_mmW):end,:);
     % SE_eq_after_handoff_small = SE_DL_LPMMSE_equal_after_handoff_small((1+K_mmW):end,:);
@@ -434,22 +446,26 @@ for n_ant = 1:length(N_UE_mmW_arr)
     % disp(mean(SE_DL_LPMMSE_equal_after_handoff_col(1,:))*100);
     % disp(mean(SE_DL_LPMMSE_sumSE_after_handoff_col(1,:))*100);
 end
-figure
-plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs); hold on;
-plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs); hold on;
-plot(N_UE_mmW_arr,SE_mmW_UE); hold on;
-figure
-plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs_improved); hold on;
-plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs_improved); hold on;
-plot(N_UE_mmW_arr,SE_mmW_UE_improved); hold on;
+% figure
+% plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs); hold on;
+% plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs); hold on;
+% plot(N_UE_mmW_arr,SE_mmW_UE); hold on;
+% figure
+% plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs_improved); hold on;
+% plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs_improved); hold on;
+% plot(N_UE_mmW_arr,SE_mmW_UE_improved); hold on;
 % figure
 % plot(rho_tot_arr,SE_setback_AP_sharing_UEs); hold on;
 % plot(rho_tot_arr,SE_setback_AP_not_sharing_UEs); hold on;
 % plot(rho_tot_arr,SE_mmW_UE); hold on;
-% figure
-% plot(lambda_UE_sub6_arr,SE_setback_AP_sharing_UEs); hold on;
-% plot(lambda_UE_sub6_arr,SE_setback_AP_not_sharing_UEs); hold on;
-% plot(lambda_UE_sub6_arr,SE_mmW_UE); hold on;
+figure
+plot(lambda_UE_sub6_arr,SE_setback_AP_sharing_UEs); hold on;
+plot(lambda_UE_sub6_arr,SE_setback_AP_not_sharing_UEs); hold on;
+plot(lambda_UE_sub6_arr,SE_mmW_UE); hold on;
+figure
+plot(lambda_UE_sub6_arr,SE_setback_AP_sharing_UEs_improved); hold on;
+plot(lambda_UE_sub6_arr,SE_setback_AP_not_sharing_UEs_improved); hold on;
+plot(lambda_UE_sub6_arr,SE_mmW_UE_improved); hold on;
 % figure
 % plot(p_fac_arr,SE_setback_AP_sharing_UEs); hold on;
 % plot(p_fac_arr,SE_setback_AP_not_sharing_UEs); hold on;
