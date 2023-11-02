@@ -372,13 +372,19 @@ for lambda_n = 1:length(lambda_UE_sub6_arr)
     %     % plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
     %     % plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
     %     % plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
+        figure;
+        hold on; box on;
+        set(gca,'fontsize',16);
+        
+        plot(sort(SE_DL_LPMMSE_equal(ue_idxs(2:end),n)),linspace(0,1,length(ue_idxs)-1),'k-','LineWidth',2);
+        plot(sort(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n)),linspace(0,1,length(ue_idxs)-1),'k:','LineWidth',2);
+    end
     %     plot(sort(SE_DL_LPMMSE_sumSE((1+K_mmW):end)),linspace(0,1,(K-K_mmW)),'r--','LineWidth',2);
     %     plot(sort(SE_DL_LPMMSE_sumSE_after_handoff((1+K_mmW):end)),linspace(0,1,(K-K_mmW)),'b--','LineWidth',2);
     %     plot(sort(SE_DL_LPMMSE_sumSE_after_handoff(1:K_mmW)),linspace(0,1,K_mmW),'k-','LineWidth',2);
     %     xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
     %     ylabel('CDF','Interpreter','Latex');
     %     legend({'Equal', 'Equal after handoff','mmW after handoff'},'Interpreter','Latex','Location','SouthEast')
-    end
 %     SE_eq_before_handoff = SE_DL_LPMMSE_equal((1+K_mmW):end,:);
 %     SE_eq_after_handoff = SE_DL_LPMMSE_equal_after_handoff((1+K_mmW):end,:);
 %     SE_mmW_UE(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
