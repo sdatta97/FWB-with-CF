@@ -65,8 +65,8 @@ nbrOfRealizations = 100;
 N = 32;
 
 %Number of antennas per UE
-N_UE_mmW_arr = 2.^(0:1:5);
-% N_UE_mmW = 8;
+% N_UE_mmW_arr = 2.^(0:1:5);
+N_UE_mmW = 8;
 N_UE_sub6 = 2;
 
 %Number of UEs in the network
@@ -92,29 +92,29 @@ rmin_sub6 = 1e7;
 %Prepare to save simulation results
 
 SE_DL_LPMMSE_equal = zeros(K,nbrOfSetups); %Equal
-% SE_DL_LPMMSE_equal_small = zeros(K,nbrOfSetups); %Equal
-% SE_DL_LPMMSE_equal_col = zeros(K,nbrOfSetups); %Equal
+SE_DL_LPMMSE_equal_small = zeros(K,nbrOfSetups); %Equal
+SE_DL_LPMMSE_equal_col = zeros(K,nbrOfSetups); %Equal
 SE_DL_LPMMSE_sumSE = zeros(K,nbrOfSetups); %SumSE
-% SE_DL_LPMMSE_sumSE_small = zeros(K,nbrOfSetups); %SumSE
-% SE_DL_LPMMSE_sumSE_col = zeros(K,nbrOfSetups); %SumSE
+SE_DL_LPMMSE_sumSE_small = zeros(K,nbrOfSetups); %SumSE
+SE_DL_LPMMSE_sumSE_col = zeros(K,nbrOfSetups); %SumSE
 SE_DL_LPMMSE_equal_after_handoff = zeros(K,nbrOfSetups); %Equal
-SE_DL_LPMMSE_equal_after_handoff_improved = zeros(K,nbrOfSetups); %Equal
-% SE_DL_LPMMSE_equal_after_handoff_small = zeros(K,nbrOfSetups); %Equal
-% SE_DL_LPMMSE_equal_after_handoff_col = zeros(K,nbrOfSetups); %Equal
+% SE_DL_LPMMSE_equal_after_handoff_improved = zeros(K,nbrOfSetups); %Equal
+SE_DL_LPMMSE_equal_after_handoff_small = zeros(K,nbrOfSetups); %Equal
+SE_DL_LPMMSE_equal_after_handoff_col = zeros(K,nbrOfSetups); %Equal
 SE_DL_LPMMSE_sumSE_after_handoff = zeros(K,nbrOfSetups); %SumSE
-SE_DL_LPMMSE_sumSE_after_handoff_improved = zeros(K,nbrOfSetups); %SumSE
-% SE_DL_LPMMSE_sumSE_after_handoff_small = zeros(K,nbrOfSetups); %SumSE
-% SE_DL_LPMMSE_sumSE_after_handoff_col = zeros(K,nbrOfSetups); %SumSE
+% SE_DL_LPMMSE_sumSE_after_handoff_improved = zeros(K,nbrOfSetups); %SumSE
+SE_DL_LPMMSE_sumSE_after_handoff_small = zeros(K,nbrOfSetups); %SumSE
+SE_DL_LPMMSE_sumSE_after_handoff_col = zeros(K,nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_equal_mean = zeros(nbrOfSetups); %Equal
 % SE_DL_LPMMSE_maxmin_mean = zeros(nbrOfSetups); %MMF
 % SE_DL_LPMMSE_sumSE_mean = zeros(nbrOfSetups); %SumSE
 % SE_DL_LPMMSE_sumSE_after_handoff_mean = zeros(nbrOfSetups); %SumSE
-SE_mmW_UE = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_sharing_UEs = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_not_sharing_UEs = zeros(size(N_UE_mmW_arr));
-SE_mmW_UE_improved = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
-SE_setback_AP_not_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
+% SE_mmW_UE = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_sharing_UEs = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_not_sharing_UEs = zeros(size(N_UE_mmW_arr));
+% SE_mmW_UE_improved = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
+% SE_setback_AP_not_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
 % SE_mmW_UE = zeros(size(rho_tot_arr));
 % SE_setback_AP_sharing_UEs = zeros(size(rho_tot_arr));
 % SE_setback_AP_not_sharing_UEs = zeros(size(rho_tot_arr));
@@ -129,15 +129,15 @@ SE_setback_AP_not_sharing_UEs_improved = zeros(size(N_UE_mmW_arr));
 % SE_setback_AP_not_sharing_UEs = zeros(size(p_fac_arr));
 num_sharing_UEs = 0;
 num_not_sharing_UEs = 0;
-mean_SE_sharing_UEs = zeros(size(N_UE_mmW_arr));
-std_SE_sharing_UEs = zeros(size(N_UE_mmW_arr));
-mean_SE_sharing_UEs_after_handoff = zeros(size(N_UE_mmW_arr));
-std_SE_sharing_UEs_after_handoff = zeros(size(N_UE_mmW_arr));
-mean_SE_sharing_UEs_after_handoff_improved = zeros(size(N_UE_mmW_arr));
-std_SE_sharing_UEs_after_handoff_improved = zeros(size(N_UE_mmW_arr));
+% mean_SE_sharing_UEs = zeros(size(N_UE_mmW_arr));
+% std_SE_sharing_UEs = zeros(size(N_UE_mmW_arr));
+% mean_SE_sharing_UEs_after_handoff = zeros(size(N_UE_mmW_arr));
+% std_SE_sharing_UEs_after_handoff = zeros(size(N_UE_mmW_arr));
+% mean_SE_sharing_UEs_after_handoff_improved = zeros(size(N_UE_mmW_arr));
+% std_SE_sharing_UEs_after_handoff_improved = zeros(size(N_UE_mmW_arr));
 %% Go through all setups
-for n_ant = 1:length(N_UE_mmW_arr)
-    N_UE_mmW = N_UE_mmW_arr(n_ant);
+% for n_ant = 1:length(N_UE_mmW_arr)
+%     N_UE_mmW = N_UE_mmW_arr(n_ant);
 % for rho_n = 1:length(rho_tot_arr)
 %     rho_tot = rho_tot_arr(rho_n);
 % for lambda_n = 1:length(lambda_UE_sub6_arr)
@@ -197,7 +197,7 @@ for n_ant = 1:length(N_UE_mmW_arr)
         %Generate one setup with UEs at random locations
     %     [gainOverNoisedB,R,pilotIndex,D,D_small] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,ASD_varphi,ASD_theta);
         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0);
-    %     [gainOverNoisedB_col,R_col,pilotIndex_col,D_col,APposition_col,distances_col] = generateSetup_col(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,APpositions,UEpositions);
+        [gainOverNoisedB_col,R_col,pilotIndex_col,D_col,APposition_col,distances_col] = generateSetup_col(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0,APpositions,UEpositions);
      %Generate channel realizations, channel estimates, and estimation
         %error correlation matrices for all UEs to the cell-free APs
     %     [Hhat_mmW,Hhat_sub6,H_mmW,H_sub6,B,C] = functionChannelEstimates(R,nbrOfRealizations,L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,tau_p,pilotIndex,p);
@@ -207,7 +207,7 @@ for n_ant = 1:length(N_UE_mmW_arr)
         p_full = p*ones(K,1);
        
         gainOverNoise = db2pow(gainOverNoisedB);
-    %     gainOverNoise_col = db2pow(gainOverNoisedB_col);
+        gainOverNoise_col = db2pow(gainOverNoisedB_col);
     
     %     %Equal power allocation
     %     rho_dist_equal = (rho_tot/tau_p)*ones(L,K);
@@ -336,20 +336,20 @@ for n_ant = 1:length(N_UE_mmW_arr)
     %     SE_DL_LPMMSE_sumSE((1+K_mmW):end,n) =  functionDownlinkSE_sumSE_dist(bk_sub6,Ck_sub6,preLogFactor,L,K-K_mmW,D(:,(1+K_mmW):end),rho_tot,tau_p);   
     %     SE_DL_LPMMSE_sumSE((1+K_mmW):end) =  sum(functionDownlinkSE_sumSE_distv2(bk(:,(1+K_mmW):end),Ck(:,:,(1+K_mmW):end,(1+K_mmW):end),preLogFactor,L,K-K_mmW,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p),2);   
         [SE_DL_LPMMSE_equal((1+K_mmW):end,n), SE_DL_LPMMSE_sumSE((1+K_mmW):end,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise(:,(1+K_mmW):end),preLogFactor,L,K-K_mmW,0,N,N_UE_mmW,N_UE_sub6,D(:,(1+K_mmW):end),rho_tot,tau_p,p_fac);   
-    %     [SE_DL_LPMMSE_equal_small((1+K_mmW):end,n), SE_DL_LPMMSE_sumSE_small((1+K_mmW):end,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise(:,(1+K_mmW):end),preLogFactor,L,K-K_mmW,0,N,N_UE_mmW,N_UE_sub6,D_small(:,(1+K_mmW):end),rho_tot,tau_p);   
-    %     [SE_DL_LPMMSE_equal_col((1+K_mmW):end,n), SE_DL_LPMMSE_sumSE_col((1+K_mmW):end,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise_col((1+K_mmW):end),preLogFactor,1,K-K_mmW,0,N*L,N_UE_mmW,N_UE_sub6,D_col((1+K_mmW):end),rho_tot,tau_p);   
+        [SE_DL_LPMMSE_equal_small((1+K_mmW):end,n), SE_DL_LPMMSE_sumSE_small((1+K_mmW):end,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise(:,(1+K_mmW):end),preLogFactor,L,K-K_mmW,0,N,N_UE_mmW,N_UE_sub6,D_small(:,(1+K_mmW):end),rho_tot,tau_p);   
+        [SE_DL_LPMMSE_equal_col((1+K_mmW):end,n), SE_DL_LPMMSE_sumSE_col((1+K_mmW):end,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise_col((1+K_mmW):end),preLogFactor,1,K-K_mmW,0,N*L,N_UE_mmW,N_UE_sub6,D_col((1+K_mmW):end),rho_tot,tau_p);   
         %% 
         %excluding mmW serving gNB
     %     [~,l_idx] = max(gainOverNoise(:,1).*D(:,1));
     %     D(l_idx,(1+K_mmW):end) = 0;
     %     D(1:(l_idx-1),1) = 0;
     %     D((1+l_idx):L,1) = 0;
-        mean_SE_sharing_UEs(n_ant) =  mean_SE_sharing_UEs(n_ant) + mean(SE_DL_LPMMSE_equal(ue_idxs(2:end),n))/nbrOfSetups;
-        std_SE_sharing_UEs(n_ant) = std_SE_sharing_UEs(n_ant) + std(SE_DL_LPMMSE_equal(ue_idxs(2:end),n))/nbrOfSetups;
+%         mean_SE_sharing_UEs(n_ant) =  mean_SE_sharing_UEs(n_ant) + mean(SE_DL_LPMMSE_equal(ue_idxs(2:end),n))/nbrOfSetups;
+%         std_SE_sharing_UEs(n_ant) = std_SE_sharing_UEs(n_ant) + std(SE_DL_LPMMSE_equal(ue_idxs(2:end),n))/nbrOfSetups;
         [SE_DL_LPMMSE_equal_after_handoff(:,n), SE_DL_LPMMSE_sumSE_after_handoff(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D,rho_tot,tau_p,p_fac);   
-        mean_SE_sharing_UEs_after_handoff(n_ant) =  mean_SE_sharing_UEs_after_handoff(n_ant) + mean(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n))/nbrOfSetups;
-        std_SE_sharing_UEs_after_handoff(n_ant) = std_SE_sharing_UEs_after_handoff(n_ant) + std(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n))/nbrOfSetups;
-        SE_setback_AP_sharing_UEs(n_ant) = SE_setback_AP_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
+%         mean_SE_sharing_UEs_after_handoff(n_ant) =  mean_SE_sharing_UEs_after_handoff(n_ant) + mean(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n))/nbrOfSetups;
+%         std_SE_sharing_UEs_after_handoff(n_ant) = std_SE_sharing_UEs_after_handoff(n_ant) + std(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n))/nbrOfSetups;
+%         SE_setback_AP_sharing_UEs(n_ant) = SE_setback_AP_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
 %         SE_setback_AP_sharing_UEs(rho_n) = SE_setback_AP_sharing_UEs(rho_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
 %         SE_setback_AP_sharing_UEs(lambda_n) = SE_setback_AP_sharing_UEs(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
 %         SE_setback_AP_sharing_UEs(n_p) = SE_setback_AP_sharing_UEs(n_p) + (sum(SE_DL_LPMMSE_equal_after_handoff(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
@@ -359,23 +359,22 @@ for n_ant = 1:length(N_UE_mmW_arr)
 %         num_sharing_UEs = num_sharing_UEs + length(ue_idxs)/(length(rho_tot_arr)*nbrOfSetups);
 %         num_not_sharing_UEs = num_not_sharing_UEs + (K-length(ue_idxs))/(length(rho_tot_arr)*nbrOfSetups);        
 %         disp(sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))
-        SE_setback_AP_not_sharing_UEs(n_ant) = SE_setback_AP_not_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+%         SE_setback_AP_not_sharing_UEs(n_ant) = SE_setback_AP_not_sharing_UEs(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(rho_n) = SE_setback_AP_not_sharing_UEs(rho_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(lambda_n) = SE_setback_AP_not_sharing_UEs(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(n_p) = SE_setback_AP_not_sharing_UEs(n_p) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
         D_after_handoff =  AP_reassign(D, gainOverNoise, K_mmW, 1, p_fac, ue_idxs(2:end));
-        [SE_DL_LPMMSE_equal_after_handoff_improved(:,n), SE_DL_LPMMSE_sumSE_after_handoff_improved(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_after_handoff,rho_tot,tau_p,p_fac);   
-        mean_SE_sharing_UEs_after_handoff_improved(n_ant) =  mean_SE_sharing_UEs_after_handoff_improved(n_ant) + mean(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n))/nbrOfSetups;
-        std_SE_sharing_UEs_after_handoff_improved(n_ant) = std_SE_sharing_UEs_after_handoff_improved(n_ant) + std(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n))/nbrOfSetups;
-        SE_setback_AP_sharing_UEs_improved(n_ant) = SE_setback_AP_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
+%         [SE_DL_LPMMSE_equal_after_handoff_improved(:,n), SE_DL_LPMMSE_sumSE_after_handoff_improved(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_after_handoff,rho_tot,tau_p,p_fac);   
+%         mean_SE_sharing_UEs_after_handoff_improved(n_ant) =  mean_SE_sharing_UEs_after_handoff_improved(n_ant) + mean(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n))/nbrOfSetups;
+%         std_SE_sharing_UEs_after_handoff_improved(n_ant) = std_SE_sharing_UEs_after_handoff_improved(n_ant) + std(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n))/nbrOfSetups;
+%         SE_setback_AP_sharing_UEs_improved(n_ant) = SE_setback_AP_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
 %         SE_setback_AP_sharing_UEs_improved(lambda_n) = SE_setback_AP_sharing_UEs_improved(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(ue_idxs(2:end),n) - SE_DL_LPMMSE_equal(ue_idxs(2:end),n)))/nbrOfSetups;
-        SE_setback_AP_not_sharing_UEs_improved(n_ant) = SE_setback_AP_not_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
+%         SE_setback_AP_not_sharing_UEs_improved(n_ant) = SE_setback_AP_not_sharing_UEs_improved(n_ant) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(rho_n) = SE_setback_AP_not_sharing_UEs(rho_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
-%         SE_setback_AP_not_sharing_UEs(lambda_n) = SE_setback_AP_not_sharing_UEs(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs_improved(lambda_n) = SE_setback_AP_not_sharing_UEs_improved(lambda_n) + (sum(SE_DL_LPMMSE_equal_after_handoff_improved(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
 %         SE_setback_AP_not_sharing_UEs(n_p) = SE_setback_AP_not_sharing_UEs(n_p) + (sum(SE_DL_LPMMSE_equal_after_handoff(not_ue_idxs,n) - SE_DL_LPMMSE_equal(not_ue_idxs,n)))/nbrOfSetups;
-    %     [SE_DL_LPMMSE_equal_after_handoff_small(:,n), SE_DL_LPMMSE_sumSE_after_handoff_small(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_small,rho_tot,tau_p);   
-    %     [SE_DL_LPMMSE_equal_after_handoff_col(:,n), SE_DL_LPMMSE_sumSE_after_handoff_col(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise_col,preLogFactor,1,K,K_mmW,N*L,N_UE_mmW,N_UE_sub6,D_col,rho_tot,tau_p);   
+        [SE_DL_LPMMSE_equal_after_handoff_small(:,n), SE_DL_LPMMSE_sumSE_after_handoff_small(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise,preLogFactor,L,K,K_mmW,N,N_UE_mmW,N_UE_sub6,D_small,rho_tot,tau_p,p_fac);
+        [SE_DL_LPMMSE_equal_after_handoff_col(:,n), SE_DL_LPMMSE_sumSE_after_handoff_col(:,n)] =  functionDownlinkSE_sumSE_distv3(gainOverNoise_col,preLogFactor,1,K,K_mmW,N*L,N_UE_mmW,N_UE_sub6,D_col,rho_tot,tau_p,p_fac);   
     %     % Plot Figure 7.3
     %     figure;
     %     hold on; box on;
@@ -398,81 +397,81 @@ for n_ant = 1:length(N_UE_mmW_arr)
     %     xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
     %     ylabel('CDF','Interpreter','Latex');
     %     legend({'Equal', 'Equal after handoff','mmW after handoff'},'Interpreter','Latex','Location','SouthEast')
-%     SE_eq_before_handoff = SE_DL_LPMMSE_equal((1+K_mmW):end,:);
-%     SE_eq_after_handoff = SE_DL_LPMMSE_equal_after_handoff((1+K_mmW):end,:);
-    SE_mmW_UE(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
-    SE_mmW_UE_improved(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff_improved(1,:));
+    SE_eq_before_handoff = SE_DL_LPMMSE_equal((1+K_mmW):end,:);
+    SE_eq_after_handoff = SE_DL_LPMMSE_equal_after_handoff((1+K_mmW):end,:);
+%     SE_mmW_UE(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
+%     SE_mmW_UE_improved(n_ant) = mean(SE_DL_LPMMSE_equal_after_handoff_improved(1,:));
 %     SE_mmW_UE(rho_n) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
 %     SE_mmW_UE(lambda_n) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
 %     SE_mmW_UE_improved(lambda_n) = mean(SE_DL_LPMMSE_equal_after_handoff_improved(1,:));
 %     SE_mmW_UE(n_p) = mean(SE_DL_LPMMSE_equal_after_handoff(1,:));
-    % SE_eq_before_handoff_small = SE_DL_LPMMSE_equal_small((1+K_mmW):end,:);
-    % SE_eq_after_handoff_small = SE_DL_LPMMSE_equal_after_handoff_small((1+K_mmW):end,:);
-    % SE_eq_before_handoff_col = SE_DL_LPMMSE_equal_col((1+K_mmW):end,:);
-    % SE_eq_after_handoff_col = SE_DL_LPMMSE_equal_after_handoff_col((1+K_mmW):end,:);
-%     SE_before_handoff = SE_DL_LPMMSE_sumSE((1+K_mmW):end,:);
-%     SE_after_handoff = SE_DL_LPMMSE_sumSE_after_handoff((1+K_mmW):end,:);
-    % SE_before_handoff_small = SE_DL_LPMMSE_sumSE_small((1+K_mmW):end,:);
-    % SE_after_handoff_small = SE_DL_LPMMSE_sumSE_after_handoff_small((1+K_mmW):end,:);
-    % SE_before_handoff_col = SE_DL_LPMMSE_sumSE_col((1+K_mmW):end,:);
-    % SE_after_handoff_col = SE_DL_LPMMSE_sumSE_after_handoff_col((1+K_mmW):end,:);
+    SE_eq_before_handoff_small = SE_DL_LPMMSE_equal_small((1+K_mmW):end,:);
+    SE_eq_after_handoff_small = SE_DL_LPMMSE_equal_after_handoff_small((1+K_mmW):end,:);
+    SE_eq_before_handoff_col = SE_DL_LPMMSE_equal_col((1+K_mmW):end,:);
+    SE_eq_after_handoff_col = SE_DL_LPMMSE_equal_after_handoff_col((1+K_mmW):end,:);
+    SE_before_handoff = SE_DL_LPMMSE_sumSE((1+K_mmW):end,:);
+    SE_after_handoff = SE_DL_LPMMSE_sumSE_after_handoff((1+K_mmW):end,:);
+    SE_before_handoff_small = SE_DL_LPMMSE_sumSE_small((1+K_mmW):end,:);
+    SE_after_handoff_small = SE_DL_LPMMSE_sumSE_after_handoff_small((1+K_mmW):end,:);
+    SE_before_handoff_col = SE_DL_LPMMSE_sumSE_col((1+K_mmW):end,:);
+    SE_after_handoff_col = SE_DL_LPMMSE_sumSE_after_handoff_col((1+K_mmW):end,:);
     % % Plot Figure 7.3
-%     figure;
-%     hold on; box on;
-%     set(gca,'fontsize',16);
-    % 
-    % % plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
-    % % plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
-    % % plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
-    % % plot(sort(SE_eq_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k-','LineWidth',2);
-%     plot(sort(SE_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r--','LineWidth',2);
-    % plot(sort(SE_eq_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o:','LineWidth',2);
-%     plot(sort(SE_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b--','LineWidth',2);
-%     xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
-%     ylabel('CDF','Interpreter','Latex');
-    % legend({'Equal', 'Opt', 'Equal after handoff', 'Opt after handoff'},'Interpreter','Latex','Location','SouthEast')
-%     legend({'Equal','Equal after handoff'}, 'Interpreter','latex','Location','southeast')
-    % 
-    % figure;
-    % hold on; box on;
-    % set(gca,'fontsize',16);
-    % % plot(sort(SE_eq_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
-    % plot(sort(SE_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r-','LineWidth',2);
-    % % plot(sort(SE_eq_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
-    % plot(sort(SE_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b-','LineWidth',2);
-    % xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
-    % ylabel('CDF','Interpreter','Latex');
-    % % legend({'Equal small', 'Opt small', 'Equal after handoff small', 'Opt after handoffs small'},'Interpreter','Latex','Location','SouthEast');
-    % legend({'Equal small', 'Equal after handoff small'},'Interpreter','latex','Location','southeast')
-    % % 
-    % figure;
-    % hold on; box on;
-    % set(gca,'fontsize',16);
-    % % plot(sort(SE_eq_before_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
-    % plot(sort(SE_before_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r-','LineWidth',2);
-    % % plot(sort(SE_eq_after_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
-    % plot(sort(SE_after_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b-','LineWidth',2);
-    % xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
-    % ylabel('CDF','Interpreter','Latex');
-    % % legend({'Equal col', 'Opt col', 'Equal after handoff col', 'Opt after handoffs col'},'Interpreter','Latex','Location','SouthEast');
-    % legend({'Equal col','Equal after handoff col'},'Interpreter','latex','Location','southeast')
+    figure;
+    hold on; box on;
+    set(gca,'fontsize',16);
     
-    % disp(mean(SE_DL_LPMMSE_equal_after_handoff(1,:))*100);
-%     disp(mean(SE_DL_LPMMSE_sumSE_after_handoff(1,:))*100);
-%     disp(sum(mean(SE_DL_LPMMSE_sumSE_after_handoff,2))*100);
-    % disp(mean(SE_DL_LPMMSE_equal_after_handoff_small(1,:))*100);
-    % disp(mean(SE_DL_LPMMSE_sumSE_after_handoff_small(1,:))*100);
-    % disp(mean(SE_DL_LPMMSE_equal_after_handoff_col(1,:))*100);
-    % disp(mean(SE_DL_LPMMSE_sumSE_after_handoff_col(1,:))*100);
-end
-figure
-plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs); hold on;
-plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs); hold on;
-plot(N_UE_mmW_arr,SE_mmW_UE); hold on;
-figure
-plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs_improved); hold on;
-plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs_improved); hold on;
-plot(N_UE_mmW_arr,SE_mmW_UE_improved); hold on;
+    % plot(sort(SE_DL_LPMMSE_equal(:)),linspace(0,1,K*nbrOfSetups),'k-','LineWidth',2);
+    % plot(sort(SE_DL_LPMMSE_fractional(:)),linspace(0,1,K*nbrOfSetups),'k:','LineWidth',2);
+    % plot(sort(SE_DL_LPMMSE_maxmin(:)),linspace(0,1,K*nbrOfSetups),'b-.','LineWidth',2);
+    % plot(sort(SE_eq_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k-','LineWidth',2);
+    plot(sort(SE_before_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r--','LineWidth',2);
+%     plot(sort(SE_eq_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o:','LineWidth',2);
+    plot(sort(SE_after_handoff(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b--','LineWidth',2);
+    xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
+    ylabel('CDF','Interpreter','Latex');
+%     legend({'Equal', 'Opt', 'Equal after handoff', 'Opt after handoff'},'Interpreter','Latex','Location','SouthEast')
+    legend({'Equal','Equal after handoff'}, 'Interpreter','latex','Location','southeast')
+    
+    figure;
+    hold on; box on;
+    set(gca,'fontsize',16);
+    % plot(sort(SE_eq_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
+    plot(sort(SE_before_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r-','LineWidth',2);
+    % plot(sort(SE_eq_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
+    plot(sort(SE_after_handoff_small(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b-','LineWidth',2);
+    xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
+    ylabel('CDF','Interpreter','Latex');
+    % legend({'Equal small', 'Opt small', 'Equal after handoff small', 'Opt after handoffs small'},'Interpreter','Latex','Location','SouthEast');
+    legend({'Equal small', 'Equal after handoff small'},'Interpreter','latex','Location','southeast')
+    % 
+    figure;
+    hold on; box on;
+    set(gca,'fontsize',16);
+    % plot(sort(SE_eq_before_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'k:','LineWidth',2);
+    plot(sort(SE_before_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'r-','LineWidth',2);
+    % plot(sort(SE_eq_after_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'o-','LineWidth',2);
+    plot(sort(SE_after_handoff_col(:)),linspace(0,1,(K-K_mmW)*nbrOfSetups),'b-','LineWidth',2);
+    xlabel('Spectral efficiency [bit/s/Hz]','Interpreter','Latex');
+    ylabel('CDF','Interpreter','Latex');
+    % legend({'Equal col', 'Opt col', 'Equal after handoff col', 'Opt after handoffs col'},'Interpreter','Latex','Location','SouthEast');
+    legend({'Equal col','Equal after handoff col'},'Interpreter','latex','Location','southeast')
+    
+    disp(mean(SE_DL_LPMMSE_equal_after_handoff(1,:))*100);
+    disp(mean(SE_DL_LPMMSE_sumSE_after_handoff(1,:))*100);
+    disp(sum(mean(SE_DL_LPMMSE_sumSE_after_handoff,2))*100);
+    disp(mean(SE_DL_LPMMSE_equal_after_handoff_small(1,:))*100);
+    disp(mean(SE_DL_LPMMSE_sumSE_after_handoff_small(1,:))*100);
+    disp(mean(SE_DL_LPMMSE_equal_after_handoff_col(1,:))*100);
+    disp(mean(SE_DL_LPMMSE_sumSE_after_handoff_col(1,:))*100);
+% end
+% figure
+% plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs); hold on;
+% plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs); hold on;
+% plot(N_UE_mmW_arr,SE_mmW_UE); hold on;
+% figure
+% plot(N_UE_mmW_arr,SE_setback_AP_sharing_UEs_improved); hold on;
+% plot(N_UE_mmW_arr,SE_setback_AP_not_sharing_UEs_improved); hold on;
+% plot(N_UE_mmW_arr,SE_mmW_UE_improved); hold on;
 % figure
 % plot(rho_tot_arr,SE_setback_AP_sharing_UEs); hold on;
 % plot(rho_tot_arr,SE_setback_AP_not_sharing_UEs); hold on;
