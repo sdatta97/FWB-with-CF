@@ -1,15 +1,12 @@
-function rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,ue_idx,sub6ConnectionState)
+function rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,D,ue_idx,sub6ConnectionState)
 a = 1;
 b = 1;
 M = size(channel_dl,1);
-Kmax = params.numUE_sub6_max;
-Kd = size(channel_dl,2);
-Kd_mmw = size(sub6ConnectionState,1);
-K = params.num_sc_sub6; % no of subcarriers
-scs = params.scs_sub6; %sub carrier spacing
-BW = K*scs;
+K = size(channel_dl,2);
+K_mmW = size(sub6ConnectionState,1);
+BW = params.Band;
 Ntx = size(channel_dl,3);
-p_d = 1*Kd;
+p_d = 1*K;
 % perm_vec  = repmat(randperm(tau_p),1,2);
 % phi_index = perm_vec(1:K);
 % for k = 1:K
@@ -32,40 +29,77 @@ p_d = 1*Kd;
 %     end
 % end
 BETA = params.BETA;
-[BETA_max, idx_max] = maxk(BETA,Kmax,2);
+beta_uc = zeros(size(BETA));
+
+%Prepare array to store the number of APs serving a specficic UE
+La = zeros(K,1);
+%Prepare cell to store the AP indices serving a specficic UE
+Serv = cell(K,1);
+%Prepare cell to store the AP indices not serving a specficic UE
+NoServ = cell(K,1);
+%Construc the above array and cells
+for k = 1:K
+    servingAPs = find(D(:,k)==1);
+    NoservingAPs = find(D(:,k)==0);
+    
+    Serv{k} = servingAPs;
+    NoServ{k} = NoservingAPs;
+    
+    La(k) = length(servingAPs);
+    beta_uc(:,k) = BETA(:,k).*D(:,k);
+end
 %% initialization of c
-C_v = repmat(sqrt(1./(b*Ntx*sum(BETA(idx_max),2))),[1 Kd]);
-idx_ue = zeros(M,Kd);
-for i = 1:M
-    for k = 1:Kd
-        if any(idx_max(i,:) == k)
-            idx_ue(i,k) = 1;
+eta_eq = zeros(L,K);
+if (K_mmW == 0)
+    for l = 1:L
+        for k = 1:K
+            if ismember(l,Serv{k})
+                eta_eq(l,k) = 1./(N_AP*N_UE_sub6*sum(BETA(l,:)));
+            end
+        end
+    end
+else
+    for l = 1:L
+        for k = 1:K
+            if ismember(l,Serv{k})
+                if (k<=K_mmW)
+                    eta_eq(l,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(l,1:K_mmW)+N_UE_sub6*sum(beta_uc(l,2:K))));
+                else
+                    eta_eq(l,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(l,1:K_mmW)+N_UE_sub6*sum(beta_uc(l,2:K))));
+                end
+            end
         end
     end
 end
-D = zeros(Kd,M);
-for k = 1:Kd
-    D(k,:) = reshape(sqrt(C_v(:,k).*sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,k,:)),[M,Ntx]),2)),[1,M]).*(idx_ue(:,k)');
+C_v = sqrt(eta_eq);
+D_mmW = zeros(K,M);
+D_sub6 = zeros(K,M);
+for k = 1:K_mmW
+    for m = 1:M
+        D_mmW(k,:) = D_mmW(k,:) + sqrt(C_v(m,k))*reshape(channel_dl(m,k,:,:),[Ntx,Nrx]).*reshape(conj(channel_est_dl(m,k,:,:)),[Ntx,Nrx]);
+    end
 end
-% E = zeros(M,Kd);
-DS = zeros(Kd,1);
-MUI = zeros(Kd,1);
-% % UDI = zeros(Kd,1);
-% % TQD = zeros(Kd,1);
-N = abs(sqrt(0.5)*(randn(Kd,1) + 1j*randn(Kd,1))).^2;
-snr_num = zeros(Kd,1);
-snr_den = zeros(Kd,1);
-rate_dl = zeros(1,Kd);
-for k = 1:Kd_mmw
+for k = 1:K-K_mmW
+    for m = 1:M
+        D_sub6(k,:) = D_sub6(k,:) + sqrt(C_v(m,k+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,Nrx]).*reshape(conj(channel_est_dl(m,k,:,:)),[Ntx,Nrx]);
+    end
+end
+DS = zeros(K,1);
+MUI = zeros(K,1);
+N = abs(sqrt(0.5)*(randn(K,1) + 1j*randn(K,1))).^2;
+snr_num = zeros(K,1);
+snr_den = zeros(K,1);
+rate_dl = zeros(1,K);
+for k = 1:K_mmW
     if (sub6ConnectionState(k)==1 || k==ue_idx)
         DS(k) = a^2*p_d*abs(D(k,:)*D(k,:).')^2;
         MUI(k) = 0;
-        for q = 1:Kd_mmw
+        for q = 1:K_mmW
              if (q~=k && sub6ConnectionState(q)==1)
                MUI(k) = MUI(k) + a^2*p_d*abs((C_v(:,q).*(idx_ue(:,q)==1))'*(reshape(sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,q,:)),[M,Ntx]),2),[M,1])))^2;
              end
         end
-        for q = 1+Kd_mmw:Kd
+        for q = 1+K_mmW:K
             % E(:,q) = sqrt(0.5*(b-a^2)*(C_v(:,q).^2))*(randn(M,1) + 1i*randn(M,1));
             % MUI(k) = MUI(k) + abs(C_v(:,q)'*reshape(sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,q,:)),[M,Ntx]),2),[M,1]))^2;
             MUI(k) = MUI(k) + a^2*p_d*abs((C_v(:,q).*(idx_ue(:,q)==1))'*(reshape(sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,q,:)),[M,Ntx]),2),[M,1]).*(idx_ue(:,q)==1)))^2;
@@ -78,15 +112,15 @@ for k = 1:Kd_mmw
         rate_dl(k) = BW*TAU_FAC*log2(1+snr_num(k)/snr_den(k));
     end
 end
-for k = 1+Kd_mmw:Kd
+for k = 1+K_mmW:K
     DS(k) = a^2*p_d*abs(D(k,:)*D(k,:).')^2;
     MUI(k) = 0;
-    for q = 1:Kd_mmw
+    for q = 1:K_mmW
         if (sub6ConnectionState(q)==1)
            MUI(k) = MUI(k) + a^2*p_d*abs((C_v(:,q).*(idx_ue(:,q)==1))'*(reshape(sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,q,:)),[M,Ntx]),2),[M,1])))^2;
         end
     end
-    for q = 1+Kd_mmw:Kd
+    for q = 1+K_mmW:K
        if (q~=k)
            MUI(k) = MUI(k) + a^2*p_d*abs((C_v(:,q).*(idx_ue(:,q)==1))'*(reshape(sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,q,:)),[M,Ntx]),2),[M,1])))^2;
        end
