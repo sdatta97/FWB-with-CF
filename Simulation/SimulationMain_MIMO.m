@@ -39,7 +39,27 @@ params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
 params.sigma_sf =4;
 params.Band = 100e6;%20e6; %Communication bandwidth
-params.tau_c = 200;      % coherence block length
+
+
+%% Define simulation setup
+
+%Angular standard deviation in the local scattering model (in radians)
+params.ASD_varphi = deg2rad(15); %azimuth angle
+params.ASD_theta = deg2rad(15);  %elevation angle
+
+%Total uplink transmit power per UE (mW)
+params.p = 100;
+
+%Total downlink transmit power per AP (mW)
+params.rho_tot = 200;
+% rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
+
+%Power factor division
+% p_fac_arr = [1:1:10, 10:10:100]; %10.^(0:1:5);
+params.p_fac = 10;
+
+%Prepare to save simulation results
+
 % rng(2,'twister');
 %%
 % load('params.mat')
@@ -75,13 +95,11 @@ params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all 
 % lambda_BS = [200,300,400,500]; %densityBS
 % lambda_BS =[200,300]; %densityBS
 % lambda_BS = 50:50:200;
-lambda_BS = 50;
+lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = lambda_BS./10;
-% lambda_UE_sub6 = lambda_BS./2;
-% lambda_UE_sub6 = lambda_BS.*2;
+lambda_UE_sub6 = 50;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 % for idxUEDensity = 1:length(lambda_UE_sub6)
     for idxBSDensity = 1:length(lambda_BS)
@@ -108,7 +126,11 @@ lambda_UE_sub6 = lambda_BS./10;
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 64;
+        params.num_antennas_per_gNB = 32;
+        %Number of antennas per UE
+        % N_UE_mmW_arr = 2.^(0:1:5);
+        params.N_UE_mmW = 8;
+        params.N_UE_sub6 = 2;
         %%UE locations
         % params.numUE_sub6 = 10;
         % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
@@ -126,6 +148,23 @@ lambda_UE_sub6 = lambda_BS./10;
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
         rmin_sub6 = 1e6;
         params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
+       
+        %Length of the coherence block
+        params.tau_c = 200;
+        
+        %Compute number of pilots per coherence block
+        params.tau_p = params.numUE+params.numUE_sub6;
+        
+        %Compute the prelog factor assuming only downlink data transmission
+        params.preLogFactor = (tau_c-tau_p)/tau_c;
+        
+        %Number of setups with random UE locations
+        params.nbrOfSetups = 100;
+                
+              
+        %Number of channel realizations per setup
+        params.nbrOfRealizations = 100;
+        
         %% PHY layer params
         params.scs_mmw = 2e9;     %not using this parameter now
         params.scs_sub6 = 1e8;   %sub-6 GHz bandwidth 100 MHz
