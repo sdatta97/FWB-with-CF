@@ -84,43 +84,50 @@ for k = 1:K-K_mmW
         D_sub6(k,:,:) = D_sub6(k,:,:) + sqrt(C_v(m,k+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,Nrx])*reshape(conj(channel_est_dl(m,k,:,:)),[Ntx,Nrx])';
     end
 end
-DS = zeros(K,1);
-MUI = zeros(K,1);
+DS_mmW = zeros(K_mmW,N_mmW);
+MUI_mmW = zeros(K_mmW,N_mmW);
+DS_sub6 = zeros(K-K_mmW,N_sub6);
+MUI_sub6 = zeros(K-K_mmW,N_sub6);
+
 noise_mmW = abs(sqrt(0.5)*(randn(K_mmW,N_mmW) + 1j*randn(K_mmW,N_mmW))).^2;
 noise_sub6 = abs(sqrt(0.5)*(randn(K-K_mmW,N_sub6) + 1j*randn(K-K_mmW,N_sub6))).^2;
-snr_num = zeros(K,1);
-snr_den = zeros(K,1);
-rate_dl = zeros(1,K);
+snr_num_mmW = zeros(K_mmW,N_mmW);
+snr_den_mmW = zeros(K_mmW,N_mmW);
+snr_num_sub6 = zeros(K-K_mmW,N_sub6);
+snr_den_sub6 = zeros(K-K_mmW,N_sub6);
+rate_dl = zeros(K,1);
 for k = 1:K_mmW
     if (sub6ConnectionState(k)==1 || k==ue_idx)
-        DS(k) = p_d*abs(D_mmW(k,:,:))^2;
-        MUI(k) = 0;
-        for q = 1:K_mmW
-            if (q~=k && sub6ConnectionState(q)==1)
-              MUI(k) = MUI(k) + p_d*abs(D_mmW(q,:,:))^2;
+        for n = 1:N_mmW
+            DS_mmW(k,n) = p_d*abs(reshape(D_mmW(k,n,:),[1,N_mmW])*ue_sym)^2;
+            for q = 1:K_mmW
+                if (q~=k && sub6ConnectionState(q)==1)
+                  MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*abs(reshape(D_mmW(q,n,:),[1,N_mmW])*ue_sym)^2;
+                end
             end
+            for q = 1:K-K_mmW
+               MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*abs(reshape(D_sub6(q,n,:),[1,N_sub6])*ue_sym)^2;
+            end
+            snr_num_mmW(k,n) = DS_mmW(k,n);
+            snr_den_mmW(k,n) = MUI_mmW(k,n) + noise_mmW(k,n);
+            rate_dl(k) = rate_dl(k) + BW*TAU_FAC*log2(1+snr_num_mmW(k,n)/snr_den_mmW(k,n));
         end
-        for q = 1:K-K_mmW
-           MUI(k) = MUI(k) + p_d*abs(D_sub6(q,:,:))^2;
-        end
-        snr_num(k) = DS(k);
-        snr_den(k) = MUI(k) + noise_mmW(k);
-        rate_dl(k) = BW*TAU_FAC*log2(1+snr_num(k)/snr_den(k));
     end
 end
 for k = 1:K-K_mmW
-    DS(k) = p_d*abs(D_mmW(k,:,:))^2;
-    MUI(k) = 0;
-    for q = 1:K_mmW
-        if (q~=k && sub6ConnectionState(q)==1)
-          MUI(k) = MUI(k) + p_d*abs(D_mmW(q,:,:))^2;
+    for n = 1:N_mmW
+        DS_sub6(k,n) = p_d*abs(reshape(D_sub6(k,n,:),[1,N_sub6])*ue_sym)^2;
+        for q = 1:K_mmW
+            if (q~=k && sub6ConnectionState(q)==1)
+              MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*abs(reshape(D_mmW(q,n,:),[1,N_mmW])*ue_sym)^2;
+            end
         end
+        for q = 1:K-K_mmW
+           MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*abs(reshape(D_sub6(q,n,:),[1,N_sub6])*ue_sym)^2;
+        end
+        snr_num_sub6(k,n) = DS_sub6(k,n);
+        snr_den_sub6(k,n) = MUI_sub6(k,n) + noise_sub6(k,n);
+        rate_dl(k+K_mmW) = rate_dl(k+K_mmW) + BW*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
     end
-    for q = 1:K-K_mmW
-       MUI(k) = MUI(k) + p_d*abs(D_sub6(q,:,:))^2;
-    end
-    snr_num(k) = DS(k);
-    snr_den(k) = MUI(k) + noise_mmW(k);
-    rate_dl(k) = BW*TAU_FAC*log2(1+snr_num(k)/snr_den(k));
 end
 end
