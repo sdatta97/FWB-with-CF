@@ -1,11 +1,11 @@
 function rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,D,ue_idx,sub6ConnectionState)
-a = 1;
-b = 1;
 M = size(channel_dl,1);
 K = size(channel_dl,2);
 K_mmW = size(sub6ConnectionState,1);
 BW = params.Band;
 Ntx = size(channel_dl,3);
+N_mmW = size(channel_dl_mmW,4);
+N_sub6 = size(channel_dl,4);
 p_d = 1*K;
 % perm_vec  = repmat(randperm(tau_p),1,2);
 % phi_index = perm_vec(1:K);
@@ -86,7 +86,8 @@ for k = 1:K-K_mmW
 end
 DS = zeros(K,1);
 MUI = zeros(K,1);
-N = abs(sqrt(0.5)*(randn(K,1) + 1j*randn(K,1))).^2;
+noise_mmW = abs(sqrt(0.5)*(randn(K_mmW,N_mmW) + 1j*randn(K_mmW,N_mmW))).^2;
+noise_sub6 = abs(sqrt(0.5)*(randn(K-K_mmW,N_sub6) + 1j*randn(K-K_mmW,N_sub6))).^2;
 snr_num = zeros(K,1);
 snr_den = zeros(K,1);
 rate_dl = zeros(1,K);
@@ -100,19 +101,14 @@ for k = 1:K_mmW
              end
         end
         for q = 1+K_mmW:K
-            % E(:,q) = sqrt(0.5*(b-a^2)*(C_v(:,q).^2))*(randn(M,1) + 1i*randn(M,1));
-            % MUI(k) = MUI(k) + abs(C_v(:,q)'*reshape(sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,q,:)),[M,Ntx]),2),[M,1]))^2;
             MUI(k) = MUI(k) + a^2*p_d*abs((C_v(:,q).*(idx_ue(:,q)==1))'*(reshape(sum(reshape(channel_dl(:,k,:),[M,Ntx]).*reshape(conj(channel_est_dl(:,q,:)),[M,Ntx]),2),[M,1]).*(idx_ue(:,q)==1)))^2;
         end
-        % for l = 1:Ku
-        %     UDI(k) = UDI(k) + abs(interUEchannel(k,l)*sqrt(p_u*Theta_v(l)))^2;
-        % end
         snr_num(k) = DS(k);
-        snr_den(k) = MUI(k) + N(k);
+        snr_den(k) = MUI(k) + noise_mmW(k);
         rate_dl(k) = BW*TAU_FAC*log2(1+snr_num(k)/snr_den(k));
     end
 end
-for k = 1+K_mmW:K
+for k = 1:K-K_mmW
     DS(k) = a^2*p_d*abs(D(k,:)*D(k,:).')^2;
     MUI(k) = 0;
     for q = 1:K_mmW
@@ -126,7 +122,7 @@ for k = 1+K_mmW:K
        end
     end
     snr_num(k) = DS(k);
-    snr_den(k) = MUI(k) + N(k);
+    snr_den(k) = MUI(k) + noise_sub6(k);
     rate_dl(k) = BW*TAU_FAC*log2(1+snr_num(k)/snr_den(k));
 end
 end
