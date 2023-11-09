@@ -71,17 +71,32 @@ else
         end
     end
 end
-C_v = sqrt(eta_eq);
-D_mmW = zeros(K_mmW,Ntx,Ntx);
-D_sub6 = zeros(K-K_mmW,Ntx,Ntx);
+D_mmW_mmW = zeros(K_mmW,K_mmW,N_mmW,N_mmW);
+D_mmW_sub6 = zeros(K_mmW,K-K_mmW,N_mmW,N_sub6);
+D_sub6_mmW = zeros(K-K_mmW,K_mmW,N_sub6,N_mmW);
+D_sub6_sub6 = zeros(K-K_mmW,K_mmW,N_sub6,N_sub6);
 for k = 1:K_mmW
-    for m = 1:M
-        D_mmW(k,:,:) = D_mmW(k,:,:) + sqrt(C_v(m,k))*reshape(channel_dl(m,k,:,:),[Ntx,Nrx])*reshape(conj(channel_est_dl(m,k,:,:)),[Ntx,Nrx])';
+    for q = 1:K_mmW
+        for m = 1:M
+            D_mmW_mmW(k,q,:,:) = D_mmW_mmW(k,q,:,:) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_mmW])'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_mmW]);
+        end
+    end
+    for q = 1:K-K_mmW
+        for m = 1:M
+            D_mmW_sub6(k,q,:,:) = D_mmW_sub6(k,q,:,:) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_mmW])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_sub6]);
+        end
     end
 end
 for k = 1:K-K_mmW
-    for m = 1:M
-        D_sub6(k,:,:) = D_sub6(k,:,:) + sqrt(C_v(m,k+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,Nrx])*reshape(conj(channel_est_dl(m,k,:,:)),[Ntx,Nrx])';
+    for q = 1:K_mmW
+        for m = 1:M
+            D_sub6_mmW(k,q,:,:) = D_sub6_mmW(k,q,:,:) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_sub6])'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_mmW]);
+        end
+    end
+    for q = 1:K-K_mmW
+        for m = 1:M
+            D_sub6_sub6(k,q,:,:) = D_sub6_sub6(k,q,:,:) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_sub6])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_sub6]);
+        end
     end
 end
 DS_mmW = zeros(K_mmW,N_mmW);
@@ -99,14 +114,14 @@ rate_dl = zeros(K,1);
 for k = 1:K_mmW
     if (sub6ConnectionState(k)==1 || k==ue_idx)
         for n = 1:N_mmW
-            DS_mmW(k,n) = p_d*abs(reshape(D_mmW(k,n,:),[1,N_mmW])*ue_sym)^2;
+            DS_mmW(k,n) = p_d*norm(D_mmW_mmW(k,k,n,:))^2;
             for q = 1:K_mmW
                 if (q~=k && sub6ConnectionState(q)==1)
-                  MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*abs(reshape(D_mmW(q,n,:),[1,N_mmW])*ue_sym)^2;
+                  MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(D_mmW_mmW(k,q,n,:))^2;
                 end
             end
             for q = 1:K-K_mmW
-               MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*abs(reshape(D_sub6(q,n,:),[1,N_sub6])*ue_sym)^2;
+               MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(D_mmW_sub6(k,q,n,:))^2;
             end
             snr_num_mmW(k,n) = DS_mmW(k,n);
             snr_den_mmW(k,n) = MUI_mmW(k,n) + noise_mmW(k,n);
@@ -115,15 +130,15 @@ for k = 1:K_mmW
     end
 end
 for k = 1:K-K_mmW
-    for n = 1:N_mmW
-        DS_sub6(k,n) = p_d*abs(reshape(D_sub6(k,n,:),[1,N_sub6])*ue_sym)^2;
+    for n = 1:N_sub6
+        DS_sub6(k,n) = p_d*norm(D_sub6_sub6(k,k,n,:))^2;
         for q = 1:K_mmW
             if (q~=k && sub6ConnectionState(q)==1)
-              MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*abs(reshape(D_mmW(q,n,:),[1,N_mmW])*ue_sym)^2;
+              MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(D_sub6_mmW(k,q,n,:))^2;
             end
         end
         for q = 1:K-K_mmW
-           MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*abs(reshape(D_sub6(q,n,:),[1,N_sub6])*ue_sym)^2;
+           MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(D_sub6_sub6(q,n,:))^2;
         end
         snr_num_sub6(k,n) = DS_sub6(k,n);
         snr_den_sub6(k,n) = MUI_sub6(k,n) + noise_sub6(k,n);
