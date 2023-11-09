@@ -11,10 +11,10 @@ phy_channel_mmW = zeros(M,K_mmW,Ntx,N_mmW);
 phy_channel_sub6 = zeros(M,K-K_mmW,Ntx,N_sub6);
 for m = 1:M
     for k = 1:K_mmW
-        phy_channel_mmW (m,k,:) = sqrt(0.5*BETA(m,k))*(randn(Ntx,N_mmW) + 1i*randn(Ntx,N_mmW));        
+        phy_channel_mmW (m,k,:,:) = sqrt(0.5*BETA(m,k))*(randn(Ntx,N_mmW) + 1i*randn(Ntx,N_mmW));        
     end
     for k = 1:K-K_mmW
-        phy_channel_sub6 (m,k,:) = sqrt(0.5*BETA(m,k+K_mmW))*(randn(Ntx,N_sub6) + 1i*randn(Ntx,N_sub6));        
+        phy_channel_sub6 (m,k,:,:) = sqrt(0.5*BETA(m,k+K_mmW))*(randn(Ntx,N_sub6) + 1i*randn(Ntx,N_sub6));        
     end 
 end
 phy_channel_mmW_est = phy_channel_mmW;

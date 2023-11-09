@@ -351,8 +351,8 @@ while nextEventTime < params.simTime
                         % rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
                         sub6ConnectionState = UE.sub6ConnectionState;
                         sub6ConnectionState(ue_idx) = 1;
-                        rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,D,ue_idx,sub6ConnectionState);
-                        %                      
+                        [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+                        rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,D,ue_idx,sub6ConnectionState);                                              
                         % r_calc_mmw = rate_analyticalv5_mmW_only(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
                         %                         sub6ConnectionState(ue_idx) = 0;
                         %                         r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
