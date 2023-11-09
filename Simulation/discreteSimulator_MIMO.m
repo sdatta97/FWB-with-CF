@@ -599,6 +599,10 @@ for ue_idx = 1:numUE
     connectionEvents = mergeConnectionEvents(connectionEvents);
     sub6connectionEvents = mergeConnectionEvents(sub6connectionEvents);
     outageEvents = getOutageEvents(connectionEvents,params);
+    outage_not_mitigated_by_cf = setdiff(outageEvents,sub6connectionEvents);
+    figure
+    cdfplot(outage_not_mitigated_by_cf); hold on;
+    cdfplot(outageEvents); hold on;
     outage_duration_wo_cf = sum(outageEvents(2,:));
     connected_duration_wo_cf = sum(connectionEvents(2,:));
     try

@@ -63,7 +63,7 @@ params.p_fac = 10;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 10*60; %sec Total Simulation time should be more than 100.
+params.simTime = 2*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -89,7 +89,7 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-rmin = 2e8;
+rmin = 1e9;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = [200,300,400,500]; %densityBS
