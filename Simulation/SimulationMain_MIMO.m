@@ -156,7 +156,7 @@ lambda_UE_sub6 = 50;
         params.tau_p = params.numUE+params.numUE_sub6;
         
         %Compute the prelog factor assuming only downlink data transmission
-        params.preLogFactor = (tau_c-tau_p)/tau_c;
+        params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
         
         %Number of setups with random UE locations
         params.nbrOfSetups = 100;
@@ -253,64 +253,64 @@ lambda_UE_sub6 = 50;
         %[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
         %params.BETA = channelGain_GUE';
         %params.ricianFactor = K_Rician';
-        [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,coverageRange,coverageRange_sub6,tau_p,1,0);
-        params.BETA = db2pow(gainOverNoisedB)';        
+        [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
+        params.BETA = db2pow(gainOverNoisedB);        
         outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_probability_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_duration_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         outage_duration_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
         
-        %% Simulation
-        for idxDiscDelay = 1:length(protocolParams.discovery_time)
-            for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
-                for idxConnDelay = 1:length(protocolParams.connection_time)
-                    for idxSignalingAfterRachDelay = 1:length(protocolParams.signalingAfterRachTime)
-                        theta = protocolParams.theta;
-                        omega = 1/(protocolParams.connection_time(idxConnDelay) + protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay) + protocolParams.FailureDetectionTime(idxFailureDetectionDelay));
-                        psi = 1/(protocolParams.discovery_time(idxDiscDelay) + 1/params.mu);
-                        plos2 = pLoS2(params.locationsBS, [params.UE_locations;params.UE_locations_sub6], theta,omega,psi);
-                        plos = zeros(params.numUE,1);
-                        % [~,idx_max] = mink(plos2(:,1:params.numUE),2,1);
-                        % [~,idx_max] = mink(plos2(:,1:params.numUE),1,1);
-                        [~,idx_max] = mink(plos2(:,1:params.numUE),params.numGNB,1);
-                        for k = 1:params.numUE
-                            % plos(k) = prod(plos2(:,k),1);
-                            plos(k) = prod(plos2(idx_max(:,k),k),1);
-                        end
-                        rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
-                        for k = 1:params.numUE
-                           % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                           [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                           % plos3 = pLoS3(theta,omega,params.coverageRange);
-                          % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                           if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
-                               p1 = 1;
-                               tos = 0;
-                           else
-                               % p1 = 1-plos4;
-                               % p1 = 1-plos(k);
-                               % p1 = 1-plos3;
-                               p1 = 1-pos3;
-                               tos = tos3;
-                           end
-                           outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
-                           % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos4;
-                           % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos3;
-                           outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
-                           % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos(k);
-                           outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + tos;
-                           outage_duration_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + tos3;
-                        end
-                    end
-                end
-            end
-        end
+%         %% Simulation
+%         for idxDiscDelay = 1:length(protocolParams.discovery_time)
+%             for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
+%                 for idxConnDelay = 1:length(protocolParams.connection_time)
+%                     for idxSignalingAfterRachDelay = 1:length(protocolParams.signalingAfterRachTime)
+%                         theta = protocolParams.theta;
+%                         omega = 1/(protocolParams.connection_time(idxConnDelay) + protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay) + protocolParams.FailureDetectionTime(idxFailureDetectionDelay));
+%                         psi = 1/(protocolParams.discovery_time(idxDiscDelay) + 1/params.mu);
+%                         plos2 = pLoS2(params.locationsBS, [params.UE_locations;params.UE_locations_sub6], theta,omega,psi);
+%                         plos = zeros(params.numUE,1);
+%                         % [~,idx_max] = mink(plos2(:,1:params.numUE),2,1);
+%                         % [~,idx_max] = mink(plos2(:,1:params.numUE),1,1);
+%                         [~,idx_max] = mink(plos2(:,1:params.numUE),params.numGNB,1);
+%                         for k = 1:params.numUE
+%                             % plos(k) = prod(plos2(:,k),1);
+%                             plos(k) = prod(plos2(idx_max(:,k),k),1);
+%                         end
+%                         rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
+%                         for k = 1:params.numUE
+%                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+%                            [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+%                            % plos3 = pLoS3(theta,omega,params.coverageRange);
+%                           % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+%                            if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
+%                                p1 = 1;
+%                                tos = 0;
+%                            else
+%                                % p1 = 1-plos4;
+%                                % p1 = 1-plos(k);
+%                                % p1 = 1-plos3;
+%                                p1 = 1-pos3;
+%                                tos = tos3;
+%                            end
+%                            outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
+%                            % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos4;
+%                            % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos3;
+%                            outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
+%                            % outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + plos(k);
+%                            outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + tos;
+%                            outage_duration_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + tos3;
+%                         end
+%                     end
+%                 end
+%             end
+%         end
         
         %% Mobile blockage events
         tic
         dataBS_mobile = [];
-        for i = 1:(params.numUE+params.numUE_sub6)
-        % for i = 1:(params.numUE)
+%         for i = 1:(params.numUE+params.numUE_sub6)
+        for i = 1:(params.numUE)
             dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
         end
         % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
@@ -341,7 +341,7 @@ lambda_UE_sub6 = 50;
                         simInputs.connection_setup_delay = protocolParams.connection_time(idxConnDelay);
                         simInputs.signalingAfterRachDelay = protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay);
                         simOutputs{idxDiscDelay,idxFailureDetectionDelay,...
-                            idxConnDelay,idxSignalingAfterRachDelay} =  discreteSimulatorv3(simInputs); 
+                            idxConnDelay,idxSignalingAfterRachDelay} =  discreteSimulator_MIMO(simInputs); 
                     end
                 end
             end
