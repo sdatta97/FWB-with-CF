@@ -1,8 +1,9 @@
 function rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState)
 M = size(channel_dl,1);
-K = size(channel_dl,2);
 K_mmW = size(sub6ConnectionState,1);
+K = K_mmW + size(channel_dl,2);
 BW = params.Band;
+TAU_FAC = params.preLogFactor;
 Ntx = size(channel_dl,3);
 N_UE_mmW = size(channel_dl_mmW,4);
 N_UE_sub6 = size(channel_dl,4);
