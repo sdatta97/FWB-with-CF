@@ -4,15 +4,9 @@ function simOutputs = discreteSimulator_MIMO(simInputs) %trying Pei's idea
 params = simInputs.params;
 protocolParams = simInputs.protocolParams;
 dataBS_mobile = simInputs.dataBS_mobile; %{(ue_idx-1)*params.numGNB+1:ue_idx*params.numGNB,1};
-% phy_channel_mmw = simInputs.phy_channel_mmw;
-% phy_channel_sub6 = simInputs.phy_channel_sub6;
-scs_mmw = params.scs_mmw;
-scs_sub6 = params.scs_sub6;
-% link_rates_mmw = compute_link_rates(phy_channel_mmw, scs_mmw,0, ue_idx);
-% link_rates_sub6 = compute_link_rates(phy_channel_sub6, scs_sub6,0, ue_idx);
 r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
-BETA = params.BETA;
+% BETA = params.BETA;
 % ricianFactor = params.ricianFactor;
 params.no_of_rea = 1;     % no.of channel realizations
 
@@ -66,21 +60,14 @@ bsPriorities = repmat(1:1:numBS,[numUE,1]); %Priority of bs in terms of starting
 % end
 % bsPriorities = repmat(1:1:numBS_mmW,[numUE,1]); %Priority of bs in terms of starting a connection decision
 % [~,bsPriorities] = sort(link_rates_mmw,'descend'); %Priority of bs in terms of starting a connection decision
-% bsLastConnectionTimes = -100*ones(1,numBS); %When was the last time this bs was in connected state
 bsLastConnectionTimes = -100*ones(numUE,numBS); %When was the last time this bs was in connected state
-% bsLastConnectionTimes = -100*ones(numUE,numBS_mmW); %When was the last time this bs was in connected state
 
 % Discovery computations
-% link = cell(numBS,1);
 link = cell(numUE,numBS);
 % link = cell((numUE+numUE_sub6),numBS);
 for ue_idx = 1:numUE
 % for ue_idx = 1:(numUE+numUE_sub6)
-    for idxBS = 1:numBS
-        % link{idxBS}.discoveredTimes = discoveredTimes{idxBS};
-        % link{idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime);
-        % link{idxBS}.nonBlockedTimes =  bsBlockageTimes{idxBS};
-        % link{idxBS}.blockageStatus = blockageStatus(bsBlockageTimes,idxBS,currentTime);
+    for idxBS = 1:numBS        
         link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
         link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
         link{ue_idx,idxBS}.nonBlockedTimes = bsBlockageTimes{(ue_idx-1)*numBS + idxBS};
@@ -105,8 +92,6 @@ end
 % % Blockage Detection State = 3
 % % Recovery Attempt state (Beam Failure Declared) = 4
 % % MCG Failure converting secondary to primary = 5
-
-
 
 % UE states
 UE.numGNB = params.numGNB;
@@ -148,51 +133,32 @@ UE.sub6EventDescriptions = [];
 UE.sub6ConnectionStateHistory = [];
 
 %Primary State variables
-% UE.primaryConnectionState = 0;
 UE.primaryConnectionState = zeros(numUE,1);
-% UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory; UE.primaryConnectionState];
 UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-% UE.primaryBSIdx = [];
-% UE.primaryTargetIdx = [];
 UE.primaryBSIdx = zeros(numUE,1);
 UE.primaryTargetIdx = zeros(numUE,1);
-% UE.primaryNextEventTime = -100;
 UE.primaryNextEventTime = -100*ones(numUE,1);
 
 %Secondary State variables
-% UE.secondaryConnectionState = 0;
 UE.secondaryConnectionState = zeros(numUE,1);
-% UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory; UE.secondaryConnectionState];
 UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-% UE.secondaryBSIdx = [];
-% UE.secondaryTargetIdx = [];
 UE.secondaryBSIdx = zeros(numUE,1);
 UE.secondaryTargetIdx = zeros(numUE,1);
-% UE.secondaryNextEventTime = -100;
 UE.secondaryNextEventTime = -100*ones(numUE,1);
 UE.tmpMCGBSIdx = zeros(numUE,1);
 
 %Sub 6 State variables
-% UE.sub6ConnectionState = 0;
 UE.sub6ConnectionState = zeros(numUE,1);
-% UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory; UE.sub6ConnectionState];
 UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
-% UE.sub6NextEventTime = -100;
 UE.sub6NextEventTime = -100*ones(numUE,1);
 
 % Try RACH if BS available
-% if UE.primaryConnectionState == 0
-%     UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes);
-% end
 for ue_idx = 1:numUE
     if UE.primaryConnectionState(ue_idx) == 0
         UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
     end
 end
 % Try secondary RACH if BS available
-% if UE.primaryConnectionState == 0
-%     UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes);
-% end
 for ue_idx = 1:numUE
     if UE.secondaryConnectionState(ue_idx) == 0
         UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
@@ -214,8 +180,6 @@ while nextEventTime < params.simTime
         disp('Error infinite loop use ctrl c')
     end
     %Physical + Discovery Updates of all links,
-    % link = updatePhysicalDiscovery(currentTime,link,discoveredTimes,bsBlockageTimes);
-    % link = updatePhysicalDiscovery(currentTime,link,discoveredTimes,bsBlockageTimes, ue_idx); %, numBS);
     link = updatePhysicalDiscovery(currentTime,link,discoveredTimes,bsBlockageTimes);
 
     %Protocol updates
@@ -326,8 +290,6 @@ while nextEventTime < params.simTime
                     UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
                     UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
                     UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
-                    % if length(UE.sub6ConnectionStarts) > length(UE.sub6ConnectionEnds)
-                    % if length(UE.sub6ConnectionStarts(UE.sub6ConnectionStartIndices == ue_idx)) > length(UE.sub6ConnectionEnds(UE.sub6ConnectionEndIndices == ue_idx))
                     if UE.sub6ConnectionState(ue_idx) == 1
                         UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
                         UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
@@ -344,11 +306,7 @@ while nextEventTime < params.simTime
                 else
                     if UE.sub6ConnectionState(ue_idx) == 1
                         disp("Some problem")
-                    else
-                        % [BETA, phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link);
-                        % [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link,BETA,ricianFactor);
-                        % [phy_channel_sub6, phy_channel_sub6_est] = computePhysicalChannels_sub6v2(params,link);
-                        % rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
+                    else                        
                         sub6ConnectionState = UE.sub6ConnectionState;
                         sub6ConnectionState(ue_idx) = 1;
                         [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
@@ -444,12 +402,10 @@ while nextEventTime < params.simTime
                     UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
                     UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
                     UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'Declared-RLF-Going2-NonConnectedState-CanConnect-any-available-BS'}];
-                    % UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                 end
             end
         elseif UE.primaryConnectionState(ue_idx) == 5
             if UE.primaryNextEventTime(ue_idx) == currentTime
-    %             secondaryBSIdx = UE.secondaryBSIdx;
                 tmpMCGBSIdx = UE.tmpMCGBSIdx(ue_idx);
                 if link{ue_idx,tmpMCGBSIdx}.blockageStatus && link{ue_idx,tmpMCGBSIdx}.discovery_state
                     %Remove from secondary
@@ -466,7 +422,6 @@ while nextEventTime < params.simTime
                     UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
                     UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
                     UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
-                    % if length(UE.sub6ConnectionStarts(UE.sub6ConnectionStartIndices == ue_idx)) > length(UE.sub6ConnectionEnds(UE.sub6ConnectionEndIndices == ue_idx))
                     if UE.sub6ConnectionState(ue_idx) == 1
                         UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
                         UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
@@ -513,8 +468,6 @@ while nextEventTime < params.simTime
                     UE.primaryTargetIdx(ue_idx) = 0;
                     UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
                     UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
-                    % if length(UE.sub6ConnectionStarts) > length(UE.sub6ConnectionEnds)
-                    % if length(UE.sub6ConnectionStarts(UE.sub6ConnectionStartIndices == ue_idx)) > length(UE.sub6ConnectionEnds(UE.sub6ConnectionEndIndices == ue_idx))
                     if UE.sub6ConnectionState(ue_idx) == 1
                         UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
                         UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
@@ -534,7 +487,6 @@ while nextEventTime < params.simTime
                     UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
                     UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
                     UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryRachFailed-NotConnected-go2-Idle-State-Can-Try-another-BS'}];
-                    % UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                     UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
                 end
             end
@@ -612,13 +564,8 @@ end
 
 for ue_idx = 1:numUE
     if length(UE.sub6ConnectionStarts(UE.sub6ConnectionStartIndices==ue_idx)) > length(UE.sub6ConnectionEnds(UE.sub6ConnectionEndIndices==ue_idx))
-        % UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, params.simTime*ones(1,numUE)];
-        % UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, UE.sub6ConnectionStartIndices(1+length(UE.sub6ConnectionEndIndices):end)];
-        % UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, params.simTime*ones(1,length(UE.sub6ConnectionStarts(UE.sub6ConnectionStartIndices==ue_idx))-length(UE.sub6ConnectionEnds(UE.sub6ConnectionEndIndices==ue_idx)))];
         UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, params.simTime];
-        % if(sum(UE.sub6ConnectionStartIndices==ue_idx) > sum(UE.sub6ConnectionEndIndices==ue_idx))
         UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
-        % end
     end
 end
 
@@ -639,29 +586,6 @@ sub6connectionStarts = [sub6connectionStarts, UE.sub6ConnectionStarts];
 sub6connectionStartIndices = [sub6connectionStartIndices, UE.sub6ConnectionStartIndices];
 sub6connectionEnds = [sub6connectionEnds, UE.sub6ConnectionEnds];
 sub6connectionEndIndices = [sub6connectionEndIndices, UE.sub6ConnectionEndIndices];
-% connectionEvents = [connectionStarts;connectionEnds-connectionStarts;connectionEnds];
-% sub6connectionStarts = [sub6connectionStarts, UE.sub6ConnectionStarts];
-% sub6connectionEnds = [sub6connectionEnds, UE.sub6ConnectionEnds];
-% sub6connectionEvents = [sub6connectionStarts;sub6connectionEnds-sub6connectionStarts;sub6connectionEnds];
-% %Merge connection events so that means track the times at
-% %least one of the LAs is connected. If there is not even
-% %one that means outage.
-% connectionEvents = mergeConnectionEvents(connectionEvents);
-% sub6connectionEvents = mergeConnectionEvents(sub6connectionEvents);
-% outageEvents = getOutageEvents(connectionEvents,params);
-% try
-%     outage_duration = sum(outageEvents(2,:)) - sum(sub6connectionEvents(2,:));
-%     connected_duration = sum(connectionEvents(2,:)) + sum(sub6connectionEvents(2,:));
-% catch ME
-%     outage_duration = sum(outageEvents(2,:));
-%     connected_duration = sum(connectionEvents(2,:));
-% end
-% total_duration =   outage_duration + connected_duration;
-% outage_probability = outage_duration / total_duration;
-% mean_outage_duration = outage_duration / size(outageEvents,2);
-% if abs(total_duration - params.simTime) > 1e-10
-%     warning('TotalTime and simTime doesnt match check here.')
-% end
 outage_probability_wo_cf = ones(numUE,1);
 mean_outage_duration_wo_cf = zeros(numUE,1);
 outage_probability = ones(numUE,1);
