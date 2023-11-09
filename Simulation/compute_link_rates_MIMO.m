@@ -78,7 +78,7 @@ end
 D_mmW_mmW = zeros(K_mmW,K_mmW,N_UE_mmW,N_UE_mmW);
 D_mmW_sub6 = zeros(K_mmW,K-K_mmW,N_UE_mmW,N_UE_sub6);
 D_sub6_mmW = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_mmW);
-D_sub6_sub6 = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_sub6);
+D_sub6_sub6 = zeros(K-K_mmW,K-K_mmW,N_UE_sub6,N_UE_sub6);
 for k = 1:K_mmW
     for q = 1:K_mmW
         for m = 1:M
