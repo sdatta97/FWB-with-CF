@@ -13,7 +13,7 @@ scs_sub6 = params.scs_sub6;
 r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
 BETA = params.BETA;
-ricianFactor = params.ricianFactor;
+% ricianFactor = params.ricianFactor;
 params.no_of_rea = 1;     % no.of channel realizations
 
 discovery_delay         = simInputs.discovery_delay;
@@ -351,9 +351,11 @@ while nextEventTime < params.simTime
                         % rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
                         sub6ConnectionState = UE.sub6ConnectionState;
                         sub6ConnectionState(ue_idx) = 1;
-                        r_calc_mmw = rate_analyticalv5_mmW_only(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
-                        sub6ConnectionState(ue_idx) = 0;
-                        r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
+                        rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,D,ue_idx,sub6ConnectionState);
+                        %                      
+                        % r_calc_mmw = rate_analyticalv5_mmW_only(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
+                        %                         sub6ConnectionState(ue_idx) = 0;
+                        %                         r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
                         % if any(r_calc_sub6 < [params.r_min; params.r_min_sub6])
                         % if ((r_calc_sub6(ue_idx) < params.r_min(ue_idx)) || any(r_calc_sub6(1+params.numUE:params.numUE+params.numUE_sub6) < params.r_min_sub6))
                         % if ((r_calc_mmw(ue_idx) < params.r_min(ue_idx)) || any(r_calc_sub6(1:params.numUE_sub6) < params.r_min_sub6))
@@ -430,20 +432,27 @@ while nextEventTime < params.simTime
                         %     params.R_GUE_mmW = R_GUE_mmW;
                         %     params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;
                         % end
-                        rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
-                        for ue_idx_2 = 1:numUE
-                            if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)
-                                % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
-                                rates_on_sub6_handoff(ue_idx_2) = r_calc_mmw(ue_idx_2);
-                            end
-                        end
-                        % for ue_idx_2 = 1+numUE:numUE+numUE_sub6
-                        for ue_idx_2 = 1:numUE_sub6
-                            % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
-                            rates_on_sub6_handoff(ue_idx_2+numUE) = r_calc_sub6(ue_idx_2);
-                        end
+%                         rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
+%                         for ue_idx_2 = 1:numUE
+%                             if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)
+%                                 % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+%                                 rates_on_sub6_handoff(ue_idx_2) = r_calc_mmw(ue_idx_2);
+%                             end
+%                         end
+%                         % for ue_idx_2 = 1+numUE:numUE+numUE_sub6
+%                         for ue_idx_2 = 1:numUE_sub6
+%                             % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
+%                             rates_on_sub6_handoff(ue_idx_2+numUE) = r_calc_sub6(ue_idx_2);
+%                         end
+%                         % if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+%                         if ((rates_on_sub6_handoff(ue_idx) >= r_min(ue_idx)) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+%                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
+%                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
+%                             UE.sub6ConnectionState(ue_idx) = 1;
+%                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+%                         end
                         % if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
-                        if ((rates_on_sub6_handoff(ue_idx) >= r_min(ue_idx)) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+                        if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 1;
