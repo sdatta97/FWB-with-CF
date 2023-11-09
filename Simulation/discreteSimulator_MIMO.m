@@ -452,7 +452,7 @@ while nextEventTime < params.simTime
 %                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
 %                         end
                         % if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
-                        if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+                        if ((rate_dl(ue_idx) >= r_min(ue_idx))) %&& all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 1;
