@@ -352,7 +352,7 @@ while nextEventTime < params.simTime
                         sub6ConnectionState = UE.sub6ConnectionState;
                         sub6ConnectionState(ue_idx) = 1;
                         [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-                        rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,D,ue_idx,sub6ConnectionState);                                              
+                        rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                         % r_calc_mmw = rate_analyticalv5_mmW_only(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
                         %                         sub6ConnectionState(ue_idx) = 0;
                         %                         r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
@@ -452,7 +452,7 @@ while nextEventTime < params.simTime
 %                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
 %                         end
                         % if (all(rates_on_sub6_handoff(1:numUE) >= r_min) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
-                        if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rates_on_sub6_handoff(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+                        if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 1;

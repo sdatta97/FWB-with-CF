@@ -1,4 +1,4 @@
-function rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,D,ue_idx,sub6ConnectionState)
+function rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState)
 M = size(channel_dl,1);
 K = size(channel_dl,2);
 K_mmW = size(sub6ConnectionState,1);
@@ -8,6 +8,7 @@ N_mmW = size(channel_dl_mmW,4);
 N_sub6 = size(channel_dl,4);
 p_d = 0.2; % 1*K;
 p_fac = params.p_fac;
+D = params.D;
 % perm_vec  = repmat(randperm(tau_p),1,2);
 % phi_index = perm_vec(1:K);
 % for k = 1:K
@@ -49,24 +50,25 @@ for k = 1:K
     La(k) = length(servingAPs);
     beta_uc(:,k) = BETA(:,k).*D(:,k);
 end
+
 %% initialization of c
-eta_eq = zeros(L,K);
+eta_eq = zeros(M,K);
 if (K_mmW == 0)
-    for l = 1:L
+    for m = 1:M
         for k = 1:K
-            if ismember(l,Serv{k})
-                eta_eq(l,k) = 1./(N_AP*N_UE_sub6*sum(BETA(l,:)));
+            if ismember(m,Serv{k})
+                eta_eq(m,k) = 1./(N_AP*N_UE_sub6*sum(BETA(m,:)));
             end
         end
     end
 else
-    for l = 1:L
+    for m = 1:M
         for k = 1:K
-            if ismember(l,Serv{k})
+            if ismember(m,Serv{k})
                 if (k<=K_mmW)
-                    eta_eq(l,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(l,1:K_mmW)+N_UE_sub6*sum(beta_uc(l,2:K))));
+                    eta_eq(l,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
                 else
-                    eta_eq(l,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(l,1:K_mmW)+N_UE_sub6*sum(beta_uc(l,2:K))));
+                    eta_eq(l,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
                 end
             end
         end
