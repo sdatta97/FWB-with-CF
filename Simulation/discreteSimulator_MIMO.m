@@ -313,6 +313,7 @@ while nextEventTime < params.simTime
                         rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
                         if rate_dl(ue_idx) >= r_min(ue_idx)
+%                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 1;
@@ -600,8 +601,9 @@ for ue_idx = 1:numUE
     sub6connectionEvents = mergeConnectionEvents(sub6connectionEvents);
     outageEvents = getOutageEvents(connectionEvents,params);
     outage_durations_wo_cf = outageEvents(2,:);
-    outage_not_mitigated_by_cf = (setdiff(outageEvents',sub6connectionEvents','rows'))';
-    outage_durations_wi_cf = outage_not_mitigated_by_cf(2,:);
+%     outage_not_mitigated_by_cf = (setdiff(outageEvents',sub6connectionEvents','rows'))';
+    [~,ia] = setdiff(outageEvents(1,:),sub6connectionEvents(1,:)-1e-8);
+    outage_durations_wi_cf = outageEvents(2,ia);
     outage_duration_wo_cf = sum(outageEvents(2,:));
     connected_duration_wo_cf = sum(connectionEvents(2,:));
     try
