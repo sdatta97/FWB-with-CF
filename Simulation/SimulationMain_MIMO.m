@@ -431,6 +431,9 @@ lambda_UE_sub6 = 50;
                         frameDeliveryDelay      = thisOutputs.frameDeliveryDelay;
                         outage_durations_wo_cf = thisOutputs.outage_durations_wo_cf;
                         outage_durations_wi_cf = thisOutputs.outage_durations_wi_cf;
+                        figure
+                        cdfplot(outage_durations_wo_cf); hold on;
+                        cdfplot(outage_durations_wi_cf);
                         for ue_idx = 1:params.numUE   %storing outage probability and duration for each user
                             mean_outage_duration_wo_cf    = thisOutputs.mean_outage_duration_wo_cf(ue_idx);
                             outage_probability_wo_cf      = thisOutputs.outage_probability_wo_cf(ue_idx);
