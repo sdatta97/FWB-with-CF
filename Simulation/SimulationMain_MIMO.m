@@ -89,7 +89,7 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-rmin = 1e9;
+rmin = 2e8;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = [200,300,400,500]; %densityBS
@@ -99,7 +99,7 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 50;
+lambda_UE_sub6 = 10;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 % for idxUEDensity = 1:length(lambda_UE_sub6)
     for idxBSDensity = 1:length(lambda_BS)
@@ -444,10 +444,7 @@ lambda_UE_sub6 = 50;
                             out_prob_analysis = outage_probability_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
                             out_prob_analysis_wo_cf = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
                             out_dur_analysis = outage_duration_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
-                            out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
-                            figure
-                            cdfplot(out_dur_analysis); hold on;
-                            cdfplot(out_dur_analysis_wo_cf); hold on;                           
+                            out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);                        
                             min_rate_req = params.r_min(ue_idx);
                             % formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
