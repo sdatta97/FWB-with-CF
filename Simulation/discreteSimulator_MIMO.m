@@ -599,10 +599,9 @@ for ue_idx = 1:numUE
     connectionEvents = mergeConnectionEvents(connectionEvents);
     sub6connectionEvents = mergeConnectionEvents(sub6connectionEvents);
     outageEvents = getOutageEvents(connectionEvents,params);
+    outage_durations_wo_cf = outageEvents(2,:);
     outage_not_mitigated_by_cf = setdiff(outageEvents',sub6connectionEvents','rows');
-    figure
-    cdfplot(outage_not_mitigated_by_cf(2,:)); hold on;
-    cdfplot(outageEvents(2,:)); hold on;
+    outage_durations_wi_cf = outage_not_mitigated_by_cf(2,:);
     outage_duration_wo_cf = sum(outageEvents(2,:));
     connected_duration_wo_cf = sum(connectionEvents(2,:));
     try
@@ -642,7 +641,8 @@ simOutputs.outage_probability_wo_cf = outage_probability_wo_cf;
 simOutputs.mean_outage_duration_wo_cf = mean_outage_duration_wo_cf;
 simOutputs.outage_probability = outage_probability;
 simOutputs.mean_outage_duration = mean_outage_duration;
-
+simOutputs.outage_durations_wo_cf = outage_durations_wo_cf;
+simOutputs.outage_durations_wi_cf = outage_durations_wi_cf;
 % General parameters
 simOutputs.discovery_delay = discovery_delay;
 simOutputs.failureDetectionDelay = failureDetectionDelay;

@@ -63,7 +63,7 @@ params.p_fac = 10;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 10*60; %sec Total Simulation time should be more than 100.
+params.simTime = 2*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -429,6 +429,8 @@ lambda_UE_sub6 = 50;
                         signalingAfterRachDelay = thisOutputs.signalingAfterRachDelay;
                         frameHopCount           = thisOutputs.frameHopCount;
                         frameDeliveryDelay      = thisOutputs.frameDeliveryDelay;
+                        thisOutputs.outage_durations_wo_cf = outage_durations_wo_cf;
+                        thisOutputs.outage_durations_wi_cf = outage_durations_wi_cf;
                         for ue_idx = 1:params.numUE   %storing outage probability and duration for each user
                             mean_outage_duration_wo_cf    = thisOutputs.mean_outage_duration_wo_cf(ue_idx);
                             outage_probability_wo_cf      = thisOutputs.outage_probability_wo_cf(ue_idx);
@@ -440,6 +442,9 @@ lambda_UE_sub6 = 50;
                             out_prob_analysis_wo_cf = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
                             out_dur_analysis = outage_duration_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
                             out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
+                            figure
+                            cdfplot(out_dur_analysis); hold on;
+                            cdfplot(out_dur_analysis_wo_cf); hold on;                           
                             min_rate_req = params.r_min(ue_idx);
                             % formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
