@@ -308,8 +308,9 @@ while nextEventTime < params.simTime
                         disp("Some problem")
                     else                        
                         sub6ConnectionState = UE.sub6ConnectionState;
-                        sub6ConnectionState(ue_idx) = 1;
                         [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+                        rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        sub6ConnectionState(ue_idx) = 1;
                         rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
                         if rate_dl(ue_idx) >= r_min(ue_idx)
