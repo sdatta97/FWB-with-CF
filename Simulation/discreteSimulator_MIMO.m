@@ -6,6 +6,7 @@ protocolParams = simInputs.protocolParams;
 dataBS_mobile = simInputs.dataBS_mobile; %{(ue_idx-1)*params.numGNB+1:ue_idx*params.numGNB,1};
 r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
+rate_reduce_threshold = params.rate_reduce_threshold;
 % BETA = params.BETA;
 % ricianFactor = params.ricianFactor;
 params.no_of_rea = 1;     % no.of channel realizations
@@ -313,7 +314,8 @@ while nextEventTime < params.simTime
                         sub6ConnectionState(ue_idx) = 1;
                         rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
-                        if rate_dl(ue_idx) >= r_min(ue_idx)
+%                         if rate_dl(ue_idx) >= r_min(ue_idx)
+                        if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff - rate_dl) <= rate_reduce_threshold)
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
