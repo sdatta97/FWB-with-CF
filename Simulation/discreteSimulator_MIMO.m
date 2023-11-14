@@ -7,6 +7,13 @@ dataBS_mobile = simInputs.dataBS_mobile; %{(ue_idx-1)*params.numGNB+1:ue_idx*par
 r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
 rate_reduce_threshold = params.rate_reduce_threshold;
+D = params.D;
+ap_idxs = find(D(:,1));
+ue_idxs = 1;
+for a = 1:length(ap_idxs)
+    ap_idx = ap_idxs(a);
+    ue_idxs = union(ue_idxs,find(D(ap_idx,:)));
+end
 % BETA = params.BETA;
 % ricianFactor = params.ricianFactor;
 params.no_of_rea = 1;     % no.of channel realizations
@@ -315,7 +322,7 @@ while nextEventTime < params.simTime
                         rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
 %                         if rate_dl(ue_idx) >= r_min(ue_idx)
-                        if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(2:end) - rate_dl(2:end)) <= rate_reduce_threshold)
+                        if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs(2:end)) - rate_dl(ue_idxs(2:end))) <= rate_reduce_threshold)
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
