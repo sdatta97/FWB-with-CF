@@ -29,14 +29,19 @@ function rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6Conne
 hb = mean(params.hb);
 hr = params.hr;
 ht = params.ht;
-% locationsBS = [params.locationsBS; params.locationsBS_sub6];
-locationsBS = params.locationsBS_sub6;
+locationsBS = [params.locationsBS; params.locationsBS_sub6];
+% locationsBS = params.locationsBS_sub6;
 % locationsBS = params.locationsBS;
-UE_location = params.UE_locations(ue_idx,:);
+UE_location = [params.UE_locations;params.UE_locations_sub6];
 V=params.V;
 mu = params.mu;
 frac = (hb-hr)/(ht-hr);
-BS_blockage_coordinates = UE_location + frac*(locationsBS-UE_location);
+BS_blockage_coordinates = zeros(params.numGNB_sub6, params.numUE + params.numUE_sub6,2);
+for i = 1:params.numGNB_sub6
+    for j = 1:(params.numUE + params.numUE_sub6)
+        BS_blockage_coordinates (i,j,:) = UE_location (j,:) + frac*(locationsBS(i,:)-UE_location(j,:));
+    end
+end
 
 %% Basic setup
 % Multiple frequencies are set in the simulation parameters by providing a vector of frequency
