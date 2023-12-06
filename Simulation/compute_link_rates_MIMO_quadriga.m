@@ -36,12 +36,12 @@ s = qd_simulation_parameters;
 s.center_frequency = [2.6e9, 28e9];                     % Assign two frequencies
 
 l = qd_layout( s );                                     % New QuaDRiGa layout
-l.tx_position = [params.locationsBS_sub6, 25*ones(params.numGNB_sub6,1)]';                              % 25 m BS height
+l.tx_position = [[params.locationsBS; params.locationsBS_sub6], 25*ones(params.numGNB_sub6,1)]';                              % 25 m BS height
 l.no_rx = params.numUE_sub6;                                          % 100 MTs
 
 % l.randomize_rx_positions( 200, 1.5, 1.5, 0 );           % Assign random user positions
 % l.rx_position(1,:) = l.rx_position(1,:) + 220;          % Place users east of the BS
-l.rx_position = [params.UE_locations_sub6, 1.5*ones(params.numUE_sub6,1)]';
+l.rx_position = [[params.UE_locations; params.UE_locations_sub6], 1.5*ones(params.numUE+params.numUE_sub6,1)]';
 % floor = randi(5,1,l.no_rx) + 3;                         % Set random floor levels
 % for n = 1:l.no_rx
 %     floor( n ) =  randi(  floor( n ) );
