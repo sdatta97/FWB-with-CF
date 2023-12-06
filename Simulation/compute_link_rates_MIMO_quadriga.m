@@ -26,13 +26,13 @@ function rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6Conne
 % * K-Factor is different
 % * XPR of the NLOS components is different
 %% Blockage setup
-hb = params.hb;
+hb = mean(params.hb);
 hr = params.hr;
 ht = params.ht;
 % locationsBS = [params.locationsBS; params.locationsBS_sub6];
 locationsBS = params.locationsBS_sub6;
 % locationsBS = params.locationsBS;
-UE_location = params.UE_locations(ue_idx);
+UE_location = params.UE_locations(ue_idx,:);
 V=params.V;
 mu = params.mu;
 frac = (hb-hr)/(ht-hr);

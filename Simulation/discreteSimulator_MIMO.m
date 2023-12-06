@@ -175,13 +175,14 @@ for ue_idx = 1:numUE
 end
 %% Simulation next step
 nextEventTimes = getNextEvents(link,params.simTime);
-nextEventTime = min(nextEventTimes(:));
+% link_mat = cell2mat(link);
+% nextEventTimes = getNextEvents(mat2cell(link_mat(1:numUE,1:params.numGNB),[1,1]),params.simTime);
+nextEventTime = min(nextEventTimes(1:numUE,1:params.numGNB));
 %need to check Ue event times as well
 UEEventTimes = [UE.primaryNextEventTime;UE.secondaryNextEventTime];
 if min(UEEventTimes) > currentTime
     nextEventTime = min(UEEventTimes);
 end
-
 while nextEventTime < params.simTime
     prevTime = currentTime;
     currentTime = nextEventTime;
@@ -540,6 +541,8 @@ while nextEventTime < params.simTime
     end
     
     nextEventTimes = getNextEvents(link,params.simTime);
+%     link_mat = cell2mat(link);
+%     nextEventTimes = getNextEvents(mat2cell(link_mat(1:numUE,1:params.numGNB),[1,1]),params.simTime);
     nextEventTime = params.simTime;
     for ue_idx = 1:numUE
         if (min(nextEventTimes(ue_idx,1:params.numGNB)) < nextEventTime)
