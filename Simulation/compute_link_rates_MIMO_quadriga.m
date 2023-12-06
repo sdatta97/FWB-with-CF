@@ -36,10 +36,14 @@ UE_location = [params.UE_locations;params.UE_locations_sub6];
 V=params.V;
 mu = params.mu;
 frac = (hb-hr)/(ht-hr);
-BS_blockage_coordinates = zeros(params.numGNB_sub6, params.numUE + params.numUE_sub6,2);
+% BS_blockage_coordinates = zeros(params.numGNB_sub6, params.numUE + params.numUE_sub6,2);
+block_locations = [];
 for i = 1:params.numGNB_sub6
     for j = 1:(params.numUE + params.numUE_sub6)
-        BS_blockage_coordinates (i,j,:) = UE_location (j,:) + frac*(locationsBS(i,:)-UE_location(j,:));
+%         BS_blockage_coordinates (i,j,:) = UE_location (j,:) + frac*(locationsBS(i,:)-UE_location(j,:));
+        if (link{j,i}.blockageStatus == 0)
+            block_locations = [UE_location(j,:) + frac*(locationsBS(i,:)-UE_location(j,:));block_locations];
+        end
     end
 end
 
@@ -97,35 +101,35 @@ tx_power        = 30;                                   % Tx-power in [dBm] per 
 i_freq          = 1;                                    % Frequency index for 2.6 GHz
 
 % Calculate the map including path-loss and antenna patterns
-[ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'quick',...
-    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
+[ map, x_coords, y_coords] = l.power_map_w_bl( '3GPP_38.901_UMa_LOS', 'quick',...
+    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, block_locations);
 % [ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'detailed',...
 %     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
 % 
 P_db = 10*log10( sum( map{1}, 4 ) );
 
 %%
-% For the 28 GHz, we get the complex-valued phases for each antenna element in order
-% to calculate a MRT beamformer that points the towards the ground at coordinates x = 200 m and 
-% y = 100 m.
-
-tx_power        = 10;                                   % Tx-power in [dBm] per antenna element
-i_freq          = 2;                                    % Frequency index for 28 GHz
-
-% Calculate the map including path-loss and antenna patterns
-[ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'phase',...
-    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
-% [ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'detailed',...
+% % For the 28 GHz, we get the complex-valued phases for each antenna element in order
+% % to calculate a MRT beamformer that points the towards the ground at coordinates x = 200 m and 
+% % y = 100 m.
+% 
+% tx_power        = 10;                                   % Tx-power in [dBm] per antenna element
+% i_freq          = 2;                                    % Frequency index for 28 GHz
+% 
+% % Calculate the map including path-loss and antenna patterns
+% [ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'phase',...
 %     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
-% Calculate MRT beamforming weights
-beam_x = find( x_coords >= 200 , 1 );                   % Point the beam at x = 200 and y = 100
-beam_y = find( y_coords >= 100  , 1 );
-w = conj( map{1}( beam_y, beam_x , 1 ,: ) );            % Precoding weights for a MRT beamformer
-w = w ./ sqrt(mean(abs(w(:)).^2));                      % Normalize to unit power
-
-% Apply the precoding weights to each pixel on the map and calculate the received power
-P_db = map{1} .* w( ones(1,numel(y_coords)), ones(1,numel(x_coords)),:,: );
-P_db = 10*log10( abs( sum( P_db ,4 ) ).^2 );
+% % [ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'detailed',...
+% %     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
+% % Calculate MRT beamforming weights
+% beam_x = find( x_coords >= 200 , 1 );                   % Point the beam at x = 200 and y = 100
+% beam_y = find( y_coords >= 100  , 1 );
+% w = conj( map{1}( beam_y, beam_x , 1 ,: ) );            % Precoding weights for a MRT beamformer
+% w = w ./ sqrt(mean(abs(w(:)).^2));                      % Normalize to unit power
+% 
+% % Apply the precoding weights to each pixel on the map and calculate the received power
+% P_db = map{1} .* w( ones(1,numel(y_coords)), ones(1,numel(x_coords)),:,: );
+% P_db = 10*log10( abs( sum( P_db ,4 ) ).^2 );
 
 
 %% Generate channel coefficients
