@@ -12,7 +12,7 @@ numBlockers = params.numBlockers;
 width_area  = params.areaDimensions(1);
 length_area  = params.areaDimensions(2);
 numUE = params.numUE;
-% numUE_sub6 = params.numUE_sub6;
+numUE_sub6 = params.numUE_sub6;
 if (ue_idx<=numUE)
     UE_location = params.UE_locations(ue_idx,:);
 else
@@ -21,8 +21,8 @@ end
 hr = params.hr;
 ht = params.ht;
 % locationsBS = [params.locationsBS; params.locationsBS_sub6];
-% locationsBS = params.locationsBS_sub6;
-locationsBS = params.locationsBS;
+locationsBS = params.locationsBS_sub6;
+% locationsBS = params.locationsBS;
 V=params.V;
 hb = params.hb;
 simTime = params.simTime;

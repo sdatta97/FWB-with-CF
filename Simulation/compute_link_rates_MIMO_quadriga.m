@@ -25,7 +25,18 @@ function rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6Conne
 % * Delay- and angular spreads are different
 % * K-Factor is different
 % * XPR of the NLOS components is different
-
+%% Blockage setup
+hb = params.hb;
+hr = params.hr;
+ht = params.ht;
+% locationsBS = [params.locationsBS; params.locationsBS_sub6];
+locationsBS = params.locationsBS_sub6;
+% locationsBS = params.locationsBS;
+UE_location = params.UE_locations(ue_idx);
+V=params.V;
+mu = params.mu;
+frac = (hb-hr)/(ht-hr);
+BS_blockage_coordinates = UE_location + frac*(locationsBS-UE_location);
 
 %% Basic setup
 % Multiple frequencies are set in the simulation parameters by providing a vector of frequency

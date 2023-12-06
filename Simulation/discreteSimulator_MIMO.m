@@ -43,9 +43,9 @@ disp('=====================================');
 disp('Starting Simulation:')
 tic
 % numBS = size(dataBS_mobile,1);
-numBS = params.numGNB;
+% numBS = params.numGNB;
 % numBS_mmW = params.numGNB;
-% numBS = params.numGNB_sub6;
+numBS = params.numGNB_sub6;
 numUE = params.numUE;
 numUE_sub6 = params.numUE_sub6;
 % fprintf('numBS mmW: %d. \n',numBS_mmW)
@@ -71,11 +71,11 @@ bsPriorities = repmat(1:1:numBS,[numUE,1]); %Priority of bs in terms of starting
 bsLastConnectionTimes = -100*ones(numUE,numBS); %When was the last time this bs was in connected state
 
 % Discovery computations
-link = cell(numUE,numBS);
-% link = cell((numUE+numUE_sub6),numBS);
+% link = cell(numUE,numBS);
+link = cell((numUE+numUE_sub6),numBS);
 
-for ue_idx = 1:numUE
-% for ue_idx = 1:(numUE+numUE_sub6)
+% for ue_idx = 1:numUE
+for ue_idx = 1:(numUE+numUE_sub6)
     for idxBS = 1:numBS        
         link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
         link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
