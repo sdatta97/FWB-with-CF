@@ -1,4 +1,4 @@
-function rate_dl = compute_link_rates_MIMO_quadriga(params,ue_idx,sub6ConnectionState)
+function rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState)
 %% Multi-frequency simulations
 %
 % This tutorial demonstrates how to perform simultaneous multi-frequency simulations at two carrier
