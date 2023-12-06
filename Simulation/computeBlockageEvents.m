@@ -22,8 +22,8 @@ else
 end
 hr = params.hr;
 ht = params.ht;
-% locationsBS = [params.locationsBS; params.locationsBS_sub6];
-locationsBS = params.locationsBS_sub6;
+locationsBS = [params.locationsBS; params.locationsBS_sub6];
+% locationsBS = params.locationsBS_sub6;
 % locationsBS = params.locationsBS;
 V=params.V;
 hb = params.hb;

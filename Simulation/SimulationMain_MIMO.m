@@ -68,14 +68,14 @@ params.simTime = 2*60; %sec Total Simulation time should be more than 100.
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.coverageRange = 100;
+params.coverageRange = 50;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
 height_transmitter = 5;
 params.areaDimensions = [width_area, length_area, height_transmitter];
 
 
-params.coverageRange_sub6 = 1000;
+params.coverageRange_sub6 = 100;
 length_area_sub6 = 2*params.coverageRange_sub6;   
 width_area_sub6 = 2*params.coverageRange_sub6;
 height_transmitter_sub6 = 4;
@@ -93,11 +93,11 @@ rmin = 4e8;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
-lambda_BS = 5;
+lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 10;
+lambda_UE_sub6 = 50;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 % for idxUEDensity = 1:length(lambda_UE_sub6)
     for idxBSDensity = 1:length(lambda_BS)
@@ -116,7 +116,7 @@ lambda_UE_sub6 = 10;
         params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
         
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        while (n==0)
+        while (n<=params.numGNB) %(n==0)
             n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         end
         params.numGNB_sub6 = n;
