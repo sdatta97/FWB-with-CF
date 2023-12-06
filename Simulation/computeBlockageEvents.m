@@ -9,8 +9,10 @@ function dataBS = computeBlockageEvents(params,ue_idx)
 %       third row: blockage departure time
 
 numBlockers = params.numBlockers;
-width_area  = params.areaDimensions(1);
-length_area  = params.areaDimensions(2);
+% width_area  = params.areaDimensions(1);
+% length_area  = params.areaDimensions(2);
+width_area  = params.areaDimensions_sub6(1);
+length_area  = params.areaDimensions_sub6(2);
 numUE = params.numUE;
 numUE_sub6 = params.numUE_sub6;
 if (ue_idx<=numUE)

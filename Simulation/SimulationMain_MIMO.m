@@ -170,8 +170,9 @@ lambda_UE_sub6 = 10;
         lookAngleCell{1} = [0,360];
         
         %% Blocker Properties and Simulation Duration
-        params.lambdaBlockers = 0.1; %How many blockers around
-        params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+        params.lambdaBlockers = 0.01; %How many blockers around
+%         params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+        params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
         params.V = 1; %velocity of blocker m/s
         % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.
         % params.hb = (175 + TruncatedGaussian(5, [-15,15], [1 params.numBlockers])) / 100;
