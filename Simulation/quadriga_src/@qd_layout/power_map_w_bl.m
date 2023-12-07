@@ -1,5 +1,5 @@
-function [ map, x_coords, y_coords] = power_map_w_blockage( h_layout, scenario, usage, sample_distance, ...
-    x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, block_locations)
+function [ map, x_coords, y_coords] = power_map_w_bl( h_layout, scenario, usage, sample_distance, ...
+    x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, link, BS_blockage_coordinates)
 %POWER_MAP Calculates a power-map for the given layout
 %
 % Calling object:
@@ -254,7 +254,7 @@ switch usage
         for i_bs = 1 : n_bs
             %h_channel = channel_builder.get_los_channels(h_builder(1,i_bs));
 %             coeff = get_los_channels( h_builder(1,i_bs), 'single','coeff');
-            coeff = get_los_channels_w_bl( h_builder(1,i_bs), block_locations, 'single','coeff');
+            coeff = get_los_channels_w_bl( h_builder(1,i_bs), link, BS_blockage_coordinates, 'single','coeff');
             
             pow = permute(abs(coeff).^2, [3, 1, 2]);
             pow = reshape(pow, n_x_coords, n_y_coords, size( coeff, 1 ), size( coeff, 2 ));

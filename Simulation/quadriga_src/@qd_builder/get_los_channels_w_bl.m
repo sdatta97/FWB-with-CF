@@ -1,4 +1,4 @@
-function h_channel = get_los_channels_w_bl( h_builder, block_locations, precision, return_coeff, tx_array_mask )
+function h_channel = get_los_channels_w_bl( h_builder, link, BS_blockage_coordinates, precision, return_coeff, tx_array_mask )
 %GET_LOS_CHANNELS Generates channel coefficients for the LOS path only. 
 %
 % Calling object:
