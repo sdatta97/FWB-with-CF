@@ -88,10 +88,14 @@ l.rx_array = qd_arrayant('omni');                       % Set omni-rx antenna
 % including path-loss and antenna patterns. The first plot is for the 2.6 GHz band.
 
 sample_distance = 5;                                    % One pixel every 5 m
-x_min           = -50;                                  % Area to be samples in [m]
-x_max           = 550;
-y_min           = -300;
-y_max           = 300;
+% x_min           = -50;                                  % Area to be samples in [m]
+% x_max           = 550;
+% y_min           = -300;
+% y_max           = 300;
+x_min = 0;
+x_max = 0;
+y_min = 0;
+y_max = 0;
 rx_height       = 1.5;                                  % Mobile terminal height in [m]
 tx_power        = 30;                                   % Tx-power in [dBm] per antenna element
 i_freq          = 1;                                    % Frequency index for 2.6 GHz

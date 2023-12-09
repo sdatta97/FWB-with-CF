@@ -63,6 +63,8 @@ function h_channel = get_los_channels_w_bl( h_builder, link, BS_blockage_coordin
 % The QuaDRiGa Channel Model. You should have received a copy of the Software License for The
 % QuaDRiGa Channel Model along with QuaDRiGa. If not, see <http://quadriga-channel-model.de/>. 
 
+numUE = size(link,1);
+numBS = size(link,2);
 single_precision = true;
 if ~exist('precision','var') || ~strcmp( precision , 'single' )
     precision = 'double';
@@ -271,6 +273,15 @@ else
             rx_power = -path_loss;
         else
             rx_power = -path_loss + 10*log10( h_builder.sf ) .* scale_sf;
+        end
+        for i = 1:n_positions
+            for j = 1:numUE
+                for k = 1:numBS
+                    if (link{j,k}.blockageStatus == 0)
+                        %add blockage term
+                    end
+                end
+            end
         end
         rx_power = sqrt( 10.^( 0.1 * rx_power ) );
         
