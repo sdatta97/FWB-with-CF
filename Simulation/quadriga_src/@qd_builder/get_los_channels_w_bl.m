@@ -299,10 +299,11 @@ else
                         %add blockage term
                         r = norm(UE_locations(j,:)-locationsBS(k,:));
                         r_eff = frac*r;
-                        d1w1 = 0.5*r_eff;
-                        d1w2 = 0.5*r_eff;
-                        d2w1 = r - 0.5*r_eff;
-                        d2w2 = r - 0.5*r_eff;
+                        wb = 1;
+                        d1w1 = sqrt((0.25*wb)^2 + (0.5*r_eff)^2);
+                        d1w2 = sqrt((0.75*wb)^2 + (0.5*r_eff)^2);
+                        d2w1 = sqrt((0.25*wb)^2 + (r - 0.5*r_eff)^2);
+                        d2w2 = sqrt((0.75*wb)^2 + (r - 0.5*r_eff)^2);
                         d1h1 = sqrt((hb-hr)^2+(0.5*r_eff)^2);
                         d1h2 = sqrt(hr^2+(0.5*r_eff)^2);
                         d2h1 = sqrt((r-0.5*r_eff)^2 + (ht-hb)^2);
