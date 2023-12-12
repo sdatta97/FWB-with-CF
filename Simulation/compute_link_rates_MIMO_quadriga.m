@@ -25,23 +25,6 @@ function rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6Conne
 % * Delay- and angular spreads are different
 % * K-Factor is different
 % * XPR of the NLOS components is different
-%% Blockage setup
-hb = mean(params.hb);
-hr = params.hr;
-ht = params.ht;
-locationsBS = [params.locationsBS; params.locationsBS_sub6];
-% locationsBS = params.locationsBS_sub6;
-% locationsBS = params.locationsBS;
-UE_location = [params.UE_locations;params.UE_locations_sub6];
-V=params.V;
-mu = params.mu;
-frac = (hb-hr)/(ht-hr);
-BS_blockage_coordinates = zeros(params.numGNB_sub6, params.numUE + params.numUE_sub6,2);
-for i = 1:params.numGNB_sub6
-    for j = 1:(params.numUE + params.numUE_sub6)
-         BS_blockage_coordinates (i,j,:) = UE_location (j,:) + frac*(locationsBS(i,:)-UE_location(j,:));       
-    end
-end
 
 %% Basic setup
 % Multiple frequencies are set in the simulation parameters by providing a vector of frequency
@@ -102,7 +85,7 @@ i_freq          = 1;                                    % Frequency index for 2.
 
 % Calculate the map including path-loss and antenna patterns
 [ map, x_coords, y_coords] = l.power_map_w_bl( '3GPP_38.901_UMa_LOS', 'quick',...
-    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, link, BS_blockage_coordinates);
+    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, link, params);
 % [ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'detailed',...
 %     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
 % 

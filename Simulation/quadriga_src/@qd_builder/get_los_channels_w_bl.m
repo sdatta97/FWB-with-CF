@@ -1,4 +1,4 @@
-function h_channel = get_los_channels_w_bl( h_builder, link, BS_blockage_coordinates, precision, return_coeff, tx_array_mask )
+function h_channel = get_los_channels_w_bl( h_builder, link, params, precision, return_coeff, tx_array_mask )
 %GET_LOS_CHANNELS Generates channel coefficients for the LOS path only. 
 %
 % Calling object:
@@ -62,7 +62,25 @@ function h_channel = get_los_channels_w_bl( h_builder, link, BS_blockage_coordin
 % You can redistribute it and/or modify QuaDRiGa under the terms of the Software License for 
 % The QuaDRiGa Channel Model. You should have received a copy of the Software License for The
 % QuaDRiGa Channel Model along with QuaDRiGa. If not, see <http://quadriga-channel-model.de/>. 
+%% Blockage setup
+hb = mean(params.hb);
+hr = params.hr;
+ht = params.ht;
+locationsBS = [params.locationsBS; params.locationsBS_sub6];
+% locationsBS = params.locationsBS_sub6;
+% locationsBS = params.locationsBS;
+UE_location = [params.UE_locations;params.UE_locations_sub6];
+V=params.V;
+mu = params.mu;
+frac = (hb-hr)/(ht-hr);
+BS_blockage_coordinates = zeros(params.numGNB_sub6, params.numUE + params.numUE_sub6,2);
+for i = 1:params.numGNB_sub6
+    for j = 1:(params.numUE + params.numUE_sub6)
+         BS_blockage_coordinates (i,j,:) = UE_location (j,:) + frac*(locationsBS(i,:)-UE_location(j,:));       
+    end
+end
 
+%%
 numUE = size(link,1);
 numBS = size(link,2);
 single_precision = true;
@@ -279,6 +297,10 @@ else
                 for k = 1:numBS
                     if (link{j,k}.blockageStatus == 0)
                         %add blockage term
+                        fh1 = 0;
+                        fh2 = 0;
+                        fw1 = 0;
+                        fw2 = 0;                        
                     end
                 end
             end
