@@ -69,14 +69,14 @@ ht = params.ht;
 locationsBS = [params.locationsBS; params.locationsBS_sub6];
 % locationsBS = params.locationsBS_sub6;
 % locationsBS = params.locationsBS;
-UE_location = [params.UE_locations;params.UE_locations_sub6];
+UE_locations = [params.UE_locations;params.UE_locations_sub6];
 V=params.V;
 mu = params.mu;
 frac = (hb-hr)/(ht-hr);
 BS_blockage_coordinates = zeros(params.numGNB_sub6, params.numUE + params.numUE_sub6,2);
 for i = 1:params.numGNB_sub6
     for j = 1:(params.numUE + params.numUE_sub6)
-         BS_blockage_coordinates (i,j,:) = UE_location (j,:) + frac*(locationsBS(i,:)-UE_location(j,:));       
+         BS_blockage_coordinates (i,j,:) = UE_locations (j,:) + frac*(locationsBS(i,:)-UE_locations(j,:));       
     end
 end
 
@@ -297,10 +297,36 @@ else
                 for k = 1:numBS
                     if (link{j,k}.blockageStatus == 0)
                         %add blockage term
-                        fh1 = 0;
-                        fh2 = 0;
-                        fw1 = 0;
-                        fw2 = 0;                        
+                        r = norm(UE_locations(j,:)-locationsBS(k,:));
+                        r_eff = frac*r;
+                        d1w1 = 0.5*r_eff;
+                        d1w2 = 0.5*r_eff;
+                        d2w1 = r - 0.5*r_eff;
+                        d2w2 = r - 0.5*r_eff;
+                        d1h1 = sqrt((hb-hr)^2+(0.5*r_eff)^2);
+                        d1h2 = sqrt(hr^2+(0.5*r_eff)^2);
+                        d2h1 = sqrt((r-0.5*r_eff)^2 + (ht-hb)^2);
+                        d2h2 = sqrt(ht^2+(r-0.5*r_eff)^2);
+                        sum1 = d1h1+d2h1;
+                        sum2 = d1h2+d2h2;
+                        if (sum1 < sum2)
+                            fh1 = (1/pi)*atan(-0.5*pi*sqrt(0.5*wave_no*(sum1-r)));
+                            fh2 = (1/pi)*atan(0.5*pi*sqrt(0.5*wave_no*(sum2-r)));
+                        else
+                            fh1 = (1/pi)*atan(0.5*pi*sqrt(0.5*wave_no*(sum1-r)));
+                            fh2 = (1/pi)*atan(-0.5*pi*sqrt(0.5*wave_no*(sum2-r)));
+                        end
+                        sum1 = d1w1+d2w1;
+                        sum2 = d1w2+d2w2;
+                        if (sum1 < sum2)
+                            fw1 = (1/pi)*atan(-0.5*pi*sqrt(0.5*wave_no*(sum1-r)));
+                            fw2 = (1/pi)*atan(0.5*pi*sqrt(0.5*wave_no*(sum2-r)));
+                        else
+                            fw1 = (1/pi)*atan(0.5*pi*sqrt(0.5*wave_no*(sum1-r)));
+                            fw2 = (1/pi)*atan(-0.5*pi*sqrt(0.5*wave_no*(sum2-r)));
+                        end
+                        bl_loss = 20*log10(1-((fh1+fh2)*(fw1+fw2)));
+                        rx_power = rx_power - bl_loss;
                     end
                 end
             end
