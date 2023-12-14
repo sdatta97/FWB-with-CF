@@ -48,7 +48,7 @@ l.rx_position = [[params.UE_locations; params.UE_locations_sub6], 1.5*ones(param
 % end
 % l.rx_position(3,:) = 3*(floor-1) + 1.5;
 % 
-% indoor_rx = l.set_scenario('3GPP_38.901_UMa',[],[],0.8);    % Set the scenario
+indoor_rx = l.set_scenario('3GPP_38.901_UMa_LOS',[],[],0.8);    % Set the scenario
 % l.rx_position(3,~indoor_rx) = 1.5;                      % Set outdoor-users to 1.5 m height
 
 %% Antenna set-up
@@ -74,14 +74,14 @@ l.rx_array = qd_arrayant('omni');                       % Set omni-rx antenna
 % including path-loss and antenna patterns. The first plot is for the 2.6 GHz band.
 
 sample_distance = 5;                                    % One pixel every 5 m
-% x_min           = -50;                                  % Area to be samples in [m]
-% x_max           = 550;
-% y_min           = -300;
-% y_max           = 300;
-x_min = 0;
-x_max = 0;
-y_min = 0;
-y_max = 0;
+x_min           = -50;                                  % Area to be samples in [m]
+x_max           = 550;
+y_min           = -300;
+y_max           = 300;
+% x_min = 0;
+% x_max = 0;
+% y_min = 0;
+% y_max = 0;
 rx_height       = 1.5;                                  % Mobile terminal height in [m]
 tx_power        = 30;                                   % Tx-power in [dBm] per antenna element
 i_freq          = 1;                                    % Frequency index for 2.6 GHz
@@ -89,7 +89,7 @@ i_freq          = 1;                                    % Frequency index for 2.
 % Calculate the map including path-loss and antenna patterns
 % [ map, x_coords, y_coords] = l.power_map_w_bl( '3GPP_38.901_UMa_LOS', 'quick',...
 %     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, link, params);
-[ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'detailed',...
+[ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'quick',...
     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
 % 
 P_db = 10*log10( sum( map{1}, 4 ) );
