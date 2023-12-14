@@ -32,7 +32,8 @@ function rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6Conne
 % MTs are placed in accordance with the 3GPP assumptions, where 80% of them are situated indoors at
 % different floor levels.
 s = qd_simulation_parameters;
-s.center_frequency = [2.6e9, 28e9];                     % Assign two frequencies
+% s.center_frequency = [2.6e9, 28e9];                     % Assign two frequencies
+s.center_frequency = 2.6e9;                     % Assign frequency
 
 l = qd_layout( s );                                     % New QuaDRiGa layout
 l.tx_position = [[params.locationsBS; params.locationsBS_sub6], 25*ones(params.numGNB_sub6,1)]';                              % 25 m BS height
@@ -58,11 +59,13 @@ l.rx_position = [[params.UE_locations; params.UE_locations_sub6], 1.5*ones(param
 % correspond to the frequency, columns to the BS. There is only 1 BS in the layout. The mobile
 % terminal uses a vertically polarized omni-directional antenna for both frequencies.
 
-a_2600_Mhz  = qd_arrayant( '3gpp-3d',  8, 1, s.center_frequency(1), 6, 8 );
-a_28000_MHz = qd_arrayant( '3gpp-3d',  8, 8, s.center_frequency(2), 3 );
+% a_2600_Mhz  = qd_arrayant( '3gpp-3d',  8, 1, s.center_frequency(1), 6, 8 );
+% a_28000_MHz = qd_arrayant( '3gpp-3d',  8, 8, s.center_frequency(2), 3 );
+a_2600_Mhz  = qd_arrayant( '3gpp-3d',  8, 1, s.center_frequency, 6, 8 );
 
-l.tx_array(1,1) = a_2600_Mhz;                           % Set 2.6 GHz antenna
-l.tx_array(2,1) = a_28000_MHz;                          % Set 28 Ghz antenna
+l.tx_array = a_2600_Mhz;                           % Set 2.6 GHz antenna
+% l.tx_array(1,1) = a_2600_Mhz;                           % Set 2.6 GHz antenna
+% l.tx_array(2,1) = a_28000_MHz;                          % Set 28 Ghz antenna
 
 l.rx_array = qd_arrayant('omni');                       % Set omni-rx antenna
 
@@ -84,10 +87,10 @@ tx_power        = 30;                                   % Tx-power in [dBm] per 
 i_freq          = 1;                                    % Frequency index for 2.6 GHz
 
 % Calculate the map including path-loss and antenna patterns
-[ map, x_coords, y_coords] = l.power_map_w_bl( '3GPP_38.901_UMa_LOS', 'quick',...
-    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, link, params);
-% [ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'detailed',...
-%     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
+% [ map, x_coords, y_coords] = l.power_map_w_bl( '3GPP_38.901_UMa_LOS', 'quick',...
+%     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, link, params);
+[ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'detailed',...
+    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
 % 
 P_db = 10*log10( sum( map{1}, 4 ) );
 
