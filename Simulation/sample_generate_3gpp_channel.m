@@ -11,8 +11,7 @@
 %% Channel model setup and coefficient generation
 % We first set up the basic parameters.
 
-% function [channel_coeff, channel_delay, H_fr, c] = sample_generate_3gpp_channel(scenario, cc, BW, num_ue, BS_height, UE_height, Nt, Nr, N, max_dist, min_dist)
-function [channel_coeff, channel_delay, H_fr, c] = sample_generate_3gpp_channel(scenario, cc, BW, num_BS, num_ue, BS_height, UE_height, Nt, Nr, N, UE_locations, AP_locations)
+function [channel_coeff, channel_delay, H_fr, c] = sample_generate_3gpp_channel(scenario, cc, BW, num_ue, BS_height, UE_height, Nt, Nr, N, max_dist, min_dist)
 
 % cc = 3.5e9;
 % num_ue = 1;
@@ -38,18 +37,12 @@ s.use_3GPP_baseline = 1;
 % linear polarized signal and an left-hand circular polarized signal. This will allow us to verify
 % the correct functionality for both polarizations.
  
-l = qd_layout(s);% Create new QuaDRiGa layout
-l.no_tx = num_BS;
+l = qd_layout(s);                                       % Create new QuaDRiGa layout
 l.no_rx = num_ue;                                            % Set number of MTs
 %rx_indices = ones(num_ue,1);
-% l.tx_position(1:2,:) = [real(AP_locations), imag(AP_locations)]';
-l.tx_position(1:2,:) = AP_locations';
-l.tx_position(3,:) = BS_height;
-% l.randomize_rx_positions( max_dist , UE_height , UE_height , 0, [], min_dist);
-l.rx_position(3,:) = UE_height;
-l.rx_position(1:2,:) = UE_locations';
-% l.rx_position(1:2,:) = [real(UE_locations), imag(UE_locations)]';
-
+l.tx_position(3) = BS_height;
+l.randomize_rx_positions( max_dist , UE_height , UE_height , 0, [], min_dist);
+    
 l.set_scenario(scenario);    
 
 if (Nt == 1)
@@ -103,37 +96,20 @@ end
 p.gen_parameters;                                       % Generate small-scale-fading parameters
 c = p.get_channels;                                     % Generate channel coefficients
 
-% channel_coeff = cell(num_ue,1);
-% channel_delay = cell(num_ue,1);
-channel_coeff = cell(num_ue,num_BS);
-channel_delay = cell(num_ue,num_BS);
-% for i = 1:num_ue
-%     channel_coeff{i} = c(1,i).coeff;                              % Extract amplitudes and phases
-%     channel_delay{i} = c(1,i).delay;
-% end
+channel_coeff = cell(num_ue,1);
+channel_delay = cell(num_ue,1);
 for i = 1:num_ue
-    for j = 1:num_BS
-        % channel_coeff{i,j} = c(i,j).coeff;                              % Extract amplitudes and phases
-        % channel_delay{i,j} = c(i,j).delay;
-        channel_coeff{i,j} = c((j-1)*num_ue+i).coeff;                              % Extract amplitudes and phases
-        channel_delay{i,j} = c((j-1)*num_ue+i).delay;    
-    end
+    channel_coeff{i} = c(1,i).coeff;                              % Extract amplitudes and phases
+    channel_delay{i} = c(1,i).delay;
 end
 %channel_coeff = c.coeff;
 %channel_delay = c.delay;
 %H_fr = c.fr(BW, (-N/2+1:N/2)/N, 1);                     % N = number of subcarriers
-% H_fr = cell(num_ue,1);
-% for i = 1:num_ue
-%     H_fr{i} = c(1,i).fr(BW, (0:N-1)/N, 1);
-% end
-H_fr = cell(num_ue,num_BS);
+H_fr = cell(num_ue,1);
 for i = 1:num_ue
-    for j = 1:num_BS
-        % H_fr{i,j} = c(i,j).fr(BW, (0:N-1)/N, 1);
-        H_fr{i,j} = c((j-1)*num_ue+i).fr(BW, (0:N-1)/N, 1);
-    end
+    H_fr{i} = c(1,i).fr(BW, (0:N-1)/N, 1);
 end
 %H_fr = c.fr(BW, (0:N-1)/N, 1);
-% set(0,'DefaultFigurePaperSize',[14.5 7.7])              % Adjust paper size for plot
-% l.visualize([],[],0);                                   % Plot the layout
-% view(-33, 60);                                          % Enable 3D view
+set(0,'DefaultFigurePaperSize',[14.5 7.7])              % Adjust paper size for plot
+l.visualize([],[],0);                                   % Plot the layout
+view(-33, 60);                                          % Enable 3D view
