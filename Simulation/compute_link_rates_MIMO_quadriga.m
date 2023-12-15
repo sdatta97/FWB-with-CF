@@ -37,7 +37,7 @@ s.center_frequency = 2.6e9;                     % Assign frequency
 
 l = qd_layout( s );                                     % New QuaDRiGa layout
 l.tx_position = [[params.locationsBS; params.locationsBS_sub6], 25*ones(params.numGNB_sub6,1)]';                              % 25 m BS height
-l.no_rx = params.numUE_sub6;                                          % 100 MTs
+l.no_rx = params.numUE + params.numUE_sub6;                                          % 100 MTs
 
 % l.randomize_rx_positions( 200, 1.5, 1.5, 0 );           % Assign random user positions
 % l.rx_position(1,:) = l.rx_position(1,:) + 220;          % Place users east of the BS
@@ -125,7 +125,30 @@ P_db = 10*log10( sum( map{1}, 4 ) );
 % frequencies (2).
 
 c = l.get_channels;
+num_bs = params.numGNB_sub6;
+num_ue = l.no_rx;
+channel_coeff = cell(num_ue,num_bs);
+channel_delay = cell(num_ue,num_bs);
+for i = 1:num_ue
+    for j = 1:num_bs
+        channel_coeff{i,j} = c(i,j).coeff;                              % Extract amplitudes and phases
+        channel_delay{i,j} = c(i,j).delay;
+    end
+end
+BW = params.Band;
+N = 1;
+%channel_coeff = c.coeff;
+%channel_delay = c.delay;
+%H_fr = c.fr(BW, (-N/2+1:N/2)/N, 1);                     % N = number of subcarriers
+H_fr = zeros(num_ue,num_bs);
+for i = 1:num_ue
+    for j = 1:num_bs
+        H_fr(i,j) = c(i,j).fr(BW, (0:N-1)/N, 1);
+    end
+end
 
+K = l.no_rx;
+D = params.D;
 %Prepare array to store the number of APs serving a specficic UE
 La = zeros(K,1);
 %Prepare cell to store the AP indices serving a specficic UE
@@ -141,7 +164,7 @@ for k = 1:K
     NoServ{k} = NoservingAPs;
     
     La(k) = length(servingAPs);
-    beta_uc(:,k) = BETA(:,k).*D(:,k);
+%     beta_uc(:,k) = BETA(:,k).*D(:,k);
 end
 
 %% initialization of c
