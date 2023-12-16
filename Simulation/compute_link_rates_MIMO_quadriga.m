@@ -61,14 +61,14 @@ indoor_rx = l.set_scenario('3GPP_38.901_UMa_LOS',[],[],0.8);    % Set the scenar
 
 % a_2600_Mhz  = qd_arrayant( '3gpp-3d',  8, 1, s.center_frequency(1), 6, 8 );
 % a_28000_MHz = qd_arrayant( '3gpp-3d',  8, 8, s.center_frequency(2), 3 );
-a_2600_Mhz  = qd_arrayant( '3gpp-3d',  params.num_antennas_per_gNB, 1, s.center_frequency, 6, 8 );
+a_2600_Mhz  = qd_arrayant( '3gpp-mmw',  params.num_antennas_per_gNB, 1, s.center_frequency);
 
 l.tx_array = a_2600_Mhz;                           % Set 2.6 GHz antenna
 % l.tx_array(1,1) = a_2600_Mhz;                           % Set 2.6 GHz antenna
 % l.tx_array(2,1) = a_28000_MHz;                          % Set 28 Ghz antenna
 
-l.rx_array = qd_arrayant('omni');                       % Set omni-rx antenna
-
+% l.rx_array = qd_arrayant('omni');                       % Set omni-rx antenna
+l.rx_array = qd_arrayant( '3gpp-mmw',  params.N_UE_sub6, 1, s.center_frequency);
 %% Coverage preview
 % Next, we create a preview of the antenna footprint. We calculate the map for the two frequencies
 % including path-loss and antenna patterns. The first plot is for the 2.6 GHz band.
