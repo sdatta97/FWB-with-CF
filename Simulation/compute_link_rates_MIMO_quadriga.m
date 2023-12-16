@@ -61,7 +61,7 @@ indoor_rx = l.set_scenario('3GPP_38.901_UMa_LOS',[],[],0.8);    % Set the scenar
 
 % a_2600_Mhz  = qd_arrayant( '3gpp-3d',  8, 1, s.center_frequency(1), 6, 8 );
 % a_28000_MHz = qd_arrayant( '3gpp-3d',  8, 8, s.center_frequency(2), 3 );
-a_2600_Mhz  = qd_arrayant( '3gpp-3d',  8, 1, s.center_frequency, 6, 8 );
+a_2600_Mhz  = qd_arrayant( '3gpp-3d',  params.num_antennas_per_gNB, 1, s.center_frequency, 6, 8 );
 
 l.tx_array = a_2600_Mhz;                           % Set 2.6 GHz antenna
 % l.tx_array(1,1) = a_2600_Mhz;                           % Set 2.6 GHz antenna
@@ -140,10 +140,10 @@ N = 1;
 %channel_coeff = c.coeff;
 %channel_delay = c.delay;
 %H_fr = c.fr(BW, (-N/2+1:N/2)/N, 1);                     % N = number of subcarriers
-H_fr = zeros(num_ue,num_bs);
+H_fr = zeros(num_ue,num_bs,2);
 for i = 1:num_ue
     for j = 1:num_bs
-        H_fr(i,j) = c(i,j).fr(BW, (0:N-1)/N, 1);
+        H_fr(i,j,:) = c(i,j).fr(BW, (0:N-1)/N, 1);
     end
 end
 
