@@ -23,7 +23,7 @@ function rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6Conne
 % * Path-loss is different for each frequency
 % * Path-powers are different for each frequency
 % * Delay- and angular spreads are different
-% * K-Factor is different
+% * num_ue-Factor is different
 % * XPR of the NLOS components is different
 
 %% Basic setup
@@ -128,6 +128,7 @@ P_db = 10*log10( sum( map{1}, 4 ) );
 c = l.get_channels;
 num_bs = params.numGNB_sub6;
 num_ue = l.no_rx;
+num_ue_mmW = params.numUE;
 channel_coeff = cell(num_ue,num_bs);
 channel_delay = cell(num_ue,num_bs);
 for i = 1:num_ue
@@ -142,22 +143,23 @@ N = 1;
 %channel_delay = c.delay;
 %H_fr = c.fr(BW, (-N/2+1:N/2)/N, 1);                     % N = number of subcarriers
 H_fr = cell(num_ue,num_bs);
+BETA = zeros(num_bs,num_ue);
+beta_uc = zeros(num_bs,num_ue);
 for i = 1:num_ue
     for j = 1:num_bs
         H_fr{i,j} = c(i,j).fr(BW, (0:N-1)/N, 1);
+        BETA(j,i) = square(mean(abs(H_fr{i,j}),"all")); 
     end
 end
-
-K = l.no_rx;
 D = params.D;
 %Prepare array to store the number of APs serving a specficic UE
-La = zeros(K,1);
+La = zeros(num_ue,1);
 %Prepare cell to store the AP indices serving a specficic UE
-Serv = cell(K,1);
+Serv = cell(num_ue,1);
 %Prepare cell to store the AP indices not serving a specficic UE
-NoServ = cell(K,1);
+NoServ = cell(num_ue,1);
 %Construc the above array and cells
-for k = 1:K
+for k = 1:num_ue
     servingAPs = find(D(:,k)==1);
     NoservingAPs = find(D(:,k)==0);
     
@@ -165,85 +167,88 @@ for k = 1:K
     NoServ{k} = NoservingAPs;
     
     La(k) = length(servingAPs);
-%     beta_uc(:,k) = BETA(:,k).*D(:,k);
+    beta_uc(:,k) = BETA(:,k).*D(:,k);
 end
 
 %% initialization of c
-eta_eq = zeros(M,K);
+eta_eq = zeros(num_bs,num_ue);
 N_AP = params.num_antennas_per_gNB;
-if (K_mmW == 0)
-    for m = 1:M
-        for k = 1:K
+N_UE_mmW = params.N_UE_mmW;
+N_UE_sub6 = params.N_UE_sub6;
+p_fac = params.p_fac;
+if (num_ue_mmW == 0)
+    for m = 1:num_bs
+        for k = 1:num_ue
             if ismember(m,Serv{k})
                 eta_eq(m,k) = 1./(N_AP*N_UE_sub6*sum(BETA(m,:)));
             end
         end
     end
 else
-    for m = 1:M
-        for k = 1:K
+    for m = 1:num_bs
+        for k = 1:num_ue
             if ismember(m,Serv{k})
-                if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
-%                     eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
-                    eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,2:K))));
-                elseif (k>K_mmW)
-%                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
-                    eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,2:K))));
+                if ((k<=num_ue_mmW) && (sub6ConnectionState(k) == 1))
+%                     eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:num_ue_mmW)+N_UE_sub6*sum(beta_uc(m,2:num_ue))));
+                    eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:num_ue_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,2:num_ue))));
+                elseif (k>num_ue_mmW)
+%                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:num_ue_mmW)+N_UE_sub6*sum(beta_uc(m,2:num_ue))));
+                    eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:num_ue_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,2:num_ue))));
                 end
             end
         end
     end
 end
-D_mmW_mmW = zeros(K_mmW,K_mmW,N_UE_mmW,N_UE_mmW);
-D_mmW_sub6 = zeros(K_mmW,K-K_mmW,N_UE_mmW,N_UE_sub6);
-D_sub6_mmW = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_mmW);
-D_sub6_sub6 = zeros(K-K_mmW,K-K_mmW,N_UE_sub6,N_UE_sub6);
-for k = 1:K_mmW
-    for q = 1:K_mmW
-        for m = 1:M
+D_mmW_mmW = zeros(num_ue_mmW,num_ue_mmW,N_UE_mmW,N_UE_mmW);
+D_mmW_sub6 = zeros(num_ue_mmW,num_ue-num_ue_mmW,N_UE_mmW,N_UE_sub6);
+D_sub6_mmW = zeros(num_ue-num_ue_mmW,num_ue_mmW,N_UE_sub6,N_UE_mmW);
+D_sub6_sub6 = zeros(num_ue-num_ue_mmW,num_ue-num_ue_mmW,N_UE_sub6,N_UE_sub6);
+for k = 1:num_ue_mmW
+    for q = 1:num_ue_mmW
+        for m = 1:num_bs
             D_mmW_mmW(k,q,:,:) = reshape(D_mmW_mmW(k,q,:,:),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
         end
     end
-    for q = 1:K-K_mmW
-        for m = 1:M
+    for q = 1:num_ue-num_ue_mmW
+        for m = 1:num_bs
             D_mmW_sub6(k,q,:,:) = reshape(D_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
         end
     end
 end
-for k = 1:K-K_mmW
-    for q = 1:K_mmW
-        for m = 1:M
+for k = 1:num_ue-num_ue_mmW
+    for q = 1:num_ue_mmW
+        for m = 1:num_bs
             D_sub6_mmW(k,q,:,:) = reshape(D_sub6_mmW(k,q,:,:),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
         end
     end
-    for q = 1:K-K_mmW
-        for m = 1:M
+    for q = 1:num_ue-num_ue_mmW
+        for m = 1:num_bs
             D_sub6_sub6(k,q,:,:) = reshape(D_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
         end
     end
 end
-DS_mmW = zeros(K_mmW,N_UE_mmW);
-MUI_mmW = zeros(K_mmW,N_UE_mmW);
-DS_sub6 = zeros(K-K_mmW,N_UE_sub6);
-MUI_sub6 = zeros(K-K_mmW,N_UE_sub6);
+DS_mmW = zeros(num_ue_mmW,N_UE_mmW);
+MUI_mmW = zeros(num_ue_mmW,N_UE_mmW);
+DS_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
+MUI_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
 
-noise_mmW = abs(sqrt(0.5)*(randn(K_mmW,N_UE_mmW) + 1j*randn(K_mmW,N_UE_mmW))).^2;
-noise_sub6 = abs(sqrt(0.5)*(randn(K-K_mmW,N_UE_sub6) + 1j*randn(K-K_mmW,N_UE_sub6))).^2;
-snr_num_mmW = zeros(K_mmW,N_UE_mmW);
-snr_den_mmW = zeros(K_mmW,N_UE_mmW);
-snr_num_sub6 = zeros(K-K_mmW,N_UE_sub6);
-snr_den_sub6 = zeros(K-K_mmW,N_UE_sub6);
-rate_dl = zeros(K,1);
-for k = 1:K_mmW
+noise_mmW = abs(sqrt(0.5)*(randn(num_ue_mmW,N_UE_mmW) + 1j*randn(num_ue_mmW,N_UE_mmW))).^2;
+noise_sub6 = abs(sqrt(0.5)*(randn(num_ue-num_ue_mmW,N_UE_sub6) + 1j*randn(num_ue-num_ue_mmW,N_UE_sub6))).^2;
+snr_num_mmW = zeros(num_ue_mmW,N_UE_mmW);
+snr_den_mmW = zeros(num_ue_mmW,N_UE_mmW);
+snr_num_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
+snr_den_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
+rate_dl = zeros(num_ue,1);
+for k = 1:num_ue_mmW
     if (sub6ConnectionState(k)==1 || k==ue_idx)
         for n = 1:N_UE_mmW
             DS_mmW(k,n) = p_d*norm(reshape(D_mmW_mmW(k,k,n,:),[1,N_UE_mmW]))^2;
-            for q = 1:K_mmW
+            for q = 1:num_ue_mmW
                 if (q~=k && sub6ConnectionState(q)==1)
                   MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,q,n,:),[1,N_UE_mmW]))^2;
                 end
             end
-            for q = 1:K-K_mmW
+            for q = 1:num_ue-num_ue_mmW
                MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(reshape(D_mmW_sub6(k,q,n,:),[1,N_UE_sub6]))^2;
             end
             snr_num_mmW(k,n) = DS_mmW(k,n);
@@ -252,20 +257,20 @@ for k = 1:K_mmW
         end
     end
 end
-for k = 1:K-K_mmW
+for k = 1:num_ue-num_ue_mmW
     for n = 1:N_UE_sub6
         DS_sub6(k,n) = p_d*norm(reshape(D_sub6_sub6(k,k,n,:),[1,N_UE_sub6]))^2;
-        for q = 1:K_mmW
+        for q = 1:num_ue_mmW
             if (q~=k && sub6ConnectionState(q)==1)
               MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(reshape(D_sub6_mmW(k,q,n,:),[1,N_UE_mmW]))^2;
             end
         end
-        for q = 1:K-K_mmW
+        for q = 1:num_ue-num_ue_mmW
            MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(reshape(D_sub6_sub6(k,q,n,:),[1,N_UE_sub6]))^2;
         end
         snr_num_sub6(k,n) = DS_sub6(k,n);
         snr_den_sub6(k,n) = MUI_sub6(k,n) + noise_sub6(k,n);
-        rate_dl(k+K_mmW) = rate_dl(k+K_mmW) + BW*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
+        rate_dl(k+num_ue_mmW) = rate_dl(k+num_ue_mmW) + BW*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
     end
 end
 end
