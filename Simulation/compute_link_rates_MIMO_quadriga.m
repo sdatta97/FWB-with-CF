@@ -137,9 +137,18 @@ for i = 1:num_ue
         channel_delay{i,j} = c(i,j).delay;
     end
 end
-BW = params.Band;
+BW = params.Band; %bandwidth
+N = 1; %number of subcarriers
+
 TAU_FAC = (params.tau_c - params.tau_p)/params.tau_c;
-N = 1;
+
+%Noise figure (in dB)
+noiseFigure = 7;
+
+%Compute noise power (in dBm)
+noiseVariancedBm = -174 + 10*log10(BW) + noiseFigure;
+noiseVariance = db2pow(noiseVariancedBm);
+
 N_AP = params.num_antennas_per_gNB;
 % N_UE_mmW = params.N_UE_mmW;
 N_UE_mmW = params.N_UE_sub6;
@@ -245,8 +254,10 @@ MUI_mmW = zeros(num_ue_mmW,N_UE_mmW);
 DS_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
 MUI_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
 
-noise_mmW = abs(sqrt(0.5)*(randn(num_ue_mmW,N_UE_mmW) + 1j*randn(num_ue_mmW,N_UE_mmW))).^2;
-noise_sub6 = abs(sqrt(0.5)*(randn(num_ue-num_ue_mmW,N_UE_sub6) + 1j*randn(num_ue-num_ue_mmW,N_UE_sub6))).^2;
+% noise_mmW = abs(sqrt(0.5)*(randn(num_ue_mmW,N_UE_mmW) + 1j*randn(num_ue_mmW,N_UE_mmW))).^2;
+% noise_sub6 = abs(sqrt(0.5)*(randn(num_ue-num_ue_mmW,N_UE_sub6) + 1j*randn(num_ue-num_ue_mmW,N_UE_sub6))).^2;
+noise_mmW = abs(sqrt(0.5*noiseVariance)*(randn(num_ue_mmW,N_UE_mmW) + 1j*randn(num_ue_mmW,N_UE_mmW))).^2;
+noise_sub6 = abs(sqrt(0.5*noiseVariance)*(randn(num_ue-num_ue_mmW,N_UE_sub6) + 1j*randn(num_ue-num_ue_mmW,N_UE_sub6))).^2;
 snr_num_mmW = zeros(num_ue_mmW,N_UE_mmW);
 snr_den_mmW = zeros(num_ue_mmW,N_UE_mmW);
 snr_num_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);

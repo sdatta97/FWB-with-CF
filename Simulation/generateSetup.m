@@ -62,7 +62,7 @@ end
 % squareLength = 1000; %meter
 
 %Communication bandwidth (Hz)
-B = 20e6;
+B = 100e6;
 
 %Noise figure (in dB)
 noiseFigure = 7;
