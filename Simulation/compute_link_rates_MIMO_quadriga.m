@@ -138,17 +138,34 @@ for i = 1:num_ue
     end
 end
 BW = params.Band;
+TAU_FAC = (params.tau_c - params.tau_p)/params.tau_c;
 N = 1;
+N_AP = params.num_antennas_per_gNB;
+% N_UE_mmW = params.N_UE_mmW;
+N_UE_mmW = params.N_UE_sub6;
+N_UE_sub6 = params.N_UE_sub6;
+Ntx = params.num_antennas_per_gNB;
+p_fac = params.p_fac;
+p_d = params.rho_tot;
 %channel_coeff = c.coeff;
 %channel_delay = c.delay;
 %H_fr = c.fr(BW, (-N/2+1:N/2)/N, 1);                     % N = number of subcarriers
 H_fr = cell(num_ue,num_bs);
 BETA = zeros(num_bs,num_ue);
 beta_uc = zeros(num_bs,num_ue);
+channel_dl_mmW = zeros(num_bs,num_ue_mmW,Ntx,N_UE_mmW);
+channel_dl = zeros(num_bs,num_ue - num_ue_mmW,Ntx,N_UE_sub6);
+channel_est_dl_mmW = channel_dl_mmW;
+channel_est_dl = channel_dl;
 for i = 1:num_ue
     for j = 1:num_bs
         H_fr{i,j} = c(i,j).fr(BW, (0:N-1)/N, 1);
         BETA(j,i) = square(mean(abs(H_fr{i,j}),"all")); 
+        if (i<=num_ue_mmW)
+            channel_dl_mmW(j,i,:,:) = (H_fr{i,j}).';
+        else
+            channel_dl(j,i-num_ue_mmW,:,:) = (H_fr{i,j}).';
+        end
     end
 end
 D = params.D;
@@ -172,10 +189,6 @@ end
 
 %% initialization of c
 eta_eq = zeros(num_bs,num_ue);
-N_AP = params.num_antennas_per_gNB;
-N_UE_mmW = params.N_UE_mmW;
-N_UE_sub6 = params.N_UE_sub6;
-p_fac = params.p_fac;
 if (num_ue_mmW == 0)
     for m = 1:num_bs
         for k = 1:num_ue
