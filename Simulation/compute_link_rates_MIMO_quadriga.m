@@ -47,7 +47,7 @@ ll.no_rx = params.numUE;                                          % 100 MTs
 % l.rx_position(1,:) = l.rx_position(1,:) + 220;          % Place users east of the BS
 % l.rx_position = [[params.UE_locations; params.UE_locations_sub6], 1.5*ones(params.numUE+params.numUE_sub6,1)]';
 l.rx_position = [[params.UE_locations_sub6], 1.5*ones(params.numUE_sub6,1)]';
-l.rx_position = [[params.UE_locations], 1.5*ones(params.numUE,1)]';
+ll.rx_position = [[params.UE_locations], 1.5*ones(params.numUE,1)]';
 % floor = randi(5,1,l.no_rx) + 3;                         % Set random floor levels
 % for n = 1:l.no_rx
 %     floor( n ) =  randi(  floor( n ) );
@@ -79,7 +79,7 @@ ll.tx_array = a_2600_Mhz;                           % Set 2.6 GHz antenna
 aa_2600_Mhz = qd_arrayant( '3gpp-3d',  params.N_UE_sub6, 1, s.center_frequency);
 aaa_2600_Mhz = qd_arrayant( '3gpp-3d',  params.N_UE_mmW, 1, s.center_frequency);
 l.rx_array = aa_2600_Mhz;
-ll.rx_array = aa_2600_Mhz;
+ll.rx_array = aaa_2600_Mhz;
 %% Coverage preview
 % Next, we create a preview of the antenna footprint. We calculate the map for the two frequencies
 % including path-loss and antenna patterns. The first plot is for the 2.6 GHz band.
@@ -143,16 +143,19 @@ P_db_mmW = 10*log10( sum( map{1}, 4 ) );
 c = l.get_channels;
 cc = ll.get_channels;
 num_bs = params.numGNB_sub6;
-num_ue = l.no_rx;
-num_ue_mmW = params.numUE;
-channel_coeff = cell(num_ue,num_bs);
-channel_delay = cell(num_ue,num_bs);
-for i = 1:num_ue
-    for j = 1:num_bs
-        channel_coeff{i,j} = c(i,j).coeff;                              % Extract amplitudes and phases
-        channel_delay{i,j} = c(i,j).delay;
-    end
-end
+% num_ue = l.no_rx;
+% num_ue_mmW = params.numUE;
+num_ue = l.no_rx + ll.no_rx;
+num_ue_mmW = ll.no_rx;
+
+% channel_coeff = cell(num_ue,num_bs);
+% channel_delay = cell(num_ue,num_bs);
+% for i = 1:num_ue
+%     for j = 1:num_bs
+%         channel_coeff{i,j} = c(i,j).coeff;                              % Extract amplitudes and phases
+%         channel_delay{i,j} = c(i,j).delay;
+%     end
+% end
 BW = params.Band; %bandwidth
 N = 1; %number of subcarriers
 
@@ -166,8 +169,7 @@ noiseVariancedBm = -174 + 10*log10(BW) + noiseFigure;
 noiseVariance = db2pow(noiseVariancedBm);
 
 N_AP = params.num_antennas_per_gNB;
-% N_UE_mmW = params.N_UE_mmW;
-N_UE_mmW = params.N_UE_sub6;
+N_UE_mmW = params.N_UE_mmW;
 N_UE_sub6 = params.N_UE_sub6;
 Ntx = params.num_antennas_per_gNB;
 p_fac = params.p_fac;
@@ -182,7 +184,11 @@ channel_dl_mmW = zeros(num_bs,num_ue_mmW,Ntx,N_UE_mmW);
 channel_dl = zeros(num_bs,num_ue - num_ue_mmW,Ntx,N_UE_sub6);
 for i = 1:num_ue
     for j = 1:num_bs
-        H_fr{i,j} = c(i,j).fr(BW, (0:N-1)/N, 1);
+        if (i<=num_ue_mmW)
+            H_fr{i,j} = cc(i,j).fr(BW, (0:N-1)/N, 1);
+        else
+            H_fr{i,j} = c(i-num_ue_mmW,j).fr(BW, (0:N-1)/N, 1);
+        end
         BETA(j,i) = (mean(abs(H_fr{i,j}),"all"))^2; 
         if (i<=num_ue_mmW)
             channel_dl_mmW(j,i,:,:) = (H_fr{i,j}).';
