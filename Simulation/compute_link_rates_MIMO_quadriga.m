@@ -160,7 +160,7 @@ channel_est_dl = channel_dl;
 for i = 1:num_ue
     for j = 1:num_bs
         H_fr{i,j} = c(i,j).fr(BW, (0:N-1)/N, 1);
-        BETA(j,i) = square(mean(abs(H_fr{i,j}),"all")); 
+        BETA(j,i) = (mean(abs(H_fr{i,j}),"all"))^2; 
         if (i<=num_ue_mmW)
             channel_dl_mmW(j,i,:,:) = (H_fr{i,j}).';
         else
