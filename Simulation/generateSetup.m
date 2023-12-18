@@ -257,13 +257,13 @@ for n = 1:nbrOfSetups
     gainOverNoise = db2pow(gainOverNoisedB);
     for l = 1:L
         [gains, idxs] = sort(gainOverNoise(l,:), 'descend');
-        for k = 1:K
-            if ((sum(gains(1:k))/sum(gains))*100 > 90)
-                idxs_not_chosen = idxs((k+1):end);
-                break;
-            end
-        end
-        D(l,idxs_not_chosen,n) = 0;
+%         for k = 1:K
+%             if ((sum(gains(1:k))/sum(gains))*100 > 90)
+%                 idxs_not_chosen = idxs((k+1):end);
+%                 break;
+%             end
+%         end
+%         D(l,idxs_not_chosen,n) = 0;
     end
     for k = 1:K
         if (sum(D(:,k,n)) == 0)
