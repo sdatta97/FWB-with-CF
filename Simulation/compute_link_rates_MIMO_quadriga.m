@@ -37,11 +37,17 @@ s.center_frequency = 2.6e9;                     % Assign frequency
 
 l = qd_layout( s );                                     % New QuaDRiGa layout
 l.tx_position = [[params.locationsBS; params.locationsBS_sub6], 25*ones(params.numGNB_sub6,1)]';                              % 25 m BS height
-l.no_rx = params.numUE + params.numUE_sub6;                                          % 100 MTs
+ll = qd_layout( s );                                     % New QuaDRiGa layout
+ll.tx_position = [[params.locationsBS; params.locationsBS_sub6], 25*ones(params.numGNB_sub6,1)]';   
+% l.no_rx = params.numUE + params.numUE_sub6;                                          % 100 MTs
+l.no_rx = params.numUE_sub6;                                          % 100 MTs
+ll.no_rx = params.numUE;                                          % 100 MTs
 
 % l.randomize_rx_positions( 200, 1.5, 1.5, 0 );           % Assign random user positions
 % l.rx_position(1,:) = l.rx_position(1,:) + 220;          % Place users east of the BS
-l.rx_position = [[params.UE_locations; params.UE_locations_sub6], 1.5*ones(params.numUE+params.numUE_sub6,1)]';
+% l.rx_position = [[params.UE_locations; params.UE_locations_sub6], 1.5*ones(params.numUE+params.numUE_sub6,1)]';
+l.rx_position = [[params.UE_locations_sub6], 1.5*ones(params.numUE_sub6,1)]';
+l.rx_position = [[params.UE_locations], 1.5*ones(params.numUE,1)]';
 % floor = randi(5,1,l.no_rx) + 3;                         % Set random floor levels
 % for n = 1:l.no_rx
 %     floor( n ) =  randi(  floor( n ) );
@@ -49,6 +55,7 @@ l.rx_position = [[params.UE_locations; params.UE_locations_sub6], 1.5*ones(param
 % l.rx_position(3,:) = 3*(floor-1) + 1.5;
 % 
 indoor_rx = l.set_scenario('3GPP_38.901_UMa_LOS',[],[],0.8);    % Set the scenario
+indoor_rx_2 = ll.set_scenario('3GPP_38.901_UMa_LOS',[],[],0.8);    % Set the scenario
 % l.rx_position(3,~indoor_rx) = 1.5;                      % Set outdoor-users to 1.5 m height
 
 %% Antenna set-up
@@ -64,12 +71,15 @@ indoor_rx = l.set_scenario('3GPP_38.901_UMa_LOS',[],[],0.8);    % Set the scenar
 a_2600_Mhz  = qd_arrayant( '3gpp-3d',  params.num_antennas_per_gNB/2, params.num_antennas_per_gNB/2, s.center_frequency,6,8);
 
 l.tx_array = a_2600_Mhz;                           % Set 2.6 GHz antenna
+ll.tx_array = a_2600_Mhz;                           % Set 2.6 GHz antenna
 % l.tx_array(1,1) = a_2600_Mhz;                           % Set 2.6 GHz antenna
 % l.tx_array(2,1) = a_28000_MHz;                          % Set 28 Ghz antenna
 
 % l.rx_array = qd_arrayant('omni');                       % Set omni-rx antenna
 aa_2600_Mhz = qd_arrayant( '3gpp-3d',  params.N_UE_sub6, 1, s.center_frequency);
+aaa_2600_Mhz = qd_arrayant( '3gpp-3d',  params.N_UE_mmW, 1, s.center_frequency);
 l.rx_array = aa_2600_Mhz;
+ll.rx_array = aa_2600_Mhz;
 %% Coverage preview
 % Next, we create a preview of the antenna footprint. We calculate the map for the two frequencies
 % including path-loss and antenna patterns. The first plot is for the 2.6 GHz band.
@@ -94,7 +104,12 @@ i_freq          = 1;                                    % Frequency index for 2.
 %     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
 % 
 P_db = 10*log10( sum( map{1}, 4 ) );
-
+[ map, x_coords, y_coords] = ll.power_map_w_bl( '3GPP_38.901_UMa_LOS', 'quick',...
+    sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq, link, params);
+% [ map, x_coords, y_coords] = l.power_map( '3GPP_38.901_UMa_LOS', 'quick',...
+%     sample_distance, x_min, x_max, y_min, y_max, rx_height, tx_power, i_freq );
+% 
+P_db_mmW = 10*log10( sum( map{1}, 4 ) );
 %%
 % % For the 28 GHz, we get the complex-valued phases for each antenna element in order
 % % to calculate a MRT beamformer that points the towards the ground at coordinates x = 200 m and 
@@ -126,6 +141,7 @@ P_db = 10*log10( sum( map{1}, 4 ) );
 % frequencies (2).
 
 c = l.get_channels;
+cc = ll.get_channels;
 num_bs = params.numGNB_sub6;
 num_ue = l.no_rx;
 num_ue_mmW = params.numUE;
