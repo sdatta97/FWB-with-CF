@@ -155,8 +155,6 @@ BETA = zeros(num_bs,num_ue);
 beta_uc = zeros(num_bs,num_ue);
 channel_dl_mmW = zeros(num_bs,num_ue_mmW,Ntx,N_UE_mmW);
 channel_dl = zeros(num_bs,num_ue - num_ue_mmW,Ntx,N_UE_sub6);
-channel_est_dl_mmW = channel_dl_mmW;
-channel_est_dl = channel_dl;
 for i = 1:num_ue
     for j = 1:num_bs
         H_fr{i,j} = c(i,j).fr(BW, (0:N-1)/N, 1);
@@ -168,6 +166,8 @@ for i = 1:num_ue
         end
     end
 end
+channel_est_dl_mmW = channel_dl_mmW;
+channel_est_dl = channel_dl;
 D = params.D;
 %Prepare array to store the number of APs serving a specficic UE
 La = zeros(num_ue,1);
