@@ -63,19 +63,19 @@ params.p_fac = 10;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 2*60; %sec Total Simulation time should be more than 100.
+params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.coverageRange = 50;
+params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
 height_transmitter = 5;
 params.areaDimensions = [width_area, length_area, height_transmitter];
 
 
-params.coverageRange_sub6 = 100;
+params.coverageRange_sub6 = 1000;
 length_area_sub6 = 2*params.coverageRange_sub6;   
 width_area_sub6 = 2*params.coverageRange_sub6;
 height_transmitter_sub6 = 4;
