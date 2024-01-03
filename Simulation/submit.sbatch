@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH --mem=4GB
-#SBATCH --time=24:00:00
+#SBATCH --mem=32GB
+#SBATCH --time=120:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --output=./logs/%a_%A.out
 #SBATCH --error=./logs/%a_%A.err
@@ -17,5 +17,4 @@ module load matlab/2023a
 
 echo "$SLURM_ARRAY_TASK_ID"
 
-matlab -batch "SimulationMain, exit"
-
+matlab -batch "SimulationMain_MIMO_hpc, exit"
