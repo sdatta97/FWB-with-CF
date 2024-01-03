@@ -264,7 +264,5 @@ dataBS_mobile = [];
             dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
         end
         % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
-
-        fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
     end
     save("mobility_data.mat","dataBS_mobile")
