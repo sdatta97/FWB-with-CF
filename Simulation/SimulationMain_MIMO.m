@@ -304,16 +304,17 @@ lambda_UE_sub6 = 50;
 %         end
         
         %% Mobile blockage events
-        tic
-        dataBS_mobile = [];
-        for i = 1:(params.numUE+params.numUE_sub6)
-%         for i = 1:(params.numUE)
-            dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
-        end
-        % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
+%         tic
+%         dataBS_mobile = [];
+%         for i = 1:(params.numUE+params.numUE_sub6)
+% %         for i = 1:(params.numUE)
+%             dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
+%         end
+%         % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
+% 
+%         fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
 
-        fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
-
+        load("mobility_data.mat")
         %% Create Discrete Time Event Simulation input
         simInputs.params = params;
         simInputs.dataBS_mobile = dataBS_mobile;
