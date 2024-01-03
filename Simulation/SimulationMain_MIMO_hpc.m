@@ -252,12 +252,7 @@ dataBS_mobile = [];
         %params.ricianFactor = K_Rician';
         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
         params.BETA = db2pow(gainOverNoisedB);   
-        params.D = D;
-        outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-        outage_probability_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-        outage_duration_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-        outage_duration_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-        
+        params.D = D;        
         %% Mobile blockage events
         for i = 1:(params.numUE+params.numUE_sub6)
 %         for i = 1:(params.numUE)
