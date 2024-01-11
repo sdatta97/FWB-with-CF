@@ -272,8 +272,10 @@ for k = 1:num_ue-num_ue_mmW
     end
 end
 DS_mmW = zeros(num_ue_mmW,N_UE_mmW);
+MSI_mmW = zeros(num_ue_mmW,N_UE_mmW);
 MUI_mmW = zeros(num_ue_mmW,N_UE_mmW);
 DS_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
+MSI_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
 MUI_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
 
 % noise_mmW = abs(sqrt(0.5)*(randn(num_ue_mmW,N_UE_mmW) + 1j*randn(num_ue_mmW,N_UE_mmW))).^2;
@@ -289,6 +291,11 @@ for k = 1:num_ue_mmW
     if (sub6ConnectionState(k)==1 || k==ue_idx)
         for n = 1:N_UE_mmW
             DS_mmW(k,n) = p_d*norm(reshape(D_mmW_mmW(k,k,n,:),[1,N_UE_mmW]))^2;
+            for nn = 1:N_UE_mmW
+                if (nn~=n)
+                    MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,k,nn,:),[1,N_UE_mmW]))^2;
+                end
+            end
             for q = 1:num_ue_mmW
                 if (q~=k && sub6ConnectionState(q)==1)
                   MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,q,n,:),[1,N_UE_mmW]))^2;
@@ -306,6 +313,11 @@ end
 for k = 1:num_ue-num_ue_mmW
     for n = 1:N_UE_sub6
         DS_sub6(k,n) = p_d*norm(reshape(D_sub6_sub6(k,k,n,:),[1,N_UE_sub6]))^2;
+        for nn = 1:N_UE_sub6
+            if (nn~=n)
+                MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*norm(reshape(D_sub6_sub6(k,k,nn,:),[1,N_UE_sub6]))^2;
+            end
+        end
         for q = 1:num_ue_mmW
             if (q~=k && sub6ConnectionState(q)==1)
               MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(reshape(D_sub6_mmW(k,q,n,:),[1,N_UE_mmW]))^2;
