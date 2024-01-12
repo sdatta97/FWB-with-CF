@@ -17,4 +17,4 @@ module load matlab/2023a
 
 echo "$SLURM_ARRAY_TASK_ID"
 
-matlab -batch "SimulationMain_MIMO_hpc, exit"
+matlab -batch "SimulationMain_MIMO, exit"

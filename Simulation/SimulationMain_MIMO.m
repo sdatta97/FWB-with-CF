@@ -63,19 +63,19 @@ params.p_fac = 10;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 10*60; %sec Total Simulation time should be more than 100.
+params.simTime = 2*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.coverageRange = 50;
+params.coverageRange = 50; %100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
 height_transmitter = 5;
 params.areaDimensions = [width_area, length_area, height_transmitter];
 
 
-params.coverageRange_sub6 = 100;
+params.coverageRange_sub6 = 100; %1000;
 length_area_sub6 = 2*params.coverageRange_sub6;   
 width_area_sub6 = 2*params.coverageRange_sub6;
 height_transmitter_sub6 = 4;
@@ -89,17 +89,17 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-rmin = 4e8;
+rmin = 1e8;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
-lambda_BS = 5;
+lambda_BS = 5; % 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 10;
+lambda_UE_sub6 = 5; % 5:5:25;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-% for idxUEDensity = 1:length(lambda_UE_sub6)
+for idxUEDensity = 1:length(lambda_UE_sub6)
     for idxBSDensity = 1:length(lambda_BS)
         %% gNB locations
         % params.numGNB = 10;
@@ -138,9 +138,9 @@ lambda_UE_sub6 = 10;
         % params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         % params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
 %         params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        n = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+        n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange/1000)^2);
         while (n==0)
-            n = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+            n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange/1000)^2);       
         end
         params.numUE_sub6 = n;
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
@@ -349,7 +349,6 @@ lambda_UE_sub6 = 10;
                 end
             end
         end
-        % end
 
 
         %% Recording the Results
@@ -413,10 +412,14 @@ lambda_UE_sub6 = 10;
         %     'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
         %     'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
         %     'minRatereq,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
-        output_categories = ['UE idx,','lambdaBS,','numBlockers,',...
-            'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
+%         output_categories = ['UE idx,','lambdaBS,','numBlockers,',...
+%             'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
+%             'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
+%             'minRatereq,','outageDuration_wo_CF_Analysis,','outageDurationAnalysis,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
+        output_categories = ['UE idx,','lambdaBS,','lambdaUE,','numBlockers,',...
+            'discoveryDelay,','failureDetectionDelay','connectionSetupDelay,',...
             'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
-            'minRatereq,','outageDuration_wo_CF_Analysis,','outageDurationAnalysis,','outageProbability_wo_CF_Analysis,','outageProbabilityAnalysis,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
+            'minRatereq,','meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
 
         fprintf(fileID,output_categories);
 
@@ -439,6 +442,9 @@ lambda_UE_sub6 = 10;
                         figure
                         cdfplot(outage_durations_wo_cf); hold on;
                         cdfplot(outage_durations_wi_cf);
+                        saveas(gcf,'cdfplot','.fig')
+                        saveas(gcf,'cdfplot','.png')
+
                         for ue_idx = 1:params.numUE   %storing outage probability and duration for each user
                             mean_outage_duration_wo_cf    = thisOutputs.mean_outage_duration_wo_cf(ue_idx);
                             outage_probability_wo_cf      = thisOutputs.outage_probability_wo_cf(ue_idx);
@@ -446,13 +452,14 @@ lambda_UE_sub6 = 10;
                             % outage_probability_wo_cf      = thisOutputs_wo_cf.outage_probability_wo_cf(ue_idx);
                             mean_outage_duration    = thisOutputs.mean_outage_duration(ue_idx);
                             outage_probability      = thisOutputs.outage_probability(ue_idx);
-                            out_prob_analysis = outage_probability_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
-                            out_prob_analysis_wo_cf = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
-                            out_dur_analysis = outage_duration_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
-                            out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);                        
+%                             out_prob_analysis = outage_probability_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
+%                             out_prob_analysis_wo_cf = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
+%                             out_dur_analysis = outage_duration_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
+%                             out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);                        
                             min_rate_req = params.r_min(ue_idx);
                             % formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
-                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+%                             formatSpec = '%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+                            formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f\n';
                             % fprintf(fileID,formatSpec,ue_idx,numBS,numBlockers,...
                             %     discDelay,failureDetectionDelay,connDelay,...
                             %     signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
@@ -461,10 +468,14 @@ lambda_UE_sub6 = 10;
                             %     discDelay,failureDetectionDelay,connDelay,...
                             %     signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
                             %     min_rate_req, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
-                            fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),numBlockers,...
+%                             fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),numBlockers,...
+%                                 discDelay,failureDetectionDelay,connDelay,...
+%                                 signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
+%                                 min_rate_req, out_dur_analysis_wo_cf, out_dur_analysis, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
+                            fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
                                 discDelay,failureDetectionDelay,connDelay,...
                                 signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
-                                min_rate_req, out_dur_analysis_wo_cf, out_dur_analysis, out_prob_analysis_wo_cf, out_prob_analysis, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
+                                min_rate_req, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
                         end
                     end
                 end
@@ -472,6 +483,6 @@ lambda_UE_sub6 = 10;
         end
         fclose(fileID);
     end
-% end
+end
 tEnd = toc(tStart);
 fprintf('Total runtime: %f seconds\n',tEnd)
