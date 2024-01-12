@@ -318,7 +318,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
 
         fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
-
+        save("mobility_data.mat","dataBS_mobile")
 %         load("mobility_data.mat")
         %% Create Discrete Time Event Simulation input
         simInputs.params = params;
