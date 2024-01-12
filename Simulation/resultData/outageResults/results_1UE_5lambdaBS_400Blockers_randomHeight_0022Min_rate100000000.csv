@@ -1,0 +1,2 @@
+UE idx,lambdaBS,lambdaUE,numBlockers,discoveryDelay,failureDetectionDelayconnectionSetupDelay,signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,minRatereq,meanOutageDuration_wo_CF,outageProbability_wo_CF,meanOutageDuration,outageProbability
+1,5,5,400,0.050000,0.000000,0.050000,0.000000,0.000000,0.000000,100000000.000000,0.262658,0.0131329041015456,0.1940228340767829,0.0097011417038391,
