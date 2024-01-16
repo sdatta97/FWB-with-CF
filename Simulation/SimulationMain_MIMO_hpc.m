@@ -171,7 +171,7 @@ dataBS_mobile = [];
         lookAngleCell{1} = [0,360];
         
         %% Blocker Properties and Simulation Duration
-        params.lambdaBlockers = 0.01; %How many blockers around
+        params.lambdaBlockers = 0.1; %How many blockers around
 %         params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
         params.V = 1; %velocity of blocker m/s
@@ -261,3 +261,4 @@ dataBS_mobile = [];
         % [phy_channel_mmw, phy_channel_sub6] = computePhysicalChannels(params);
     end
     save("mobility_data.mat","dataBS_mobile")
+    save("params.mat","params")
