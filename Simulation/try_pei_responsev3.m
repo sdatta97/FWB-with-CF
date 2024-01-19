@@ -370,8 +370,11 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         %offloading
         sub6ConnectionState = UE.sub6ConnectionState;
         ue_idx = 1;
+        p_fac = params.p_fac;
+        params.p_fac = 0;
         rate_dl_before_handoff = compute_link_rates_MIMO_quadrigav2(params,ue_idx,sub6ConnectionState); 
         sub6ConnectionState(ue_idx) = 1;
+        params.p_fac = p_fac;
         rate_dl = compute_link_rates_MIMO_quadrigav2(params,ue_idx,sub6ConnectionState);
         figure
         cdfplot(rate_dl_before_handoff(2:end)./10^6); hold on;
