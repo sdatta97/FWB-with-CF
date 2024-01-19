@@ -41,6 +41,25 @@ params.noiseFigure = 9; % gue
 params.sigma_sf =4;
 params.Band = 100e6;%20e6; %Communication bandwidth
 params.tau_c = 200;      % coherence block length
+
+%% Define simulation setup
+
+%Angular standard deviation in the local scattering model (in radians)
+params.ASD_varphi = deg2rad(15); %azimuth angle
+params.ASD_theta = deg2rad(15);  %elevation angle
+
+%Total uplink transmit power per UE (mW)
+params.p = 100;
+
+%Total downlink transmit power per AP (mW)
+params.rho_tot = 200;
+% rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
+
+%Power factor division
+% p_fac_arr = [1:1:10, 10:10:100]; %10.^(0:1:5);
+params.p_fac = 10;
+
+%Prepare to save simulation results
 % rng(2,'twister');
 %%
 % load('params.mat')
@@ -74,7 +93,7 @@ lambda_BS = 25;
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
 lambda_UE = 10;
-lambda_UE_sub6 = 50; %:10:50;
+lambda_UE_sub6 = 10:10:50;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -113,8 +132,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
         % params.locationsBS_sub6 = [params.locationsBS_sub6(1, :); params.locationsBS_sub6(3:10, :)];
         % params.numGNB_sub6 = 9;
-        params.num_antennas_per_gNB = 10;
-        params.num_antennas_per_gNB_mmW = 10;
+        params.num_antennas_per_gNB = 32;
        %%UE locations
 
 
@@ -131,8 +149,9 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         rmin = 1e9;
         params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
         params.bw_alloc = zeros(params.numUE,1);
-        params.num_antennas_per_UE_mmW = 4;
-      
+%         params.num_antennas_per_UE_mmW = 4;
+        params.N_UE_mmW = 8;
+        params.N_UE_sub6 = 2;
         % params.numUE = 1;
         % params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         % params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
@@ -160,6 +179,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         rmin_sub6 = 1e7;
         params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
         params.bw_alloc_sub6 = params.Band*ones(params.numUE_sub6,1);
+
+        %Compute number of pilots per coherence block
+        params.tau_p = params.numUE+params.numUE_sub6;
+        
+        %Compute the prelog factor assuming only downlink data transmission
+        params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
         %% PHY layer params
         params.scs_mmw = 2e9;     %not using this parameter now
         params.scs_sub6 = 1e8;   %sub-6 GHz bandwidth 100 MHz
@@ -219,12 +244,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % self_blockage = 5/6;
        
         % N = params.num_antennas_per_gNB;  % antennas per AP
-        N_mmW = params.num_antennas_per_gNB_mmW;  % antennas per AP
-        N = params.num_antennas_per_gNB;  % antennas per AP
-        N_UE = params.num_antennas_per_UE_mmW;
-        L = params.numGNB_sub6;
-        K = params.numUE + params.numUE_sub6;  % --Ground UEs
-        K_mmW = params.numUE;
+%         N_mmW = params.num_antennas_per_gNB_mmW;  % antennas per AP
+%         N = params.num_antennas_per_gNB;  % antennas per AP
+%         N_UE = params.num_antennas_per_UE_mmW;
+%         L = params.numGNB_sub6;
+%         K = params.numUE + params.numUE_sub6;  % --Ground UEs
+%         K_mmW = params.numUE;
         snr_db = params.snr_db;
         LOOP = length(params.snr_db);
         asd_length = length(params.ASD_VALUE);
@@ -249,20 +274,23 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         sigma_sf = params.sigma_sf;
         Band = params.Band; %Communication bandwidth
         tau_c = params.tau_c;      % coherence block length  
-        % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
-        [channelGain_GUE_mmW,R_GUE_mmW,h_LOS_GUE_mmW,K_Rician_mmW,probLOS_mmW] = channel_cellfree_GUE3_mmW_only(K,K_mmW,L,N,N_mmW,N_UE,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
-        [channelGain_GUE,R_GUE,h_LOS_GUE,int_R_GUE_mmW,int_h_LOS_GUE_mmW,K_Rician,probLOS] = channel_cellfree_GUE3(K,K_mmW,L,N,N_mmW,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
-        params.BETA = channelGain_GUE(1+params.numUE:params.numUE_sub6)';
-        params.BETA_mmW = channelGain_GUE_mmW';
-        params.BETA_int_mmW =  channelGain_GUE(1:params.numUE)';
-        params.ricianFactor = K_Rician';
-        params.ricianFactor_mmW = K_Rician_mmW';
-        params.R_GUE = R_GUE;
-        params.h_LOS_GUE = h_LOS_GUE;
-        params.R_GUE_mmW = R_GUE_mmW;
-        params.int_R_GUE_mmW = int_R_GUE_mmW;
-        params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;  
-        params.int_h_LOS_GUE_mmW = int_h_LOS_GUE_mmW;  
+%         % [channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
+%         [channelGain_GUE_mmW,R_GUE_mmW,h_LOS_GUE_mmW,K_Rician_mmW,probLOS_mmW] = channel_cellfree_GUE3_mmW_only(K,K_mmW,L,N,N_mmW,N_UE,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
+%         [channelGain_GUE,R_GUE,h_LOS_GUE,int_R_GUE_mmW,int_h_LOS_GUE_mmW,K_Rician,probLOS] = channel_cellfree_GUE3(K,K_mmW,L,N,N_mmW,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
+%         params.BETA = channelGain_GUE(1+params.numUE:params.numUE_sub6)';
+%         params.BETA_mmW = channelGain_GUE_mmW';
+%         params.BETA_int_mmW =  channelGain_GUE(1:params.numUE)';
+%         params.ricianFactor = K_Rician';
+%         params.ricianFactor_mmW = K_Rician_mmW';
+%         params.R_GUE = R_GUE;
+%         params.h_LOS_GUE = h_LOS_GUE;
+%         params.R_GUE_mmW = R_GUE_mmW;
+%         params.int_R_GUE_mmW = int_R_GUE_mmW;
+%         params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;  
+%         params.int_h_LOS_GUE_mmW = int_h_LOS_GUE_mmW;  
+        [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
+        params.BETA = db2pow(gainOverNoisedB);   
+        params.D = D;
         %%
         % UE states
         UE.numGNB = params.numGNB;
@@ -337,34 +365,19 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
         % UE.sub6NextEventTime = -100;
         UE.sub6NextEventTime = -100*ones(numUE,1);
+
         %%
         %offloading
         sub6ConnectionState = UE.sub6ConnectionState;
-        ue_idx=1;
+        ue_idx = 1;
+        rate_dl_before_handoff = compute_link_rates_MIMO_quadrigav2(params,ue_idx,sub6ConnectionState); 
         sub6ConnectionState(ue_idx) = 1;
-        r_calc_mmw = rate_analyticalv5_mmW_only(params, sub6ConnectionState); %= compute_link_rates_w_rician(params, link, ue_idx, UE.sub6ConnectionState);
-        r_calc_sub6 = rate_analyticalv4(params, sub6ConnectionState); 
-        sub6ConnectionState(ue_idx) = 0;
-        params.numUE=0;
-        rates_before_sub6_handoff = rate_analyticalv4(params, sub6ConnectionState); 
-        sub6ConnectionState(ue_idx) = 1;
-        params.numUE=1;
-        rates_on_sub6_handoff = zeros(numUE+numUE_sub6,1);  %[r_min;r_min_sub6]; %r_min.*ones(numUE+numUE_sub6,1);
-        for ue_idx_2 = 1:numUE
-            if ((UE.sub6ConnectionState(ue_idx_2) == 1) || ue_idx_2 == ue_idx)
-                % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
-                rates_on_sub6_handoff(ue_idx_2) = r_calc_mmw(ue_idx_2);
-            end
-        end
-        % for ue_idx_2 = 1+numUE:numUE+numUE_sub6
-        for ue_idx_2 = 1:numUE_sub6
-            % rates_on_sub6_handoff(ue_idx_2) = r_calc_sub6(ue_idx_2);
-            rates_on_sub6_handoff(ue_idx_2+numUE) = r_calc_sub6(ue_idx_2);
-        end
+        rate_dl = compute_link_rates_MIMO_quadrigav2(params,ue_idx,sub6ConnectionState);
+        figure
+        cdfplot(rate_dl_before_handoff(2:end)./10^6); hold on;
+        cdfplot(rate_dl(2:end)./10^6);
     end
 end
-figure
-cdfplot(rates_before_sub6_handoff./10^6); hold on;
-cdfplot(rates_on_sub6_handoff(2:end)./10^6);
+
 tEnd = toc(tStart);
 fprintf('Total runtime: %f seconds\n',tEnd)
