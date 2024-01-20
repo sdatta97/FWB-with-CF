@@ -93,7 +93,7 @@ lambda_BS = 25;
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
 lambda_UE = 10;
-lambda_UE_sub6 = 10:10:50;
+lambda_UE_sub6 = 5:5:25;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -132,7 +132,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
         % params.locationsBS_sub6 = [params.locationsBS_sub6(1, :); params.locationsBS_sub6(3:10, :)];
         % params.numGNB_sub6 = 9;
-        params.num_antennas_per_gNB = 32;
+        params.num_antennas_per_gNB = 128;
        %%UE locations
 
 
@@ -151,7 +151,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.bw_alloc = zeros(params.numUE,1);
 %         params.num_antennas_per_UE_mmW = 4;
         params.N_UE_mmW = 8;
-        params.N_UE_sub6 = 2;
+        params.N_UE_sub6 = 4;
         % params.numUE = 1;
         % params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         % params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
