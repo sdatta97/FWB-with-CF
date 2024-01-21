@@ -293,7 +293,9 @@ for k = 1:num_ue_mmW
 %             DS_mmW(k,n) = p_d*norm(reshape(D_mmW_mmW(k,k,n,:),[1,N_UE_mmW]))^2;
             DS_mmW(k,n) = p_d*(abs(D_mmW_mmW(k,k,n,n)))^2;
             for nn = 1:N_UE_mmW
-                if (nn~=n)
+%                 if (nn~=n)
+%                 if (nn>n)
+                if (abs(D_mmW_mmW(k,k,n,nn))<abs(D_mmW_mmW(k,k,n,n)))
 %                     MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,k,nn,:),[1,N_UE_mmW]))^2;
                     MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*(abs(D_mmW_mmW(k,k,n,nn)))^2;
                 end
@@ -318,7 +320,9 @@ for k = 1:num_ue-num_ue_mmW
 %         DS_sub6(k,n) = p_d*norm(reshape(D_sub6_sub6(k,k,n,:),[1,N_UE_sub6]))^2;
         DS_sub6(k,n) = p_d*(abs(D_sub6_sub6(k,k,n,n)))^2;
         for nn = 1:N_UE_sub6
-            if (nn~=n)
+%             if (nn~=n)
+%             if (nn>n)
+            if (abs(D_sub6_sub6(k,k,n,nn))<abs(D_sub6_sub6(k,k,n,n)))
 %                 MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*norm(reshape(D_sub6_sub6(k,k,nn,:),[1,N_UE_sub6]))^2;
                 MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*(abs(D_sub6_sub6(k,k,n,nn)))^2;
             end
