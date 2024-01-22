@@ -220,9 +220,9 @@ end
 
 %% initialization of c
 eta_eq = zeros(num_bs,num_ue);
-if (num_ue_mmW == 0)
+if ((num_ue_mmW == 0) || (sub6ConnectionState == zeros(num_ue_mmW,1)))
     for m = 1:num_bs
-        for k = 1:num_ue
+        for k = 1+num_ue_mmW:num_ue
             if ismember(m,Serv{k})
                 eta_eq(m,k) = 1./(N_AP*N_UE_sub6*sum(BETA(m,:)));
             end

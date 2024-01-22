@@ -320,14 +320,14 @@ while nextEventTime < params.simTime
                         sub6ConnectionState = UE.sub6ConnectionState;
 %                         [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
 %                         rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                        if (sub6ConnectionState == zeros(params.numUE,1))
-                            p_fac = params.p_fac;
-                            params.p_fac = 0;
-                        end
+%                         if (sub6ConnectionState == zeros(params.numUE,1))
+%                             p_fac = params.p_fac;
+%                             params.p_fac = 0;
+%                         end
                         rate_dl_before_handoff = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);    
-                        if (sub6ConnectionState == zeros(params.numUE,1))
-                            params.p_fac = p_fac;
-                        end
+%                         if (sub6ConnectionState == zeros(params.numUE,1))
+%                             params.p_fac = p_fac;
+%                         end
                         sub6ConnectionState(ue_idx) = 1;
 %                         rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                         rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);                                              
