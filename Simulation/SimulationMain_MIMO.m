@@ -89,7 +89,7 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-rmin = 2e8;
+rmin = 4e8;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
@@ -156,8 +156,9 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.tau_p = params.numUE+params.numUE_sub6;
         
         %Compute the prelog factor assuming only downlink data transmission
-        params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
-        
+%         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
+        params.preLogFactor = 1;
+
         %Number of setups with random UE locations
         params.nbrOfSetups = 100;
                 

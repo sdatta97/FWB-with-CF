@@ -27,7 +27,7 @@ params.CH_estimation = 1;  % 1= have channel estimation
 %%
 params.LB=1;  %Lower bound
 params.UB =1;  %Upper bound
-params.no_of_rea = 10;     % no.of channel realizations
+params.no_of_rea = 2;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
 params.snr_db = 30;
@@ -93,7 +93,7 @@ lambda_BS = 25;
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
 lambda_UE = 10;
-lambda_UE_sub6 = 5:5:25;
+lambda_UE_sub6 = 50; %5:5:25;
 % lambda_UE_sub6 = lambda_BS./2;
 % lambda_UE_sub6 = lambda_BS.*2;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
