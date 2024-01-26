@@ -77,11 +77,7 @@ link = cell(numUE,numBS);
 for ue_idx = 1:numUE
 % for ue_idx = 1:(numUE+numUE_sub6)
     for idxBS = 1:numBS        
-        try
-            link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
-        catch
-            disp("Hey")
-        end
+        link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
         link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
         link{ue_idx,idxBS}.nonBlockedTimes = bsBlockageTimes{(ue_idx-1)*numBS + idxBS};
         link{ue_idx,idxBS}.blockageStatus = blockageStatus(bsBlockageTimes,idxBS,currentTime, ue_idx, numBS);    % if link is discovered the next event time will be next blockage
