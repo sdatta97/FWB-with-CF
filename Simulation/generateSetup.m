@@ -237,16 +237,16 @@ for n = 1:nbrOfSetups
             if nargin>12
                 R_gNB(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
                 if (k<=K_mmW)
-                    R_ue_mmW(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N_UE_mmW,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
+                    R_ue_mmW(:,:,l,k,n) = functionRlocalscattering_mod(N_UE_mmW,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
                 else
-                    R_ue_sub6(:,:,l,k-K_mmW,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N_UE_sub6,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
+                    R_ue_sub6(:,:,l,k-K_mmW,n) = functionRlocalscattering_mod(N_UE_sub6,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
                 end
             else
                 R_gNB(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N);  %If angular standard deviations are not specified, set i.i.d. fading
                 if (k<=K_mmW)
-                    R_ue_mmW(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N_UE_mmW);
+                    R_ue_mmW(:,:,l,k,n) = eye(N_UE_mmW);
                 else
-                    R_ue_sub6(:,:,l,k-K_mmW,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N_UE_sub6);
+                    R_ue_sub6(:,:,l,k-K_mmW,n) = eye(N_UE_sub6);
                 end
             end
         end
