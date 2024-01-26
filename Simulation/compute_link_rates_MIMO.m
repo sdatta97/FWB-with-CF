@@ -55,7 +55,7 @@ end
 %% initialization of c
 eta_eq = zeros(M,K);
 N_AP = params.num_antennas_per_gNB;
-if ((K_mmW == 0) || (sub6ConnectionState == zeros(num_ue_mmW,1)))
+if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
     for m = 1:M
         for k = 1+K_mmW:K
             if ismember(m,Serv{k})
