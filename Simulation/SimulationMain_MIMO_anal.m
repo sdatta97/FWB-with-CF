@@ -45,7 +45,7 @@ params.Band = 100e6;%20e6; %Communication bandwidth
 
 %Angular standard deviation in the local scattering model (in radians)
 params.ASD_varphi = deg2rad(15); %azimuth angle
-params.ASD_theta = deg2rad(15);  %elevation angle
+params.ASD_theta = 0; %deg2rad(15);  %elevation angle
 
 %Total uplink transmit power per UE (mW)
 params.p = 100;

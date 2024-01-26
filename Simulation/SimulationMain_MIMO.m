@@ -45,7 +45,7 @@ params.Band = 100e6;%20e6; %Communication bandwidth
 
 %Angular standard deviation in the local scattering model (in radians)
 params.ASD_varphi = deg2rad(15); %azimuth angle
-params.ASD_theta = deg2rad(15);  %elevation angle
+params.ASD_theta = 0; %deg2rad(15);  %elevation angle
 
 %Total uplink transmit power per UE (mW)
 params.p = 100;
@@ -255,7 +255,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         %[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
         %params.BETA = channelGain_GUE';
         %params.ricianFactor = K_Rician';
-        [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
+%         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
+        [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
         params.BETA = db2pow(gainOverNoisedB);   
         params.D = D;
         outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
