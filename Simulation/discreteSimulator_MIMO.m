@@ -71,11 +71,11 @@ bsPriorities = repmat(1:1:numBS,[numUE,1]); %Priority of bs in terms of starting
 bsLastConnectionTimes = -100*ones(numUE,numBS); %When was the last time this bs was in connected state
 
 % Discovery computations
-% link = cell(numUE,numBS);
-link = cell((numUE+numUE_sub6),numBS);
+link = cell(numUE,numBS);
+% link = cell((numUE+numUE_sub6),numBS);
 
-% for ue_idx = 1:numUE
-for ue_idx = 1:(numUE+numUE_sub6)
+for ue_idx = 1:numUE
+% for ue_idx = 1:(numUE+numUE_sub6)
     for idxBS = 1:numBS        
         link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
         link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
@@ -318,13 +318,13 @@ while nextEventTime < params.simTime
                         disp("Some problem")
                     else                        
                         sub6ConnectionState = UE.sub6ConnectionState;
-%                         [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-%                         rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+                        rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if (sub6ConnectionState == zeros(params.numUE,1))
 %                             p_fac = params.p_fac;
 %                             params.p_fac = 0;
 %                         end
-                        rate_dl_before_handoff = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);    
+%                         rate_dl_before_handoff = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);    
 %                         if (sub6ConnectionState == zeros(params.numUE,1))
 %                             params.p_fac = p_fac;
 %                         end

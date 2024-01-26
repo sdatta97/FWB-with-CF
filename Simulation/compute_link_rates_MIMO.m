@@ -55,9 +55,9 @@ end
 %% initialization of c
 eta_eq = zeros(M,K);
 N_AP = params.num_antennas_per_gNB;
-if (K_mmW == 0)
+if ((K_mmW == 0) || (sub6ConnectionState == zeros(num_ue_mmW,1)))
     for m = 1:M
-        for k = 1:K
+        for k = 1+K_mmW:K
             if ismember(m,Serv{k})
                 eta_eq(m,k) = 1./(N_AP*N_UE_sub6*sum(BETA(m,:)));
             end
@@ -90,7 +90,7 @@ for k = 1:K_mmW
     end
     for q = 1:K-K_mmW
         for m = 1:M
-            D_mmW_sub6(k,q,:,:) = reshape(D_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
+            D_mmW_sub6(k,q,:,:) = reshape(D_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
         end
     end
 end
@@ -102,13 +102,15 @@ for k = 1:K-K_mmW
     end
     for q = 1:K-K_mmW
         for m = 1:M
-            D_sub6_sub6(k,q,:,:) = reshape(D_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
+            D_sub6_sub6(k,q,:,:) = reshape(D_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
         end
     end
 end
 DS_mmW = zeros(K_mmW,N_UE_mmW);
+MSI_mmW = zeros(K_mmW,N_UE_mmW);
 MUI_mmW = zeros(K_mmW,N_UE_mmW);
 DS_sub6 = zeros(K-K_mmW,N_UE_sub6);
+MSI_sub6 = zeros(K-K_mmW,N_UE_sub6);
 MUI_sub6 = zeros(K-K_mmW,N_UE_sub6);
 
 noise_mmW = abs(sqrt(0.5)*(randn(K_mmW,N_UE_mmW) + 1j*randn(K_mmW,N_UE_mmW))).^2;
@@ -119,9 +121,18 @@ snr_num_sub6 = zeros(K-K_mmW,N_UE_sub6);
 snr_den_sub6 = zeros(K-K_mmW,N_UE_sub6);
 rate_dl = zeros(K,1);
 for k = 1:K_mmW
-    if (sub6ConnectionState(k)==1 || k==ue_idx)
+%     if (sub6ConnectionState(k)==1 || k==ue_idx)
+    if (sub6ConnectionState(k)==1)
         for n = 1:N_UE_mmW
-            DS_mmW(k,n) = p_d*norm(reshape(D_mmW_mmW(k,k,n,:),[1,N_UE_mmW]))^2;
+%             DS_mmW(k,n) = p_d*norm(reshape(D_mmW_mmW(k,k,n,:),[1,N_UE_mmW]))^2;
+            DS_mmW(k,n) = p_d*(abs(D_mmW_mmW(k,k,n,n)))^2;
+            for nn = 1:N_UE_mmW
+%                 if (nn~=n)
+                if (abs(D_mmW_mmW(k,k,nn,nn))<abs(D_mmW_mmW(k,k,n,n)))
+%                     MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,k,nn,:),[1,N_UE_mmW]))^2;
+                    MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*(abs(D_mmW_mmW(k,k,n,nn)))^2;
+                end
+            end
             for q = 1:K_mmW
                 if (q~=k && sub6ConnectionState(q)==1)
                   MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,q,n,:),[1,N_UE_mmW]))^2;
@@ -138,7 +149,16 @@ for k = 1:K_mmW
 end
 for k = 1:K-K_mmW
     for n = 1:N_UE_sub6
-        DS_sub6(k,n) = p_d*norm(reshape(D_sub6_sub6(k,k,n,:),[1,N_UE_sub6]))^2;
+%         DS_sub6(k,n) = p_d*norm(reshape(D_sub6_sub6(k,k,n,:),[1,N_UE_sub6]))^2;
+        DS_sub6(k,n) = p_d*(abs(D_sub6_sub6(k,k,n,n)))^2;
+        for nn = 1:N_UE_sub6
+%             if (nn~=n)
+%             if (nn>n)
+            if (abs(D_sub6_sub6(k,k,nn,nn))<abs(D_sub6_sub6(k,k,n,n)))
+%                 MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*norm(reshape(D_sub6_sub6(k,k,nn,:),[1,N_UE_sub6]))^2;
+                MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*(abs(D_sub6_sub6(k,k,n,nn)))^2;
+            end
+        end
         for q = 1:K_mmW
             if (q~=k && sub6ConnectionState(q)==1)
               MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(reshape(D_sub6_mmW(k,q,n,:),[1,N_UE_mmW]))^2;

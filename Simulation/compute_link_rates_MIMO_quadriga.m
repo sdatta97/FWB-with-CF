@@ -288,7 +288,8 @@ snr_num_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
 snr_den_sub6 = zeros(num_ue-num_ue_mmW,N_UE_sub6);
 rate_dl = zeros(num_ue,1);
 for k = 1:num_ue_mmW
-    if (sub6ConnectionState(k)==1 || k==ue_idx)
+    %if (sub6ConnectionState(k)==1 || k==ue_idx)
+    if (sub6ConnectionState(k)==1)
         for n = 1:N_UE_mmW
 %             DS_mmW(k,n) = p_d*norm(reshape(D_mmW_mmW(k,k,n,:),[1,N_UE_mmW]))^2;
             DS_mmW(k,n) = p_d*(abs(D_mmW_mmW(k,k,n,n)))^2;
