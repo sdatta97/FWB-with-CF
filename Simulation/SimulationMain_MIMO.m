@@ -63,7 +63,7 @@ params.p_fac = 10;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 10*60; %sec Total Simulation time should be more than 100.
+params.simTime = 2*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -177,8 +177,8 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         
         %% Blocker Properties and Simulation Duration
         params.lambdaBlockers = 0.1; %How many blockers around
-%         params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
-        params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
+        params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+%         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
         params.V = 1; %velocity of blocker m/s
         % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.
         % params.hb = (175 + TruncatedGaussian(5, [-15,15], [1 params.numBlockers])) / 100;

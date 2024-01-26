@@ -43,9 +43,9 @@ disp('=====================================');
 disp('Starting Simulation:')
 tic
 % numBS = size(dataBS_mobile,1);
-% numBS = params.numGNB;
+numBS = params.numGNB;
 % numBS_mmW = params.numGNB;
-numBS = params.numGNB_sub6;
+% numBS = params.numGNB_sub6;
 numUE = params.numUE;
 numUE_sub6 = params.numUE_sub6;
 % fprintf('numBS mmW: %d. \n',numBS_mmW)
@@ -77,7 +77,11 @@ link = cell(numUE,numBS);
 for ue_idx = 1:numUE
 % for ue_idx = 1:(numUE+numUE_sub6)
     for idxBS = 1:numBS        
-        link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
+        try
+            link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
+        catch
+            disp("Hey")
+        end
         link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
         link{ue_idx,idxBS}.nonBlockedTimes = bsBlockageTimes{(ue_idx-1)*numBS + idxBS};
         link{ue_idx,idxBS}.blockageStatus = blockageStatus(bsBlockageTimes,idxBS,currentTime, ue_idx, numBS);    % if link is discovered the next event time will be next blockage
