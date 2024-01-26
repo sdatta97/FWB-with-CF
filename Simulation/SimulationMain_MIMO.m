@@ -63,7 +63,7 @@ params.p_fac = 10;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 2*60; %sec Total Simulation time should be more than 100.
+params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -89,7 +89,7 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-rmin = 4e8;
+rmin = 1e9;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
@@ -138,9 +138,9 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         % params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
 %         params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange/1000)^2);
+        n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
         while (n==0)
-            n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange/1000)^2);       
+            n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         end
         params.numUE_sub6 = n;
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
