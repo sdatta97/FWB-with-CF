@@ -1,4 +1,4 @@
-function R = functionRlocalscattering(N,varphi,theta,ASD_varphi,ASD_theta,antennaSpacing)
+function R = functionRlocalscattering_mod(N,varphi,theta,ASD_varphi,ASD_theta,antennaSpacing)
 %Generate the spatial correlation matrix for the local scattering model,
 %defined in (2.18) for Gaussian angular distribution and ULA
 %

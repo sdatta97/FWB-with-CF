@@ -1,4 +1,5 @@
-function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N, coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
+% function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N, coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
+function [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
 %This function generates realizations of the simulation setup described in
 %Section 5.3.
 %
@@ -89,7 +90,9 @@ antennaSpacing = 1/2; %Half wavelength distance
 
 %Prepare to save results
 gainOverNoisedB = zeros(L,K,nbrOfSetups);
-R = zeros(N,N,L,K,nbrOfSetups);
+R_gNB = zeros(N,N,L,K,nbrOfSetups);
+R_ue_mmW = zeros(N_UE_mmW,N_UE_mmW,L,K_mmW,nbrOfSetups);
+R_ue_sub6 = zeros(N_UE_sub6,N_UE_sub6,L,K-K_mmW,nbrOfSetups);
 distances = zeros(L,K,nbrOfSetups);
 pilotIndex = zeros(K,nbrOfSetups);
 D = zeros(L,K,nbrOfSetups);
@@ -231,10 +234,20 @@ for n = 1:nbrOfSetups
             %Generate spatial correlation matrix using the local
             %scattering model in (2.18) and Gaussian angular distribution
             %by scaling the normalized matrices with the channel gain
-            if nargin>10
-                R(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
+            if nargin>12
+                R_gNB(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
+                if (k<=K_mmW)
+                    R_ue_mmW(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N_UE_mmW,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
+                else
+                    R_ue_sub6(:,:,l,k-K_mmW,n) = db2pow(gainOverNoisedB(l,k,n))*functionRlocalscattering_mod(N_UE_sub6,angletoUE_varphi,angletoUE_theta,ASD_varphi,ASD_theta,antennaSpacing);
+                end
             else
-                R(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N);  %If angular standard deviations are not specified, set i.i.d. fading
+                R_gNB(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N);  %If angular standard deviations are not specified, set i.i.d. fading
+                if (k<=K_mmW)
+                    R_ue_mmW(:,:,l,k,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N_UE_mmW);
+                else
+                    R_ue_sub6(:,:,l,k-K_mmW,n) = db2pow(gainOverNoisedB(l,k,n))*eye(N_UE_sub6);
+                end
             end
         end
         
