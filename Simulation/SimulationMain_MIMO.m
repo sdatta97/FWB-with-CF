@@ -124,7 +124,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 64;
+        params.num_antennas_per_gNB = 128;
         %Number of antennas per UE
         % N_UE_mmW_arr = 2.^(0:1:5);
         params.N_UE_mmW = 8;
