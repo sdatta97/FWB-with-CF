@@ -633,6 +633,7 @@ for ue_idx = 1:numUE
         outage_duration = sum(outageEvents(2,:)) - sum(sub6connectionEvents(2,:));
         connected_duration = sum(connectionEvents(2,:)) + sum(sub6connectionEvents(2,:));
     catch 
+        outage_durations_wi_cf = outage_durations_wo_cf;
         outage_duration = sum(outageEvents(2,:));
         connected_duration = sum(connectionEvents(2,:));
     end
