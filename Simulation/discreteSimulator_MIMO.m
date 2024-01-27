@@ -624,15 +624,15 @@ for ue_idx = 1:numUE
     sub6connectionEvents = mergeConnectionEvents(sub6connectionEvents);
     outageEvents = getOutageEvents(connectionEvents,params);
     outage_durations_wo_cf = outageEvents(2,:);
-%     outage_not_mitigated_by_cf = (setdiff(outageEvents',sub6connectionEvents','rows'))';
-    [~,ia] = setdiff(outageEvents(1,:),sub6connectionEvents(1,:)-1e-8);
-    outage_durations_wi_cf = outageEvents(2,ia);
     outage_duration_wo_cf = sum(outageEvents(2,:));
     connected_duration_wo_cf = sum(connectionEvents(2,:));
     try
+%       outage_not_mitigated_by_cf = (setdiff(outageEvents',sub6connectionEvents','rows'))';
+        [~,ia] = setdiff(outageEvents(1,:),sub6connectionEvents(1,:)-1e-8);
+        outage_durations_wi_cf = outageEvents(2,ia);
         outage_duration = sum(outageEvents(2,:)) - sum(sub6connectionEvents(2,:));
         connected_duration = sum(connectionEvents(2,:)) + sum(sub6connectionEvents(2,:));
-    catch ME
+    catch 
         outage_duration = sum(outageEvents(2,:));
         connected_duration = sum(connectionEvents(2,:));
     end
