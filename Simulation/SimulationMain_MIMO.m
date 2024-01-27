@@ -176,7 +176,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         lookAngleCell{1} = [0,360];
         
         %% Blocker Properties and Simulation Duration
-        params.lambdaBlockers = 0.1; %How many blockers around
+        params.lambdaBlockers = 0.01; %How many blockers around
         params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
 %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
         params.V = 1; %velocity of blocker m/s
