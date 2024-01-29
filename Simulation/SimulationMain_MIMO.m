@@ -89,6 +89,11 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
+params.num_antennas_per_gNB = 64;
+%Number of antennas per UE
+% N_UE_mmW_arr = 2.^(0:1:5);
+params.N_UE_mmW = 8;
+params.N_UE_sub6 = 4;
 rmin = 4e8;
 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
 % params.r_min = rmin*rand(params.numUE,1);
@@ -97,38 +102,34 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 50;
+lambda_UE_sub6 = 10:10:40; %50;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-for idxUEDensity = 1:length(lambda_UE_sub6)
-    for idxBSDensity = 1:length(lambda_BS)
-        %% gNB locations
-        % params.numGNB = 10;
-        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-        while (n==0)
-            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
-        end
-        params.numGNB = n;
-        % params.numGNB = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-        % params.numGNB = floor(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-        params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
-        % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
-        params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
-        params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
-        
-        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        while (n<=params.numGNB) %(n==0)
-            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
-        end
-        params.numGNB_sub6 = n;
-        params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
-        % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
-        params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
-        params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.num_antennas_per_gNB = 128;
-        %Number of antennas per UE
-        % N_UE_mmW_arr = 2.^(0:1:5);
-        params.N_UE_mmW = 8;
-        params.N_UE_sub6 = 4;
+for idxBSDensity = 1:length(lambda_BS)
+    %% gNB locations
+    % params.numGNB = 10;
+    n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+    while (n==0)
+        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+    end
+    params.numGNB = n;
+    % params.numGNB = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+    % params.numGNB = floor(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+    params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+    % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
+    params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
+    params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+    
+    n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
+    while (n<=params.numGNB) %(n==0)
+        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
+    end
+    params.numGNB_sub6 = n;
+    params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
+    % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
+    params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
+    params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
+    for idxUEDensity = 1:length(lambda_UE_sub6)
+    
         %%UE locations
         % params.numUE_sub6 = 10;
         % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
@@ -176,7 +177,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         lookAngleCell{1} = [0,360];
         
         %% Blocker Properties and Simulation Duration
-        params.lambdaBlockers = 0.1; %How many blockers around
+        params.lambdaBlockers = 0.01; %How many blockers around
         params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
 %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
         params.V = 1; %velocity of blocker m/s
