@@ -1,2 +1,2 @@
 UEIdx,lambdaBS,lambdaUE,numBlockers,discoveryDelay,failureDetectionDelay,connectionSetupDelay,signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,minRatereq,GroupCount,mean_meanOutageDuration_wo_CF,std_meanOutageDuration_wo_CF,mean_outageProbability_wo_CF,std_outageProbability_wo_CF,mean_meanOutageDuration,std_meanOutageDuration,mean_outageProbability,std_outageProbability
-1,25,50,4000,0.05,0,0.05,0,0,0,100000000,95,0.526215831578947,0.266651384742512,0.184836499005478,0.108686747637062,0.203072528374688,0.256174821904563,0.0723363258891326,0.0936583595374065
+1,25,50,4000,0.05,0,0.05,0,0,0,100000000,99,0.522709707070707,0.266006572264298,0.185163444600747,0.107596621472697,0.202054058325627,0.256398698911877,0.0721709787033466,0.0936162332845002
