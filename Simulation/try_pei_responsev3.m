@@ -31,7 +31,7 @@ params.no_of_rea = 2;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
 params.snr_db = 30;
-params.snr_db_mmw = 50;
+% params.snr_db_mmw = 50;
 params.ASD_VALUE = 0.25;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 1;
 params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
@@ -288,9 +288,12 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
 %         params.int_R_GUE_mmW = int_R_GUE_mmW;
 %         params.h_LOS_GUE_mmW = h_LOS_GUE_mmW;  
 %         params.int_h_LOS_GUE_mmW = int_h_LOS_GUE_mmW;  
-        [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
+        [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
         params.BETA = db2pow(gainOverNoisedB);   
         params.D = D;
+        params.R_gNB = R_gNB;
+        params.R_ue_mmW = R_ue_mmW;
+        params.R_ue_sub6 = R_ue_sub6;
         %%
         % UE states
         UE.numGNB = params.numGNB;
@@ -369,13 +372,10 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         %%
         %offloading
         sub6ConnectionState = UE.sub6ConnectionState;
-        ue_idx = 1;
-        p_fac = params.p_fac;
-        params.p_fac = 0;
-        rate_dl_before_handoff = compute_link_rates_MIMO_quadrigav2(params,ue_idx,sub6ConnectionState); 
+        [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+        rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                             
         sub6ConnectionState(ue_idx) = 1;
-        params.p_fac = p_fac;
-        rate_dl = compute_link_rates_MIMO_quadrigav2(params,ue_idx,sub6ConnectionState);
+        rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
         figure
         cdfplot(rate_dl_before_handoff(2:end)./10^6); hold on;
         cdfplot(rate_dl(2:end)./10^6);
