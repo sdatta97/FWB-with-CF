@@ -30,10 +30,10 @@ params.UB =1;  %Upper bound
 params.no_of_rea = 2;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
-params.snr_db = 30;
+params.snr_db = 40;
 % params.snr_db_mmw = 50;
-params.ASD_VALUE = 0.25;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
-params.ASD_CORR = 1;
+params.ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
+params.ASD_CORR = 0;
 params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
@@ -184,7 +184,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.tau_p = params.numUE+params.numUE_sub6;
         
         %Compute the prelog factor assuming only downlink data transmission
-        params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
+        params.preLogFactor = 1; % (params.tau_c-params.tau_p)/params.tau_c;
         %% PHY layer params
         params.scs_mmw = 2e9;     %not using this parameter now
         params.scs_sub6 = 1e8;   %sub-6 GHz bandwidth 100 MHz
