@@ -45,8 +45,8 @@ params.tau_c = 200;      % coherence block length
 %% Define simulation setup
 
 %Angular standard deviation in the local scattering model (in radians)
-params.ASD_varphi = deg2rad(15); %azimuth angle
-params.ASD_theta = deg2rad(15);  %elevation angle
+params.ASD_varphi = deg2rad(30); %azimuth angle
+params.ASD_theta = 0; %deg2rad(15);  %elevation angle
 
 %Total uplink transmit power per UE (mW)
 params.p = 100;
@@ -63,7 +63,7 @@ params.p_fac = 10;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 2*60; %sec Total Simulation time should be more than 100.
+params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -132,7 +132,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
         % params.locationsBS_sub6 = [params.locationsBS_sub6(1, :); params.locationsBS_sub6(3:10, :)];
         % params.numGNB_sub6 = 9;
-        params.num_antennas_per_gNB = 128;
+        params.num_antennas_per_gNB = 64;
        %%UE locations
 
 
@@ -146,7 +146,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.RUE = 0; %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
         params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-        rmin = 1e9;
+        rmin = 4e8;
         params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
         params.bw_alloc = zeros(params.numUE,1);
 %         params.num_antennas_per_UE_mmW = 4;
@@ -176,7 +176,7 @@ for idxUEDensity = 1:length(lambda_UE_sub6)
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
         params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
-        rmin_sub6 = 1e7;
+        rmin_sub6 = 1e5;
         params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
         params.bw_alloc_sub6 = params.Band*ones(params.numUE_sub6,1);
 
