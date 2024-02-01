@@ -130,14 +130,6 @@ for idxBSDensity = 1:length(lambda_BS)
     for idxUEDensity = 1:length(lambda_UE_sub6)
     
         %%UE locations
-        % params.numUE_sub6 = 10;
-        % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
-        % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange/1000)^2);
-        % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-        % params.RUE_sub6 = params.coverageRange * sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-        % params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
-        % params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
-%         params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
         n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
         while (n==0)
             n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
@@ -255,10 +247,6 @@ for idxBSDensity = 1:length(lambda_BS)
             sigma_sf = params.sigma_sf;
             Band = params.Band; %Communication bandwidth
             tau_c = params.tau_c;      % coherence block length  
-            %[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
-            %params.BETA = channelGain_GUE';
-            %params.ricianFactor = K_Rician';
-    %         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
             [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
             params.BETA = db2pow(gainOverNoisedB);   
             params.D = D;
@@ -271,8 +259,38 @@ for idxBSDensity = 1:length(lambda_BS)
             ue_idx = 1;
             rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
             sub6ConnectionState(ue_idx) = 1;
-            rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-
+            rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+            numUE = params.numUE;
+            numUE_sub6 = params.numUE_sub6;
+            numBS = size(params.locationsBS,1);
+            numBlockers = params.numBlockers;
+            %% Recording the Results
+    
+            %Taking care of folder directory creation etc
+            dataFolder = 'resultData';
+            impactFolder = strcat(dataFolder,'/impactResults');
+            if not(isfolder(impactFolder))
+                mkdir(impactFolder)
+            end
+            result_string = ['/handoff_impact_',num2str(numUE),...
+                'UE_',num2str(lambda_BS(idxBSDensity)),...
+                'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
+                'lambdaUE_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin)];    
+            %Since we are mostly interested in blockage probability, we want to
+            %transfer the data quickly to our local machine from server. We will save
+            %the results as a txt file.
+            recording_text_file_string = strcat(impactFolder,result_string,'.csv');
+            fileID = fopen(recording_text_file_string,'w');
+            output_categories = ['UE idx,','lambdaBS,','lambdaUE,','numBlockers,',...
+                'rate_before_handoff,','rate_after_handoff\n'];  
+            fprintf(fileID,output_categories);
+            min_rate_req = params.r_min(1);   
+            mean_rate_before_handoff = mean(rate_dl_before_handoff(2:end));
+            mean_rate_after_handoff = mean(rate_dl_after_handoff(2:end));                          
+            formatSpec = '%d,%d,%d,%d,%.16f,%.16f\n';
+            fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
+               mean_rate_before_handoff,mean_rate_after_handoff);                      
+            fclose(fileID);
         end
     end
 end
