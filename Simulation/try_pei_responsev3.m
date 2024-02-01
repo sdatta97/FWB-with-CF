@@ -19,11 +19,11 @@ rng(str2double(aID),'twister');
 %% GUE channel parameters
 params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
 params.RAYLEIGH=0;   %1= rayleigh, % 0=rician
-params.Perf_CSI =0;
+params.Perf_CSI =1;
 params.cov_area = 1; %0.25; % 4; %km
 %%
 params.TAU_P_K_by_two = 0; %1;  
-params.CH_estimation = 1;  % 1= have channel estimation
+params.CH_estimation = 0;  % 1= have channel estimation
 %%
 params.LB=1;  %Lower bound
 params.UB =1;  %Upper bound
