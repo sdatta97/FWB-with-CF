@@ -94,14 +94,14 @@ params.num_antennas_per_gNB = 64;
 % N_UE_mmW_arr = 2.^(0:1:5);
 params.N_UE_mmW = 8;
 params.N_UE_sub6 = 4;
-rmin_arr = [1:1:3, 5]*10^8;
+rmin_arr =  4*10^8; %[1:1:3, 5]*10^8;
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
 lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 50;
+lambda_UE_sub6 = 10:10:50;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
@@ -179,7 +179,7 @@ for idxBSDensity = 1:length(lambda_BS)
             lookAngleCell{1} = [0,360];
             
             %% Blocker Properties and Simulation Duration
-            params.lambdaBlockers = 0.01; %How many blockers around
+            params.lambdaBlockers = 0.1; %How many blockers around
             params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
     %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
             params.V = 1; %velocity of blocker m/s
