@@ -248,6 +248,7 @@ for idxBSDensity = 1:length(lambda_BS)
                 sigma_sf = params.sigma_sf;
                 Band = params.Band; %Communication bandwidth
                 tau_c = params.tau_c;      % coherence block length  
+                
                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
                 params.BETA = db2pow(gainOverNoisedB);   
                 params.D = D;

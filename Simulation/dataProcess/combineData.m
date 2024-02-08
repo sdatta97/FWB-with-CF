@@ -1,7 +1,7 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = 'C:/Users/dsoum/Desktop/outageData/outageResults0.1_wo_quadriga_64_50';
+projectdir = 'C:/Users/dsoum/Desktop/impactData/impactData_pf_9';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
@@ -22,11 +22,15 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
 % end
-changingVars = cell(1,length(colNames)-4);
-for i=1:(length(colNames)-4)
+% changingVars = cell(1,length(colNames)-4);
+% for i=1:(length(colNames)-4)
+%     changingVars{i} = colNames{i};
+% end
+changingVars = cell(1,length(colNames)-3);
+for i=1:(length(colNames)-3)
     changingVars{i} = colNames{i};
 end
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
 
-writetable(summaryTable,'./outage_lambda_UE_50_bl_0.1.txt')
-writetable(summaryTable,'./outage_lambda_UE_50_bl_0.1.csv')
+writetable(summaryTable,'./impact_pfac_9.txt')
+writetable(summaryTable,'./impact_pfac_9.csv')
