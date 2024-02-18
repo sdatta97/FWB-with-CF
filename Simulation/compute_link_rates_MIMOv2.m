@@ -180,34 +180,34 @@ D_I_sub6_mmW = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_mmW);
 D_I_sub6_sub6 = zeros(K-K_mmW,K-K_mmW,N_UE_sub6,N_UE_sub6);
 for k = 1:K_mmW
     for m = 1:M
-        D_DS_mmW(k,:,:) = reshape(D_DS_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,k))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(conj(channel_est_dl_mmW(m,k,:,:)),[Ntx,N_UE_mmW]);
+        D_DS_mmW(k,:,:) = reshape(D_DS_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,k))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl_mmW(m,k,:,:)),[Ntx,N_UE_mmW]);
     end
     for q = 1:K_mmW
         if (q~=k)
             for m = 1:M
-                D_I_mmW_mmW(k,q,:,:) = reshape(D_I_mmW_mmW(k,q,:,:),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
+                D_I_mmW_mmW(k,q,:,:) = reshape(D_I_mmW_mmW(k,q,:,:),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
             end
         end
     end
     for q = 1:K-K_mmW
         for m = 1:M
-            D_I_mmW_sub6(k,q,:,:) = reshape(D_I_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
+            D_I_mmW_sub6(k,q,:,:) = reshape(D_I_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
         end
     end
 end
 for k = 1:K-K_mmW
     for m = 1:M
-        D_DS_sub6(k,:,:) = reshape(D_DS_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,k+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(conj(channel_est_dl(m,k,:,:)),[Ntx,N_UE_sub6]);
+        D_DS_sub6(k,:,:) = reshape(D_DS_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,k+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl(m,k,:,:)),[Ntx,N_UE_sub6]);
     end
     for q = 1:K_mmW
         for m = 1:M
-            D_I_sub6_mmW(k,q,:,:) = reshape(D_I_sub6_mmW(k,q,:,:),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
+            D_I_sub6_mmW(k,q,:,:) = reshape(D_I_sub6_mmW(k,q,:,:),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
         end
     end
     for q = 1:K-K_mmW
         if (q~=k)
             for m = 1:M
-                D_I_sub6_sub6(k,q,:,:) = reshape(D_I_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
+                D_I_sub6_sub6(k,q,:,:) = reshape(D_I_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
             end
         end
     end
@@ -231,7 +231,7 @@ for k = 1:K_mmW
         for q = 1:K-K_mmW
             I_mmW(k,:,:) = reshape(I_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]) + p_d*reshape(D_I_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6])*reshape(D_I_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6])';
         end
-        rate_dl(k) = BW*TAU_FAC*log2(det(1+reshape(DS_mmW(k,:,:),[N_UE_mmW,N_UE_mmW])\(reshape(I_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]))));
+        rate_dl(k) = BW*TAU_FAC*log2(det(eye(N_UE_mmW)+reshape(DS_mmW(k,:,:),[N_UE_mmW,N_UE_mmW])\(reshape(I_mmW(k,:,:),[N_UE_mmW,N_UE_mmW]))));
     end
 end
 for k = 1:K-K_mmW
@@ -245,6 +245,6 @@ for k = 1:K-K_mmW
             I_sub6(k,:,:) = reshape(I_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]) + p_d*reshape(D_I_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6])*reshape(D_I_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6])';
         end
     end
-    rate_dl(k+K_mmW) = BW*TAU_FAC*log2(det(1+reshape(DS_sub6(k,:,:),[N_UE_sub6,N_UE_sub6])\(reshape(I_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]))));
+    rate_dl(k+K_mmW) = BW*TAU_FAC*log2(det(eye(N_UE_sub6)+reshape(DS_sub6(k,:,:),[N_UE_sub6,N_UE_sub6])\(reshape(I_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]))));
 end
 end
