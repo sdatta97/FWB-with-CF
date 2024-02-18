@@ -247,4 +247,5 @@ for k = 1:K-K_mmW
     end
     rate_dl(k+K_mmW) = BW*TAU_FAC*log2(det(eye(N_UE_sub6)+reshape(DS_sub6(k,:,:),[N_UE_sub6,N_UE_sub6])\(reshape(I_sub6(k,:,:),[N_UE_sub6,N_UE_sub6]))));
 end
+rate_dl = real(rate_dl);
 end
