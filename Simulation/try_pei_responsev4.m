@@ -55,7 +55,7 @@ params.rho_tot = 200;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10^1; %10:10:100; %[1:1:10, 10:10:100]; %10.^(0:1:5);
+p_fac_arr = 10.^(0:1:10);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
