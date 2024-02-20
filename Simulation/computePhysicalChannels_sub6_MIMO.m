@@ -15,11 +15,11 @@ phy_channel_sub6 = zeros(M,K-K_mmW,Ntx,N_sub6);
 for m = 1:M
     for k = 1:K_mmW
 %         phy_channel_mmW (m,k,:,:) = sqrt(0.5*BETA(m,k))*(randn(Ntx,N_mmW) + 1i*randn(Ntx,N_mmW));        
-        phy_channel_mmW (m,k,:,:) = sqrtm(R_gNB(:,:,m,k,1))*(randn(Ntx,N_mmW) + 1i*randn(Ntx,N_mmW))*sqrtm(R_ue_mmW(:,:,m,k,1));        
+        phy_channel_mmW (m,k,:,:) = sqrt(0.5)*sqrtm(R_gNB(:,:,m,k,1))*(randn(Ntx,N_mmW) + 1i*randn(Ntx,N_mmW))*sqrtm(R_ue_mmW(:,:,m,k,1));        
     end
     for k = 1:K-K_mmW
 %         phy_channel_sub6 (m,k,:,:) = sqrt(0.5*BETA(m,k+K_mmW))*(randn(Ntx,N_sub6) + 1i*randn(Ntx,N_sub6));        
-        phy_channel_sub6 (m,k,:,:) = sqrtm(R_gNB(:,:,m,k+K_mmW,1))*(randn(Ntx,N_sub6) + 1i*randn(Ntx,N_sub6))*sqrtm(R_ue_sub6(:,:,m,k,1));        
+        phy_channel_sub6 (m,k,:,:) = sqrt(0.5)*sqrtm(R_gNB(:,:,m,k+K_mmW,1))*(randn(Ntx,N_sub6) + 1i*randn(Ntx,N_sub6))*sqrtm(R_ue_sub6(:,:,m,k,1));        
     end 
 end
 phy_channel_mmW_est = phy_channel_mmW;

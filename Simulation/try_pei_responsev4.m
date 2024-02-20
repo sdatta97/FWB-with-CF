@@ -55,7 +55,7 @@ params.rho_tot = 200;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10:10:100; %[1:1:10, 10:10:100]; %10.^(0:1:5);
+p_fac_arr = 10^1; %10:10:100; %[1:1:10, 10:10:100]; %10.^(0:1:5);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
@@ -187,7 +187,7 @@ for idxBSDensity = 1:length(lambda_BS)
             % run in paralel, i.e., even when UE is connected to another gNB, UE can
             % discover other gNB in the background.
             % protocolParams.discovery_time = [20 50]*10^(-3);
-            protocolParams.discovery_time = 50*10^(-3);
+            protocolParams.discovery_time = 20*10^(-3);
             
             % in ms, measurement report trigger time. 
             % BeamFailureMaxCount*MeasurementFrequency (10*2 = 20).
@@ -260,9 +260,9 @@ for idxBSDensity = 1:length(lambda_BS)
                 sub6ConnectionState = zeros(numUE,1);
                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
                 ue_idx = 1;
-                rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 sub6ConnectionState(ue_idx) = 1;
-                rate_dl_after_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 numUE = params.numUE;
                 numUE_sub6 = params.numUE_sub6;
                 numBS = size(params.locationsBS,1);
