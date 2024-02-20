@@ -78,7 +78,7 @@ params.areaDimensions = [width_area, length_area, height_transmitter];
 params.coverageRange_sub6 = 1000;
 length_area_sub6 = 2*params.coverageRange_sub6;   
 width_area_sub6 = 2*params.coverageRange_sub6;
-height_transmitter_sub6 = 4;
+height_transmitter_sub6 = 5;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
 %%UE location
 params.numUE = 1;
@@ -249,7 +249,8 @@ for idxBSDensity = 1:length(lambda_BS)
                 Band = params.Band; %Communication bandwidth
                 tau_c = params.tau_c;      % coherence block length  
                 
-                [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
+%                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
+                [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
                 params.BETA = db2pow(gainOverNoisedB);   
                 params.D = D;
                 params.R_gNB = R_gNB;

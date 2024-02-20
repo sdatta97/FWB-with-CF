@@ -1,5 +1,6 @@
 % function [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N, coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
-function [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
+% function [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(L_mmW,L,K_mmW,K,N,N_UE_mmW,N_UE_sub6,coverageRange, coverageRange_sub6, tau_p,nbrOfSetups,seed,ASD_varphi,ASD_theta)
+function [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,nbrOfSetups,seed)
 %This function generates realizations of the simulation setup described in
 %Section 5.3.
 %
@@ -50,12 +51,23 @@ function [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositi
 %License: This code is licensed under the GPLv2 license. If you in any way
 %use this code for research that results in publications, please cite our
 %monograph as described above.
-
-
+L_mmW = params.numGNB;
+L = params.numGNB_sub6;
+K_mmW = params.numUE;
+K = params.numUE+params.numUE_sub6;
+N = params.num_antennas_per_gNB;
+N_UE_mmW = params.N_UE_mmW;
+N_UE_sub6 = params.N_UE_sub6;
+coverageRange = params.coverageRange;
+coverageRange_sub6 = params.coverageRange_sub6;
+tau_p = params.tau_p;
+ASD_varphi = params.ASD_varphi;
+ASD_theta = params.ASD_theta;
 %% Define simulation setup
 
 %Set the seed number if it is specified other than zero
-if (nargin>9)&&(seed>0)
+% if (nargin>9)&&(seed>0)
+if (nargin>1)&&(seed>0)
     rng(seed)
 end
 
@@ -63,7 +75,7 @@ end
 % squareLength = 1000; %meter
 
 %Communication bandwidth (Hz)
-B = 100e6;
+B = params.Band;
 
 %Noise figure (in dB)
 noiseFigure = 7;
@@ -82,7 +94,8 @@ sigma_sf = 4;
 decorr = 9;
 
 %Height difference between an AP and a UE (in meters)
-distanceVertical = 10;
+% distanceVertical = 10;
+distanceVertical = params.ht - params.hr;
 
 %Define the antenna spacing (in number of wavelengths)
 antennaSpacing = 1/2; %Half wavelength distance
@@ -270,13 +283,13 @@ for n = 1:nbrOfSetups
     gainOverNoise = db2pow(gainOverNoisedB);
     for l = 1:L
         [gains, idxs] = sort(gainOverNoise(l,:), 'descend');
-%         for k = 1:K
-%             if ((sum(gains(1:k))/sum(gains))*100 > 90)
-%                 idxs_not_chosen = idxs((k+1):end);
-%                 break;
-%             end
-%         end
-%         D(l,idxs_not_chosen,n) = 0;
+        for k = 1:K
+            if ((sum(gains(1:k))/sum(gains))*100 > 99)
+                idxs_not_chosen = idxs((k+1):end);
+                break;
+            end
+        end
+        D(l,idxs_not_chosen,n) = 0;
     end
     for k = 1:K
         if (sum(D(:,k,n)) == 0)
