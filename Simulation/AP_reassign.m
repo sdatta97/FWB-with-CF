@@ -3,6 +3,7 @@ function D_after_handoff =  AP_reassign(params, ue_idx)
 D = params.D;
 chgains = params.BETA;
 D_after_handoff = D;
+loss_pc_thresh = params.loss_pc_thresh;
 M = size(chgains,1);
 K = size(chgains,2);
 ap_idxs = find(D(:,ue_idx));
@@ -20,7 +21,7 @@ for kk_idx = 1:length(ue_idxs)
     ap_idxs_affected = intersect(ap_idxs,ap_idxs_k);
     loss_pc_arr(kk_idx) = 100*(sum(chgains(ap_idxs_affected,k))/sum(chgains(ap_idxs_k,k)));
 end
-ue_idxs = ue_idxs(loss_pc_arr > 10);
+ue_idxs = ue_idxs(loss_pc_arr > loss_pc_thresh);
 for kk_idx = 1:length(ue_idxs)
     k = ue_idxs(kk_idx);
     ap_idxs_k = find(D(:,k));
