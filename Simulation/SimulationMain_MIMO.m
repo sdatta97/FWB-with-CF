@@ -55,7 +55,7 @@ params.rho_tot = 200;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10:10:100; %10.^(0:1:5);
+p_fac_arr = 10^3; %10:10:100; %10.^(0:1:5);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
@@ -94,7 +94,7 @@ params.num_antennas_per_gNB = 64;
 % N_UE_mmW_arr = 2.^(0:1:5);
 params.N_UE_mmW = 8;
 params.N_UE_sub6 = 4;
-rmin_arr =  4*10^8;
+rmin_arr =  (1:1:5)*10^8;
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
 lambda_BS = 25;
@@ -102,6 +102,7 @@ lambda_BS = 25;
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
 lambda_UE_sub6 = 50;
+params.loss_pc_thresh = 50;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
@@ -261,7 +262,8 @@ for idxBSDensity = 1:length(lambda_BS)
                 %params.BETA = channelGain_GUE';
                 %params.ricianFactor = K_Rician';
         %         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
-                [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
+%                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
+                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
                 params.BETA = db2pow(gainOverNoisedB);   
                 params.D = D;
                 params.R_gNB = R_gNB;

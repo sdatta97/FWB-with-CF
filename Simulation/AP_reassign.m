@@ -30,7 +30,10 @@ for kk_idx = 1:length(ue_idxs)
     other_ap_idxs = other_ap_idxs(other_ap_idxs_idxs);
     ap_idxs_affected = intersect(ap_idxs,ap_idxs_k);
     for m = 1:length(ap_idxs_affected)
-        D_after_handoff(other_ap_idxs(m),k) = 1;
+        try 
+            D_after_handoff(other_ap_idxs(m),k) = 1;
+        catch
+        end
         D_after_handoff(ap_idxs_affected(m),k) = 0;
     end
 end
