@@ -12,6 +12,7 @@ for i = 1:length(ap_idxs)
     ue_idxs = union(ue_idxs, find(D(ap,:)));
 end
 % for k = 1:(K-K_mmW)
+ue_idxs = ue_idxs (2:end);
 loss_pc_arr = zeros(size(ue_idxs));
 for kk_idx = 1:length(ue_idxs)
     k = ue_idxs(kk_idx);
