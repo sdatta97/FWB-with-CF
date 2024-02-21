@@ -29,9 +29,7 @@ for kk_idx = 1:length(ue_idxs)
     ap_idxs_affected = intersect(ap_idxs,ap_idxs_k);
     for m = 1:length(ap_idxs_affected)
         D_after_handoff(other_ap_idxs(m),k) = 1;
-        if (p_fac == 1)
-            D_after_handoff(ap_idxs_affected(m),k) = 0;
-        end
+        D_after_handoff(ap_idxs_affected(m),k) = 0;
     end
 end
 end
