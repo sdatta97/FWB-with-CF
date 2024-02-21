@@ -9,7 +9,7 @@ ap_idxs = find(D(:,ue_idx));
 ue_idxs = [];
 for i = 1:length(ap_idxs)
     ap = ap_idxs(i);
-    ue_idxs = [ue_idxs, setdiff(find(D(ap,:)),ue_idxs)];
+    ue_idxs = union(ue_idxs, find(D(ap,:)));
 end
 % for k = 1:(K-K_mmW)
 loss_pc_arr = zeros(size(ue_idxs));
