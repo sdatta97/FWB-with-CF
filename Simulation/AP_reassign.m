@@ -1,8 +1,16 @@
-function D_after_handoff =  AP_reassign(D, chgains, K_mmW, k_idx, p_fac, ue_idxs)
+% function D_after_handoff =  AP_reassign(D, chgains, K_mmW, k_idx, p_fac, ue_idxs)
+function D_after_handoff =  AP_reassign(params)
+D = params.D;
+chgains = params.BETA;
 D_after_handoff = D;
 M = size(chgains,1);
 K = size(chgains,2);
 ap_idxs = find(D(:,k_idx));
+ue_idxs = [];
+for i = 1:length(ap_idxs)
+    ap = ap_idxs(i);
+    ue_idxs = [ue_idxs, find(D(ap,:))];
+end
 % for k = 1:(K-K_mmW)
 loss_pc_arr = zeros(size(ue_idxs));
 for kk_idx = 1:length(ue_idxs)
