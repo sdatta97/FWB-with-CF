@@ -1,8 +1,8 @@
 close all;
 clear;
 tStart = tic;
-aID = getenv('SLURM_ARRAY_TASK_ID');
-
+% aID = getenv('SLURM_ARRAY_TASK_ID');
+aID = '1';
 % This is for running on a cluster in parallel
 % the bash script should give the aID as input
 if (isempty(aID))
@@ -55,7 +55,7 @@ params.rho_tot = 200;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10.^(0:1:10);
+p_fac_arr = 10^3; %10.^(0:1:10);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
@@ -101,7 +101,7 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 50;
+lambda_UE_sub6 = 10:10:50; %50;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 params.loss_pc_thresh = 50;
 for idxBSDensity = 1:length(lambda_BS)
