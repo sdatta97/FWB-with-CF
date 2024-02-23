@@ -1,8 +1,8 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = 'C:/Users/dsoum/Desktop/outageData/outageResults0.1_Pow_fac_1000_rmin_1';
-dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
+projectdir = 'C:/Users/dsoum/FWB-with-CF/Simulation/resultData/impactResults';
+dinfo = dir(fullfile(projectdir, 'handoff_impact_1UE_25lambdaBS_50lambdaUE*Pow_factor_1000.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
 tables = cell(nfiles,1);
@@ -22,15 +22,15 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
 % end
-changingVars = cell(1,length(colNames)-4);
-for i=1:(length(colNames)-4)
-    changingVars{i} = colNames{i};
-end
-% changingVars = cell(1,length(colNames)-3);
-% for i=1:(length(colNames)-3)
+% changingVars = cell(1,length(colNames)-4);
+% for i=1:(length(colNames)-4)
 %     changingVars{i} = colNames{i};
 % end
+changingVars = cell(1,length(colNames)-3);
+for i=1:(length(colNames)-3)
+    changingVars{i} = colNames{i};
+end
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
 
-writetable(summaryTable,'./impact_pfac_1000_rmin_1.txt')
-writetable(summaryTable,'./impact_pfac_1000_rmin_1.csv')
+writetable(summaryTable,'./impact_pfac_1000_ue_density_50.txt')
+writetable(summaryTable,'./impact_pfac_1000_ue_density_50.csv')
