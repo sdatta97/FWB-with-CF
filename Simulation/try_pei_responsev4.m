@@ -2,7 +2,7 @@ close all;
 clear;
 tStart = tic;
 % aID = getenv('SLURM_ARRAY_TASK_ID');
-aID = '1';
+aID = '11';
 % This is for running on a cluster in parallel
 % the bash script should give the aID as input
 if (isempty(aID))
