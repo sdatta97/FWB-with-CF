@@ -153,7 +153,7 @@ for idxBSDensity = 1:length(lambda_BS)
                 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
                 rmin_sub6 = 1e5;
                 params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
-                params.rate_reduce_threshold = 5e8;
+                params.rate_reduce_threshold = 1e8;
                 params.p_fac = p_fac_arr(idx_p);
                 %Length of the coherence block
                 params.tau_c = 200;
