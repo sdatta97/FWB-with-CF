@@ -1,8 +1,11 @@
-function rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState)
+function rate_dl = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState)
 M = size(channel_dl,1);
 K_mmW = size(sub6ConnectionState,1);
 K = K_mmW + size(channel_dl,2);
 BW = params.Band;
+scs = params.scs_sub6;
+num_sc_sub6 = params.num_sc_sub6;
+K_sc = K/num_sc_sub6;
 TAU_FAC = params.preLogFactor;
 Ntx = size(channel_dl,3);
 N_UE_mmW = size(channel_dl_mmW,4);
@@ -53,13 +56,19 @@ for k = 1:K
 end
 
 %% initialization of c
-eta_eq = zeros(M,K);
+eta_eq = zeros(M,K,num_sc_sub6);
+user_sc_alloc = randi([0,1],num_sc_sub6);
 N_AP = params.num_antennas_per_gNB;
 if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
     for m = 1:M
         for k = 1+K_mmW:K
             if ismember(m,Serv{k})
-                eta_eq(m,k) = 1./(N_AP*N_UE_sub6*sum(beta_uc(m,:)));
+                for n = 1:num_sc_sub6
+                    term = (N_AP*N_UE_sub6*num_sc_sub6*beta_uc(m,:)*user_sc_alloc(:,n));
+                    if term > 0
+                        eta_eq(m,k,n) = 1./term;
+                    end
+                end
             end
         end
     end
@@ -68,11 +77,20 @@ else
         for k = 1:K
             if ismember(m,Serv{k})
                 if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
-%                     eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
-                    eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
+                    for n = 1:num_sc_sub6
+                        term = (N_AP*(N_UE_mmW*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
+                        if term > 0
+                            eta_eq(m,k,n) = p_fac/term;
+                        end
+                    end
                 elseif (k>K_mmW)
-%                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
-                    eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
+%                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
+                    for n = 1:num_sc_sub6
+                        term = (N_AP*(N_UE_mmW*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
+                        if term > 0
+                            eta_eq(m,k,n) = 1/term;
+                        end
+                    end
                 end
             end
         end
