@@ -105,6 +105,7 @@ lambda_UE_sub6 = 4;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
+
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
@@ -258,6 +259,8 @@ for idxBSDensity = 1:length(lambda_BS)
                 noiseFigure = params.noiseFigure;
                 sigma_sf = params.sigma_sf;
                 Band = params.Band; %Communication bandwidth
+                num_sc_sub6 = params.num_sc_sub6;
+                params.user_sc_alloc = randi([0,1],K,num_sc_sub6);
                 tau_c = params.tau_c;      % coherence block length  
                 %[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
                 %params.BETA = channelGain_GUE';
