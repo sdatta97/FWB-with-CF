@@ -55,6 +55,7 @@ L_mmW = params.numGNB;
 L = params.numGNB_sub6;
 K_mmW = params.numUE;
 K = params.numUE+params.numUE_sub6;
+Lmax = params.Lmax;
 N = params.num_antennas_per_gNB;
 N_UE_mmW = params.N_UE_mmW;
 N_UE_sub6 = params.N_UE_sub6;
@@ -282,23 +283,32 @@ for n = 1:nbrOfSetups
         
     end
     gainOverNoise = db2pow(gainOverNoisedB);
-    for l = 1:L
-        [gains, idxs] = sort(gainOverNoise(l,:), 'descend');
-        for k = 1:K
-            if ((sum(gains(1:k))/sum(gains))*100 > 99)
-                idxs_not_chosen = idxs((k+1):end);
-                break;
-            end
-        end
-        D(l,idxs_not_chosen,n) = 0;
-    end
+%     for l = 1:L
+%         [gains, idxs] = sort(gainOverNoise(l,:), 'descend');
+% %         for k = 1:K
+% %             if ((sum(gains(1:k))/sum(gains))*100 > 90)
+% %                 idxs_not_chosen = idxs((k+1):end);
+% %                 break;
+% %             end
+% %         end
+%         idxs_not_chosen = idxs((Kmax+1):end);
+%         D(l,idxs_not_chosen,n) = 0;
+%     end
+%     for k = 1:K
+%         if (sum(D(:,k,n)) == 0)
+%             [~, idx] = max(gainOverNoise(:,k));
+%             other_ue_idxs = setdiff(find(D(idx,:,n)),k);
+%             [~,k_idx_idx] = min(gainOverNoise(idx,other_ue_idxs)); 
+%             k_idx = other_ue_idxs(k_idx_idx);
+%             D(idx,k,n) = 1;
+%             D(idx,k_idx,n) = 0;
+%         end
+%     end
     for k = 1:K
-        if (sum(D(:,k,n)) == 0)
-            [~, idx] = max(gainOverNoise(:,k));
-            D(idx,k,n) = 1;
-        end
+        [gains, idxs] = sort(gainOverNoise(:,k), 'descend');
+        idxs_not_chosen = idxs((Lmax+1):end);
+        D(idxs_not_chosen,k,n) = 0;
     end
-    
     %Determine the AP serving each UE in the small-cell setup according to
     %(5.47) by considering only the APs from the set M_k for UE k, i.e.,
     %where D(:,k,n) is one.

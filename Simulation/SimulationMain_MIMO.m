@@ -97,12 +97,13 @@ params.N_UE_sub6 = 4;
 rmin_arr = 4*10^8;
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
-lambda_BS = 1;
+lambda_BS = 2;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 2;
+lambda_UE_sub6 = 4;
 params.loss_pc_thresh = 10;
+params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations

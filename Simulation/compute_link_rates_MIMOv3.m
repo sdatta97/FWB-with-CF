@@ -57,7 +57,7 @@ end
 
 %% initialization of c
 eta_eq = zeros(M,K,num_sc_sub6);
-user_sc_alloc = randi([0,1],num_sc_sub6);
+user_sc_alloc = randi([0,1],K,num_sc_sub6);
 N_AP = params.num_antennas_per_gNB;
 if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
     for m = 1:M
