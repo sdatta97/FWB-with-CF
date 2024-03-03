@@ -271,11 +271,30 @@ for idxBSDensity = 1:length(lambda_BS)
 %                 stream = RandStream('mlfg6331_64');  % Random number stream
 %                 options = statset('UseParallel',1,'UseSubstreams',1,'Streams',stream);
 %                 [cluster_idxs, cluster_centroids, sum_cluster_distances, cluster_distances] = kmeans([real(UEpositions), imag(UEpositions)],num_sc_sub6, 'Options',options,'MaxIter',10000,'Display','final','Replicates',10);
-                [cluster_idxs, cluster_centroids, sum_cluster_distances, cluster_distances] = kmeans([real(UEpositions), imag(UEpositions)],num_sc_sub6);
-                params.user_sc_alloc = zeros(K,num_sc_sub6);
-                for k=1:K
-                    params.user_sc_alloc (k,cluster_idxs(k)) = 1;
+                idx = 0;
+                n_pc = num_sc_sub6;
+                eq_n = 1;
+                split_clust = 1.3;
+                init_iter = 20;
+                realign = 1;
+                drawfig = 1;
+                dot_size = [10,40];
+                [cluster_centroids, cluster_idxs, n_c] = centroid_fct([real(UEpositions), imag(UEpositions)],idx,n_pc,eq_n,split_clust,init_iter,realign,drawfig,dot_size);
+                user_cluster_map = zeros(K,num_sc_sub6);
+                for k = 1:K
+                    user_cluster_map(k,cluster_idxs(k)) = 1;
                 end
+                user_sc_alloc = zeros(K,num_sc_sub6);
+                for n = 1:num_sc_sub6
+                    for c_idx = 1:num_sc_sub6
+                        k = find(user_cluster_map(:,c_idx),1);
+                        if(sum(user_sc_alloc (k,:)) == 0)
+                            user_sc_alloc (k,n) = 1;
+                            user_cluster_map(k,c_idx) = 0;
+                        end
+                    end
+                end
+                params.user_sc_alloc = user_sc_alloc;
                 params.BETA = db2pow(gainOverNoisedB);   
                 params.D = D;
                 params.R_gNB = R_gNB;
