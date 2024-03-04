@@ -274,7 +274,7 @@ for idxBSDensity = 1:length(lambda_BS)
 %                 options = statset('UseParallel',1,'UseSubstreams',1,'Streams',stream);
 %                 [cluster_idxs, cluster_centroids, sum_cluster_distances, cluster_distances] = kmeans([real(UEpositions), imag(UEpositions)],num_sc_sub6, 'Options',options,'MaxIter',10000,'Display','final','Replicates',10);
                 idx = 0;
-                n_pc = num_sc_sub6;
+                n_pc = 0; %num_sc_sub6;
                 eq_n = 1;
                 split_clust = 1.3;
                 init_iter = 1;
@@ -288,12 +288,15 @@ for idxBSDensity = 1:length(lambda_BS)
                 end
                 user_sc_alloc = zeros(K,num_sc_sub6);
                 for n = 1:num_sc_sub6
-                    for c_idx = 1:num_sc_sub6
-                        k = find(user_cluster_map(:,c_idx),1);
-                        if(sum(user_sc_alloc (k,:)) == 0)
-                            user_sc_alloc (k,n) = 1;
-                            user_cluster_map(k,c_idx) = 0;
-                        end
+                    for c_idx = 1:n_c
+%                         k = find(user_cluster_map(:,c_idx),1);
+                        k_idxs = find(user_cluster_map(:,c_idx));
+                        k = k_idxs(randi([1,numel(k_idxs)]));
+%                         if(sum(user_sc_alloc (k,:)) == 0)
+%                             user_sc_alloc (k,n) = 1;
+%                             user_cluster_map(k,c_idx) = 0;
+%                         end
+                        user_sc_alloc (k,n) = 1;
                     end
                 end
                 params.user_sc_alloc = user_sc_alloc;
