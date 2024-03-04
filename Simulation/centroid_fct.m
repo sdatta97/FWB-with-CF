@@ -269,15 +269,16 @@ if eq_n                                     % reassign observations toward equal
     [~,c_idx] = sort(c_idx,'descend');      % sort by mean square distance
     
     n_pc_i = ones(n_c,1)*n_pc;              % individualize cluster size (integers) to accomodate all observations
-    if sum(n_pc_i)~=n_v
-        n_pc_d = n_v-sum(n_pc_i);
-        %         n_pc_ds = zeros(n_c,1);           % random selection of clusters
-        %         n_pc_adj = randperm(n_c,abs(n_pc_d));
-        %         n_pc_ds(n_pc_adj) = 1.*sign(n_pc_d);
-        %         n_pc_i = n_pc_i+n_pc_ds;
-        n_pc_i(c_idx(1:(abs(n_pc_d)))) = n_pc_i(c_idx(1:(abs(n_pc_d)))) + sign(n_pc_d);
-        % sorted by distance from CoG
-    end
+    n_pc_i (n_c) = n_v - n_pc*(n_c-1);
+%     if sum(n_pc_i)~=n_v
+%         n_pc_d = n_v-sum(n_pc_i);
+%         %         n_pc_ds = zeros(n_c,1);           % random selection of clusters
+%         %         n_pc_adj = randperm(n_c,abs(n_pc_d));
+%         %         n_pc_ds(n_pc_adj) = 1.*sign(n_pc_d);
+%         %         n_pc_i = n_pc_i+n_pc_ds;
+%         n_pc_i(c_idx(1:(abs(n_pc_d)))) = n_pc_i(c_idx(1:(abs(n_pc_d)))) + sign(n_pc_d);
+%         % sorted by distance from CoG
+%     end
     
     while sum(v_c==0)>0                     % continue until all observations assigned
         for icc = 1:n_c                     % running index for clusters
