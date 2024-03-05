@@ -90,7 +90,7 @@ params.hr = 1.4; %height receiver (UE), approximately the height a human holds t
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % params.num_antennas_per_gNB = 64;
-params.num_antennas_per_gNB = 1;
+params.num_antennas_per_gNB = 2;
 %Number of antennas per UE
 % N_UE_mmW_arr = 2.^(0:1:5);
 params.N_UE_mmW = 8;
