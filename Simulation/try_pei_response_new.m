@@ -1,22 +1,23 @@
 close all;
 clear;
 tStart = tic;
-aID = getenv('SLURM_ARRAY_TASK_ID');
+% aID = getenv('SLURM_ARRAY_TASK_ID');
 % for idx = 1 %21:99
 %     aID = num2str(idx);
 % This is for running on a cluster in parallel
 % the bash script should give the aID as input
-if (isempty(aID))
-    warning('aID is empty. Trying SLURM ID.')
-    aID = getenv('SLURM_ARRAY_TASK_ID');
-end
-if(isempty(aID))
-    warning('aID is empty. Replacing it with 0010.')
-    aID = '0022';
-end
+% if (isempty(aID))
+%     warning('aID is empty. Trying SLURM ID.')
+%     aID = getenv('SLURM_ARRAY_TASK_ID');
+% end
+% if(isempty(aID))
+%     warning('aID is empty. Replacing it with 0010.')
+%     aID = '0022';
+% end
 %RNG seed.
-rng(str2double(aID),'twister');
-
+% rng(str2double(aID),'twister');
+aID = randi([0, 99]);
+rng(aID,'twister');
 %% GUE channel parameters
 params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
 params.RAYLEIGH=0;   %1= rayleigh, % 0=rician
@@ -39,7 +40,7 @@ params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
 params.sigma_sf =4;
-params.Band = 100e6;%20e6; %Communication bandwidth
+params.Band = 20e6; %Communication bandwidth
 
 
 %% Define simulation setup
@@ -102,7 +103,7 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 1000; %:100:2000;
+lambda_UE_sub6 = 100; %:100:2000;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 params.loss_pc_thresh = 10;
 params.Lmax=4;
@@ -126,8 +127,8 @@ for idxBSDensity = 1:length(lambda_BS)
     while (n<=params.numGNB) %(n==0)
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
     end
-    params.numGNB_sub6 = 1;
-    %     params.numGNB_sub6 = n;
+%     params.numGNB_sub6 = 1;
+    params.numGNB_sub6 = n;
     params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
     % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
     params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
@@ -139,8 +140,8 @@ for idxBSDensity = 1:length(lambda_BS)
         while (n==0)
             n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         end
-        params.numUE_sub6 = 0;
-%         params.numUE_sub6 = n;
+%         params.numUE_sub6 = 1;
+        params.numUE_sub6 = n;
         params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
         params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
         params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
@@ -169,7 +170,7 @@ for idxBSDensity = 1:length(lambda_BS)
             
             %% PHY layer params
             params.scs_mmw = 2e9;     %not using this parameter now
-            params.scs_sub6 = 1e8;   %sub-6 GHz bandwidth 100 MHz
+            params.scs_sub6 = 2e7;   %sub-6 GHz bandwidth 100 MHz
             params.num_sc_mmw = 1;    %not using this parameter now
             params.num_sc_sub6 = 1;   %sub-6 GHz considered as one full band
             
