@@ -105,6 +105,7 @@ lambda_BS = 25;
 lambda_UE_sub6 = 1000; %:100:2000;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 params.loss_pc_thresh = 10;
+params.Lmax=4;
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
@@ -168,9 +169,9 @@ for idxBSDensity = 1:length(lambda_BS)
             
             %% PHY layer params
             params.scs_mmw = 2e9;     %not using this parameter now
-            params.scs_sub6 = 1e8;   %sub-6 GHz bandwidth 100 MHz
+            params.scs_sub6 = 12*15e3;   %sub-6 GHz bandwidth 100 MHz
             params.num_sc_mmw = 1;    %not using this parameter now
-            params.num_sc_sub6 = 1;   %sub-6 GHz considered as one full band
+            params.num_sc_sub6 = 100;   %sub-6 GHz considered as one full band
             
             %% UE angular coverage range (full 360 coverage for now)
             lookAngleCell{1} = [0,360];
