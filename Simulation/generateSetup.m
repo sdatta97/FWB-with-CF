@@ -209,34 +209,34 @@ for n = 1:nbrOfSetups
         
         %Determine the master AP for UE k by looking for AP with best
         %channel condition
-        [~,master] = max(gainOverNoisedB(:,k,n));
-        D(master,k,n) = 1;
-        masterAPs(k) = master;
-        
-        %Assign orthogonal pilots to the first tau_p UEs according to
-        %Algorithm 4.1
-        if k <= tau_p
-            
-            pilotIndex(k,n) = k;
-            
-        else %Assign pilot for remaining UEs
-            
-            %Compute received power to the master AP from each pilot
-            %according to Algorithm 4.1
-            pilotinterference = zeros(tau_p,1);
-            
-            for t = 1:tau_p
-                
-                pilotinterference(t) = sum(db2pow(gainOverNoisedB(master,pilotIndex(1:k-1,n)==t,n)));
-                
-            end
-            
-            %Find the pilot with the least receiver power according to
-            %Algorithm 4.1
-            [~,bestpilot] = min(pilotinterference);
-            pilotIndex(k,n) = bestpilot;
-            
-        end
+%         [~,master] = max(gainOverNoisedB(:,k,n));
+%         D(master,k,n) = 1;
+%         masterAPs(k) = master;
+%         
+%         %Assign orthogonal pilots to the first tau_p UEs according to
+%         %Algorithm 4.1
+%         if k <= tau_p
+%             
+%             pilotIndex(k,n) = k;
+%             
+%         else %Assign pilot for remaining UEs
+%             
+%             %Compute received power to the master AP from each pilot
+%             %according to Algorithm 4.1
+%             pilotinterference = zeros(tau_p,1);
+%             
+%             for t = 1:tau_p
+%                 
+%                 pilotinterference(t) = sum(db2pow(gainOverNoisedB(master,pilotIndex(1:k-1,n)==t,n)));
+%                 
+%             end
+%             
+%             %Find the pilot with the least receiver power according to
+%             %Algorithm 4.1
+%             [~,bestpilot] = min(pilotinterference);
+%             pilotIndex(k,n) = bestpilot;
+%             
+%         end
         
         
         
