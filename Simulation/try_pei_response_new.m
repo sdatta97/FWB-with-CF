@@ -126,7 +126,7 @@ for idxBSDensity = 1:length(lambda_BS)
     while (n<=params.numGNB) %(n==0)
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
     end
-    params.numGNB_sub6 = 0;
+    params.numGNB_sub6 = 1;
     %     params.numGNB_sub6 = n;
     params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
     % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)

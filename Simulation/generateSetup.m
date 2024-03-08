@@ -110,7 +110,8 @@ R_ue_mmW = zeros(N_UE_mmW,N_UE_mmW,L,K_mmW,nbrOfSetups);
 R_ue_sub6 = zeros(N_UE_sub6,N_UE_sub6,L,K-K_mmW,nbrOfSetups);
 distances = zeros(L,K,nbrOfSetups);
 pilotIndex = zeros(K,nbrOfSetups);
-D = zeros(L,K,nbrOfSetups);
+% D = zeros(L,K,nbrOfSetups);
+D = ones(L,K,nbrOfSetups);
 D_small = zeros(L,K,nbrOfSetups);
 
 masterAPs = zeros(K,1); %the indices of master AP of each UE k 
@@ -271,17 +272,18 @@ for n = 1:nbrOfSetups
     
     %Each AP serves the UE with the strongest channel condition on each of
     %the pilots in the cell-free setup
-    for l = 1:L
-        
-        for t = 1:tau_p
-            
-            pilotUEs = find(t==pilotIndex(:,n));
-            [~,UEindex] = max(gainOverNoisedB(l,pilotUEs,n));
-            D(l,pilotUEs(UEindex),n) = 1;
-           
-        end
-        
-    end
+%     for l = 1:L
+%         
+%         for t = 1:tau_p
+%             
+%             pilotUEs = find(t==pilotIndex(:,n));
+%             [~,UEindex] = max(gainOverNoisedB(l,pilotUEs,n));
+%             D(l,pilotUEs(UEindex),n) = 1;
+%            
+%         end
+%         
+%     end
+    
     gainOverNoise = db2pow(gainOverNoisedB);
 %     for l = 1:L
 %         [gains, idxs] = sort(gainOverNoise(l,:), 'descend');
