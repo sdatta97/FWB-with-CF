@@ -17,4 +17,4 @@ module load matlab/2023a
 
 echo "$SLURM_ARRAY_TASK_ID"
 
-matlab -batch "try_pei_responsev4, exit"
+matlab -batch "try_pei_response_new, exit"
