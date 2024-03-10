@@ -102,7 +102,7 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 50;
+lambda_UE_sub6 = 200;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -177,11 +177,12 @@ for idxBSDensity = 1:length(lambda_BS)
                 
                 %% PHY layer params
                 params.scs_mmw = 2e9;     %not using this parameter now
-%                 params.scs_sub6 = 2e7;   %sub-6 GHz bandwidth 100 MHz
-                params.scs_sub6 = 12*15e3;   %sub-6 GHz bandwidth 100 MHz
+                params.scs_sub6 = 2e7;   %sub-6 GHz bandwidth 100 MHz
+%                 params.scs_sub6 = 12*15e3;   %sub-6 GHz bandwidth 100 MHz
                 params.num_sc_mmw = 1;    %not using this parameter now
+                params.num_sc_sub6 = 1;
 %                 params.num_sc_sub6 = params.Band/params.scs_sub6;   %sub-6 GHz considered as one full band
-                params.num_sc_sub6 = 100;   %sub-6 GHz considered as one full band
+%                 params.num_sc_sub6 = 100;   %sub-6 GHz considered as one full band
                 
                 %% UE angular coverage range (full 360 coverage for now)
                 lookAngleCell{1} = [0,360];
@@ -274,42 +275,42 @@ for idxBSDensity = 1:length(lambda_BS)
 %                 stream = RandStream('mlfg6331_64');  % Random number stream
 %                 options = statset('UseParallel',1,'UseSubstreams',1,'Streams',stream);
 %                 [cluster_idxs, cluster_centroids, sum_cluster_distances, cluster_distances] = kmeans([real(UEpositions), imag(UEpositions)],num_sc_sub6, 'Options',options,'MaxIter',10000,'Display','final','Replicates',10);
-                idx = 0;
-                n_pc = 0; %num_sc_sub6;
-                eq_n = 1;
-                split_clust = 1.3;
-                init_iter = 1;
-                realign = 1;
-                drawfig = 1;
-                dot_size = [10,40];
-                [cluster_centroids, cluster_idxs, n_c] = centroid_fct([real(UEpositions), imag(UEpositions)],idx,n_pc,eq_n,split_clust,init_iter,realign,drawfig,dot_size);
-                user_cluster_map = zeros(K,num_sc_sub6);
-                for k = 1:K
-                    user_cluster_map(k,cluster_idxs(k)) = 1;
-                end
-                user_sc_alloc = zeros(K,num_sc_sub6);
-                for n = 1:num_sc_sub6
-                    n_allotted = 0;
-                    while (n_allotted < floor(K/n_c))
-                        for c_idx = 1:n_c
-    %                         k = find(user_cluster_map(:,c_idx),1);
-                            k_idxs = find(user_cluster_map(:,c_idx));
-    %                         if(sum(user_sc_alloc (k,:)) == 0)
-    %                             user_sc_alloc (k,n) = 1;
-    %                             user_cluster_map(k,c_idx) = 0;
-    %                         end
-                            while (user_sc_alloc(k,n) > 0)
-                                k = k_idxs(randi([1,numel(k_idxs)]));
-                            end
-                            user_sc_alloc (k,n) = 1;
-                            n_allotted = n_allotted + 1;
-                            if (n_allotted == floor(K/n_c))
-                                break;
-                            end
-                        end
-                    end
-                end
-                params.user_sc_alloc = user_sc_alloc;
+%                 idx = 0;
+%                 n_pc = 0; %num_sc_sub6;
+%                 eq_n = 1;
+%                 split_clust = 1.3;
+%                 init_iter = 1;
+%                 realign = 1;
+%                 drawfig = 1;
+%                 dot_size = [10,40];
+%                 [cluster_centroids, cluster_idxs, n_c] = centroid_fct([real(UEpositions), imag(UEpositions)],idx,n_pc,eq_n,split_clust,init_iter,realign,drawfig,dot_size);
+%                 user_cluster_map = zeros(K,num_sc_sub6);
+%                 for k = 1:K
+%                     user_cluster_map(k,cluster_idxs(k)) = 1;
+%                 end
+%                 user_sc_alloc = zeros(K,num_sc_sub6);
+%                 for n = 1:num_sc_sub6
+%                     n_allotted = 0;
+%                     while (n_allotted < floor(K/n_c))
+%                         for c_idx = 1:n_c
+%     %                         k = find(user_cluster_map(:,c_idx),1);
+%                             k_idxs = find(user_cluster_map(:,c_idx));
+%     %                         if(sum(user_sc_alloc (k,:)) == 0)
+%     %                             user_sc_alloc (k,n) = 1;
+%     %                             user_cluster_map(k,c_idx) = 0;
+%     %                         end
+%                             while (user_sc_alloc(k,n) > 0)
+%                                 k = k_idxs(randi([1,numel(k_idxs)]));
+%                             end
+%                             user_sc_alloc (k,n) = 1;
+%                             n_allotted = n_allotted + 1;
+%                             if (n_allotted == floor(K/n_c))
+%                                 break;
+%                             end
+%                         end
+%                     end
+%                 end
+%                 params.user_sc_alloc = user_sc_alloc;
                 params.BETA = db2pow(gainOverNoisedB);   
                 params.D = D;
                 params.R_gNB = R_gNB;

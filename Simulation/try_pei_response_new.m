@@ -1,23 +1,23 @@
 close all;
 clear;
 tStart = tic;
-% aID = getenv('SLURM_ARRAY_TASK_ID');
+aID = getenv('SLURM_ARRAY_TASK_ID');
 % for idx = 1 %21:99
 %     aID = num2str(idx);
 % This is for running on a cluster in parallel
 % the bash script should give the aID as input
-% if (isempty(aID))
-%     warning('aID is empty. Trying SLURM ID.')
-%     aID = getenv('SLURM_ARRAY_TASK_ID');
-% end
-% if(isempty(aID))
-%     warning('aID is empty. Replacing it with 0010.')
-%     aID = '0022';
-% end
+if (isempty(aID))
+    warning('aID is empty. Trying SLURM ID.')
+    aID = getenv('SLURM_ARRAY_TASK_ID');
+end
+if(isempty(aID))
+    warning('aID is empty. Replacing it with 0010.')
+    aID = '0022';
+end
 %RNG seed.
-% rng(str2double(aID),'twister');
-aID = randi([0, 99]);
-rng(aID,'twister');
+rng(str2double(aID),'twister');
+% aID = randi([0, 99]);
+% rng(aID,'twister');
 %% GUE channel parameters
 params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
 params.RAYLEIGH=0;   %1= rayleigh, % 0=rician
@@ -265,11 +265,17 @@ for idxBSDensity = 1:length(lambda_BS)
                 params.R_ue_sub6 = R_ue_sub6;
                 numUE = params.numUE;
                 sub6ConnectionState = zeros(numUE,1);
+                ap_idxs = find(D(:,1));
+                ue_idxs = 1;
+                for a = 1:length(ap_idxs)
+                    ap_idx = ap_idxs(a);
+                    ue_idxs = union(ue_idxs,find(D(ap_idx,:)));
+                end
                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
                 ue_idx = 1;
                 rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 sub6ConnectionState(ue_idx) = 1;
-                params.D = AP_reassign(params,ue_idx);
+                [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
                 rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 numUE = params.numUE;
@@ -297,8 +303,10 @@ for idxBSDensity = 1:length(lambda_BS)
                     'powFactor,','rate_before_handoff,','rate_after_handoff,','rate_mmW\n'];  
                 fprintf(fileID,output_categories);
                 min_rate_req = params.r_min(1);   
-                mean_rate_before_handoff = mean(rate_dl_before_handoff(2:end));
-                mean_rate_after_handoff = mean(rate_dl_after_handoff(2:end)); 
+%                 mean_rate_before_handoff = mean(rate_dl_before_handoff(2:end));
+%                 mean_rate_after_handoff = mean(rate_dl_after_handoff(2:end)); 
+                mean_rate_before_handoff = mean(rate_dl_before_handoff(ue_idxs_affected));
+                mean_rate_after_handoff = mean(rate_dl_after_handoff(ue_idxs_affected)); 
                 rate_mmW = rate_dl_after_handoff (1);
                 formatSpec = '%d,%d,%d,%d,%d,%.16f,%.16f,%.16f\n';
                 fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
