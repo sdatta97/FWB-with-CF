@@ -106,7 +106,7 @@ lambda_BS = 25;
 lambda_UE_sub6 = 30:20:90; %:100:2000;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 params.loss_pc_thresh = 10;
-params.Lmax=4;
+% params.Lmax=4;
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
@@ -133,6 +133,7 @@ for idxBSDensity = 1:length(lambda_BS)
     % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
     params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
     params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
+    params.Lmax=n;
     for idxUEDensity = 1:length(lambda_UE_sub6)
     
         %%UE locations
