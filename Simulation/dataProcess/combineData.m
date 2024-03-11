@@ -1,8 +1,8 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = 'C:/Users/dsoum/Desktop/impactData/impactData_pf_1000';
-dinfo = dir(fullfile(projectdir, 'handoff_impact_1UE_25lambdaBS_90lambdaUE_400Blockers_randomHeight_*Pow_factor_1000.csv'));   %use appropriate extension
+projectdir = 'C:/Users/dsoum/Desktop/impactData/impactData_pf_1000_full_CF';
+dinfo = dir(fullfile(projectdir, 'handoff_impact_1UE_25lambdaBS_70lambdaUE_400Blockers_randomHeight_*Pow_factor_1000.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
 tables = cell(nfiles,1);
@@ -18,6 +18,7 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-2)
 %     changingVars{i} = colNames{i};
 % end
+% 
 % changingVars = cell(1,length(colNames)-6);
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
@@ -32,5 +33,5 @@ for i=1:(length(colNames)-3)
 end
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
 
-writetable(summaryTable,'./impact_pfac_1000_ue_density_90.txt')
-writetable(summaryTable,'./impact_pfac_1000_ue_density_90.csv')
+writetable(summaryTable,'./impact_pfac_1000_ue_density_70_full_CF.txt')
+writetable(summaryTable,'./impact_pfac_1000_ue_density_70_full_CF.csv')
