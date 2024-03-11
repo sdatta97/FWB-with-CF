@@ -57,7 +57,7 @@ params.rho_tot = 200;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10^3; %10.^(0:1:5);
+p_fac_arr = 10.^(0:1:5);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
@@ -103,10 +103,10 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = [30:20:90, 100]; %:100:2000;
+lambda_UE_sub6 = 100; % [30:20:90, 100]; %:100:2000;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 params.loss_pc_thresh = 10;
-% params.Lmax=4;
+params.Lmax=4;
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
@@ -133,7 +133,7 @@ for idxBSDensity = 1:length(lambda_BS)
     % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
     params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
     params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-    params.Lmax=n;
+%     params.Lmax=n;
     for idxUEDensity = 1:length(lambda_UE_sub6)
     
         %%UE locations
