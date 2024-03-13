@@ -9,7 +9,9 @@ N_UE_mmW = size(channel_dl_mmW,4);
 N_UE_sub6 = size(channel_dl,4);
 p_d = params.rho_tot; % 1*K;
 p_fac = params.p_fac;
+p_fac_rearrange = params.p_fac_rearrange;
 D = params.D;
+ue_rearranged = params.ue_rearranged;
 % perm_vec  = repmat(randperm(tau_p),1,2);
 % phi_index = perm_vec(1:K);
 % for k = 1:K
@@ -56,23 +58,35 @@ end
 eta_eq = zeros(M,K);
 N_AP = params.num_antennas_per_gNB;
 if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
+    ues_not_rearranged = setdiff(1:K,ue_rearranged);
     for m = 1:M
         for k = 1+K_mmW:K
             if ismember(m,Serv{k})
-                eta_eq(m,k) = 1./(N_AP*N_UE_sub6*sum(beta_uc(m,:)));
+                if ismember(k,ue_rearranged)
+                    eta_eq(m,k) = p_fac_rearrange./(N_AP*(N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
+                else
+%                     eta_eq(m,k) = 1./(N_AP*N_UE_sub6*sum(beta_uc(m,:)));
+                    eta_eq(m,k) = 1./(N_AP*(N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
+                end
             end
         end
     end
 else
+    ues_not_rearranged = setdiff((1+K_mmW):K,ue_rearranged);
     for m = 1:M
         for k = 1:K
             if ismember(m,Serv{k})
                 if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
 %                     eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
-                    eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
+                    eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
                 elseif (k>K_mmW)
 %                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
-                    eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
+%                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K)))); 
+                    if ismember(k,ue_rearranged)
+                       eta_eq(m,k) = p_fac_rearrange./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
+                    else
+                       eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
+                    end
                 end
             end
         end
