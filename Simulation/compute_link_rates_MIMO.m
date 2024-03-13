@@ -58,7 +58,7 @@ end
 eta_eq = zeros(M,K);
 N_AP = params.num_antennas_per_gNB;
 if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
-    ues_not_rearranged = setdiff(1:K,ue_rearranged);
+    ues_not_rearranged = setdiff((1+K_mmW):K,ue_rearranged);
     for m = 1:M
         for k = 1+K_mmW:K
             if ismember(m,Serv{k})

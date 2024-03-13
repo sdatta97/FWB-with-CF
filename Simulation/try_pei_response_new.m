@@ -2,8 +2,6 @@ close all;
 clear;
 tStart = tic;
 aID = getenv('SLURM_ARRAY_TASK_ID');
-% for idx = 1 %21:99
-%     aID = num2str(idx);
 % This is for running on a cluster in parallel
 % the bash script should give the aID as input
 if (isempty(aID))
@@ -12,7 +10,7 @@ if (isempty(aID))
 end
 if(isempty(aID))
     warning('aID is empty. Replacing it with 0010.')
-    aID = '0022';
+    aID = '64';  %'0022';
 end
 %RNG seed.
 rng(str2double(aID),'twister');
@@ -107,7 +105,6 @@ lambda_UE_sub6 = [30:20:90, 100]; %:100:2000;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 params.loss_pc_thresh = 10;
 params.Lmax=4;
-params.ue_rearranged = [];
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
@@ -136,7 +133,7 @@ for idxBSDensity = 1:length(lambda_BS)
     params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
 %     params.Lmax=n;
     for idxUEDensity = 1:length(lambda_UE_sub6)
-    
+        params.ue_rearranged = [];    
         %%UE locations
         n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
         while (n==0)
