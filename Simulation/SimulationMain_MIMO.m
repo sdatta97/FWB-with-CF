@@ -38,7 +38,7 @@ params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
 params.sigma_sf =4;
-params.Band = 100e6;%20e6; %Communication bandwidth
+params.Band = 20e6; %Communication bandwidth
 
 
 %% Define simulation setup
@@ -102,7 +102,7 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 200;
+lambda_UE_sub6 = 100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -132,7 +132,7 @@ for idxBSDensity = 1:length(lambda_BS)
     params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
     params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
     for idxUEDensity = 1:length(lambda_UE_sub6)
-    
+        params.ue_rearranged = [];        
         %%UE locations
         % params.numUE_sub6 = 10;
         % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
@@ -158,6 +158,7 @@ for idxBSDensity = 1:length(lambda_BS)
                 params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
                 params.rate_reduce_threshold = 1e8;
                 params.p_fac = p_fac_arr(idx_p);
+                params.p_fac_rearrange = 0.1*p_fac_arr(idx_p);                
                 %Length of the coherence block
                 params.tau_c = 200;
                 

@@ -319,7 +319,8 @@ while nextEventTime < params.simTime
                     else                        
                         sub6ConnectionState = UE.sub6ConnectionState;
                         [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-                        rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                         
+                        rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+%                         rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                         
 %                         rate_dl_before_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if (sub6ConnectionState == zeros(params.numUE,1))
 %                             p_fac = params.p_fac;
@@ -332,6 +333,7 @@ while nextEventTime < params.simTime
                         sub6ConnectionState(ue_idx) = 1;
                         D_old = params.D;
                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                        params.ue_rearranged = ue_idxs_affected;
 %                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
 %                         rate_dl = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                         rate_dl = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
