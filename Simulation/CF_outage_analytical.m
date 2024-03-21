@@ -1,6 +1,8 @@
 function p_out = CF_outage_analytical(params,ue_idx,lambda_BS,lambda_UE)
 %     p_out = 0.5;
-    ps = params.rho_tot;
+    xi = 0.3;
+    ps = xi*params.rho_tot;
+    pz = (1-xi)*params.rho_tot;
     N = params.num_antennas_per_gNB;
     N_UE_sub6 = params.N_UE_sub6;
     N_UE_mmW = params.N_UE_mmW;
@@ -26,10 +28,13 @@ function p_out = CF_outage_analytical(params,ue_idx,lambda_BS,lambda_UE)
 % %     p_out = 0.5 - (1/pi)*integral(fun(t),0,10);
 %     t_arr = 1; %1:1:10; 
 %     p_out = 0.5 - (1/pi)*sum(fun(t_arr));
-    Ns = 1+pi*lambda_BS*(R^2-r0^2);
+    norm_fac = 10/(pi*100^2);
+    lambda_BS = lambda_BS*norm_fac;
+    lambda_UE = lambda_UE*norm_fac;
+    Ns = 1+ceil(pi*lambda_BS*(R^2-r0^2));
     N_bar = ceil(lambda_UE*pi*R^2);
     F1 = @(t) (exp(-2*pi*lambda_BS*(0.5*(R^2-r0^2) - jfunc(-1j*t*ps,N_bar,1j*(t/T)*(ps*Ns),N,r0,R,d0,mu))));
-    F2 = @(t) (exp(-2*pi*lambda_BS*(0.5*(R_inf^2-R^2) - jfunc(-1j*t*ps,N_bar,0,N-N_bar,R,R_inf,d0,mu))));
+    F2 = @(t) (exp(-2*pi*lambda_BS*(0.5*(R_inf^2-R^2) - jfunc(-1j*t*ps,N_bar,-1j*t*pz,N-N_bar,R,R_inf,d0,mu))));
 %     fun = @(t) ((1/t).*fourier(exp(1j*t)*((1-1j*t*(ps*(1+r0/d0)^(-mu)))^(-N_bar))*((1+1j*(t/T)*(ps*Ns*(1+r0/d0)^(-mu)))^(-N))*(F1(t)*F2(t))));
     fun = @(t) ((1/t)*fft(exp(1j*t)*((1-1j*t*(ps*(1+r0/d0)^(-mu)))^(-N_bar))*((1+1j*(t/T)*(ps*Ns*(1+r0/d0)^(-mu)))^(-N))*(F1(t)*F2(t))));
 %     syms t

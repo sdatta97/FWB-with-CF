@@ -68,14 +68,14 @@ params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.coverageRange = 100;
+params.coverageRange = 10; %100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
 height_transmitter = 5;
 params.areaDimensions = [width_area, length_area, height_transmitter];
 
 
-params.coverageRange_sub6 = 1000;
+params.coverageRange_sub6 = 40; %1000;
 length_area_sub6 = 2*params.coverageRange_sub6;   
 width_area_sub6 = 2*params.coverageRange_sub6;
 height_transmitter_sub6 = 4;
@@ -90,7 +90,7 @@ params.hr = 1.4; %height receiver (UE), approximately the height a human holds t
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 % params.num_antennas_per_gNB = 64;
-params.num_antennas_per_gNB = 2;
+params.num_antennas_per_gNB = 8;
 %Number of antennas per UE
 % N_UE_mmW_arr = 2.^(0:1:5);
 params.N_UE_mmW = 1; %8;
