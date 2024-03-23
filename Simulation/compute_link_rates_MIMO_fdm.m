@@ -134,6 +134,8 @@ snr_den_mmW = zeros(K_mmW,N_UE_mmW);
 snr_num_sub6 = zeros(K-K_mmW,N_UE_sub6);
 snr_den_sub6 = zeros(K-K_mmW,N_UE_sub6);
 rate_dl = zeros(K,1);
+fr2_fac = 0.2;
+fr1_fac = 0.8;
 for k = 1:K_mmW
 %     if (sub6ConnectionState(k)==1 || k==ue_idx)
     if (sub6ConnectionState(k)==1)
@@ -157,7 +159,7 @@ for k = 1:K_mmW
             end
             snr_num_mmW(k,n) = DS_mmW(k,n);
             snr_den_mmW(k,n) = MUI_mmW(k,n) + noise_mmW(k,n);
-            rate_dl(k) = rate_dl(k) + BW*TAU_FAC*log2(1+snr_num_mmW(k,n)/snr_den_mmW(k,n));
+            rate_dl(k) = rate_dl(k) + fr2_fac*BW*TAU_FAC*log2(1+snr_num_mmW(k,n)/snr_den_mmW(k,n));
         end
     end
 end
@@ -183,7 +185,7 @@ for k = 1:K-K_mmW
         end
         snr_num_sub6(k,n) = DS_sub6(k,n);
         snr_den_sub6(k,n) = MUI_sub6(k,n) + noise_sub6(k,n);
-        rate_dl(k+K_mmW) = rate_dl(k+K_mmW) + BW*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
+        rate_dl(k+K_mmW) = rate_dl(k+K_mmW) + fr1_fac*BW*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
     end
 end
 end
