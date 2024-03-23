@@ -78,14 +78,14 @@ else
             if ismember(m,Serv{k})
                 if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
 %                     eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
-                    eta_eq(m,k) = p_fac./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
+                    eta_eq(m,k) = 1./(N_AP*N_UE_mmW*(beta_uc(m,1:K_mmW).*sub6ConnectionState));
                 elseif (k>K_mmW)
 %                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K))));
 %                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,(1+K_mmW):K)))); 
                     if ismember(k,ue_rearranged)
-                       eta_eq(m,k) = p_fac_rearrange./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
+                       eta_eq(m,k) = p_fac_rearrange./(N_AP*N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged))));
                     else
-                       eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged)))));
+                       eta_eq(m,k) = 1./(N_AP*N_UE_sub6*(p_fac_rearrange*sum(beta_uc(m,ue_rearranged))+sum(beta_uc(m,ues_not_rearranged))));
                     end
                 end
             end
@@ -102,18 +102,18 @@ for k = 1:K_mmW
             D_mmW_mmW(k,q,:,:) = reshape(D_mmW_mmW(k,q,:,:),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
         end
     end
-    for q = 1:K-K_mmW
-        for m = 1:M
-            D_mmW_sub6(k,q,:,:) = reshape(D_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
-        end
-    end
+%     for q = 1:K-K_mmW
+%         for m = 1:M
+%             D_mmW_sub6(k,q,:,:) = reshape(D_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
+%         end
+%     end
 end
 for k = 1:K-K_mmW
-    for q = 1:K_mmW
-        for m = 1:M
-            D_sub6_mmW(k,q,:,:) = reshape(D_sub6_mmW(k,q,:,:),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
-        end
-    end
+%     for q = 1:K_mmW
+%         for m = 1:M
+%             D_sub6_mmW(k,q,:,:) = reshape(D_sub6_mmW(k,q,:,:),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
+%         end
+%     end
     for q = 1:K-K_mmW
         for m = 1:M
             D_sub6_sub6(k,q,:,:) = reshape(D_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);

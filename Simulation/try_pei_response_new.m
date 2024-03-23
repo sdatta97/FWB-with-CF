@@ -218,7 +218,7 @@ for idxBSDensity = 1:length(lambda_BS)
             protocolParams.signalingAfterRachTime = 0; %20*10^(-3);
             
             for p_idx = 1:length(p_fac_arr)
-                params.p_fac = p_fac_arr(p_idx);
+                params.p_fac = 1; %p_fac_arr(p_idx);
                 params.p_fac_rearrange = 0.1*p_fac_arr(p_idx);                
                 %% protocol params from other paper
                 frac = (mean(params.hb)-params.hr)/(params.ht-params.hr);
