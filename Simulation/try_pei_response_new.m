@@ -53,7 +53,7 @@ params.p = 100;
 params.num_antennas_per_gNB = 64;
 
 %Total downlink transmit power per AP (mW)
-params.rho_tot = 200*params.num_antennas_per_gNB;
+params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
