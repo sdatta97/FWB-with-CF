@@ -50,12 +50,14 @@ params.ASD_theta = 0; %deg2rad(15);  %elevation angle
 %Total uplink transmit power per UE (mW)
 params.p = 100;
 
+params.num_antennas_per_gNB = 64;
+
 %Total downlink transmit power per AP (mW)
-params.rho_tot = 200;
+params.rho_tot = 200*params.num_antennas_per_gNB;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10^2; %10.^(0:1:5);
+p_fac_arr = 10^3; %10.^(0:1:5);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
@@ -89,7 +91,6 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-params.num_antennas_per_gNB = 64;
 %Number of antennas per UE
 % N_UE_mmW_arr = 2.^(0:1:5);
 params.N_UE_mmW = 8;
@@ -101,7 +102,7 @@ lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = [30:20:90, 100]; %:100:2000;
+lambda_UE_sub6 = 100; %[30:20:90, 100]; %:100:2000;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 params.loss_pc_thresh = 10;
 params.Lmax=4;
@@ -219,7 +220,7 @@ for idxBSDensity = 1:length(lambda_BS)
             
             for p_idx = 1:length(p_fac_arr)
                 params.p_fac = 1; %p_fac_arr(p_idx);
-                params.p_fac_rearrange = 0.1*p_fac_arr(p_idx);                
+                params.p_fac_rearrange = p_fac_arr(p_idx);  %0.1*p_fac_arr(p_idx);                
                 %% protocol params from other paper
                 frac = (mean(params.hb)-params.hr)/(params.ht-params.hr);
                 protocolParams.theta = 2*params.V.*params.lambdaBlockers*frac/pi;
