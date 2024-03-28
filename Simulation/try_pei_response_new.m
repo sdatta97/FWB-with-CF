@@ -10,7 +10,7 @@ if (isempty(aID))
 end
 if(isempty(aID))
     warning('aID is empty. Replacing it with 0010.')
-    aID = '64';  %'0022';
+    aID = '0022';
 end
 %RNG seed.
 rng(str2double(aID),'twister');
@@ -57,7 +57,7 @@ params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10^3; %10.^(0:1:5);
+p_fac_arr = 10^2; %10.^(0:1:5);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
@@ -219,8 +219,8 @@ for idxBSDensity = 1:length(lambda_BS)
             protocolParams.signalingAfterRachTime = 0; %20*10^(-3);
             
             for p_idx = 1:length(p_fac_arr)
-                params.p_fac = 1; %p_fac_arr(p_idx);
-                params.p_fac_rearrange = 1; % p_fac_arr(p_idx);  %0.1*p_fac_arr(p_idx);                
+                params.p_fac = p_fac_arr(p_idx);
+                params.p_fac_rearrange = 0.1*p_fac_arr(p_idx);                
                 %% protocol params from other paper
                 frac = (mean(params.hb)-params.hr)/(params.ht-params.hr);
                 protocolParams.theta = 2*params.V.*params.lambdaBlockers*frac/pi;
@@ -276,11 +276,11 @@ for idxBSDensity = 1:length(lambda_BS)
                 ue_idx = 1;
                 rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 sub6ConnectionState(ue_idx) = 1;
-%                 [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
-%                 params.ue_rearranged = ue_idxs_affected;
+                [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                params.ue_rearranged = ue_idxs_affected;
                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-%                 rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                rate_dl_after_handoff = compute_link_rates_MIMO_fdm(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+%                 rate_dl_after_handoff = compute_link_rates_MIMO_fdm(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 numUE = params.numUE;
                 numUE_sub6 = params.numUE_sub6;
                 numBS = size(params.locationsBS,1);
@@ -303,17 +303,17 @@ for idxBSDensity = 1:length(lambda_BS)
                 recording_text_file_string = strcat(impactFolder,result_string,'.csv');
                 fileID = fopen(recording_text_file_string,'w');
                 output_categories = ['UE idx,','lambdaBS,','lambdaUE,','numBlockers,',...
-                    'powFactor,','rate_before_handoff,','rate_after_handoff,','rate_mmW\n'];  
+                    'powFactor,','rate_before_handoff,','rate_after_handoff,','rate_before_handoff_affected,','rate_after_handoff_affected,','rate_mmW\n'];  
                 fprintf(fileID,output_categories);
                 min_rate_req = params.r_min(1);   
                 mean_rate_before_handoff = mean(rate_dl_before_handoff(2:end));
                 mean_rate_after_handoff = mean(rate_dl_after_handoff(2:end)); 
-%                 mean_rate_before_handoff = mean(rate_dl_before_handoff(ue_idxs_affected));
-%                 mean_rate_after_handoff = mean(rate_dl_after_handoff(ue_idxs_affected)); 
+                mean_rate_before_handoff_affected = mean(rate_dl_before_handoff(ue_idxs_affected));
+                mean_rate_after_handoff_affected = mean(rate_dl_after_handoff(ue_idxs_affected)); 
                 rate_mmW = rate_dl_after_handoff (1);
-                formatSpec = '%d,%d,%d,%d,%d,%.16f,%.16f,%.16f\n';
+                formatSpec = '%d,%d,%d,%d,%d,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                 fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
-                   params.p_fac,mean_rate_before_handoff,mean_rate_after_handoff,rate_mmW);                      
+                   params.p_fac,mean_rate_before_handoff,mean_rate_after_handoff,mean_rate_before_handoff_affected,mean_rate_after_handoff_affected,rate_mmW);                      
                 fclose(fileID);
             end
         end
