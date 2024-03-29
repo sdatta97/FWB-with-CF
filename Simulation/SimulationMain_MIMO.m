@@ -27,7 +27,7 @@ params.CH_estimation = 0;  % 1= have channel estimation
 %%
 params.LB=1;  %Lower bound
 params.UB =1;  %Upper bound
-params.no_of_rea =2;     % no.of channel realizations
+params.no_of_rea = 1;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
 params.snr_db = 40;
@@ -38,7 +38,7 @@ params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
 params.sigma_sf =4;
-params.Band = 20e6; %Communication bandwidth
+params.Band = 100e6; %Communication bandwidth
 
 
 %% Define simulation setup
@@ -51,7 +51,6 @@ params.ASD_theta = 0; %deg2rad(15);  %elevation angle
 params.p = 100;
 
 %Total downlink transmit power per AP (mW)
-params.rho_tot = 200;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
@@ -68,17 +67,16 @@ params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.coverageRange = 10; %100;
+params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
 height_transmitter = 5;
 params.areaDimensions = [width_area, length_area, height_transmitter];
 
-
-params.coverageRange_sub6 = 40; %1000;
+params.coverageRange_sub6 = 1000;
 length_area_sub6 = 2*params.coverageRange_sub6;   
 width_area_sub6 = 2*params.coverageRange_sub6;
-height_transmitter_sub6 = 4;
+height_transmitter_sub6 = 5;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
 %%UE location
 params.numUE = 1;
@@ -89,20 +87,22 @@ params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.a
 params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
 params.ht = height_transmitter; %height transmitter (BS)
 params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-% params.num_antennas_per_gNB = 64;
-params.num_antennas_per_gNB = 8;
+params.num_antennas_per_gNB = 64;
+params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
+
+% params.num_antennas_per_gNB = 8;
 %Number of antennas per UE
 % N_UE_mmW_arr = 2.^(0:1:5);
-params.N_UE_mmW = 1; %8;
-params.N_UE_sub6 = 1; %4;
+params.N_UE_mmW = 8;
+params.N_UE_sub6 = 4;
 rmin_arr = 4*10^8;
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
-lambda_BS = 1; %25;
+lambda_BS = 25;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 2; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 100:20:200; %[30:20:90, 100]; %100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -110,9 +110,11 @@ params.Lmax = 4;
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
-    n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+%     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+    n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
     while (n==0)
-        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+%         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+        n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
     end
     params.numGNB = n;
     % params.numGNB = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
@@ -127,6 +129,7 @@ for idxBSDensity = 1:length(lambda_BS)
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
     end
     params.numGNB_sub6 = n;
+%     params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
     params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
     % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
     params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB,1);%location of gNBs (angle from x-axis)
@@ -153,17 +156,20 @@ for idxBSDensity = 1:length(lambda_BS)
         for idxrmin = 1:length(rmin_arr)
             for idx_p = 1:length(p_fac_arr)
                 rmin = rmin_arr(idxrmin);
-                params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
-                rmin_sub6 = 1e5;
-                params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
-                params.rate_reduce_threshold = 1e8;
+                rmin_sub6 = 25e6;
+                params.r_min_sub6 = rmin_sub6;  %stores min rate requirement for all sub-6 users
+                params.r_min = rmin;  %stores min rate requirement for all mmWave users
+%                 params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
+%                 rmin_sub6 = 1e5;
+%                 params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
+                params.rate_reduce_threshold = 5e7;
                 params.p_fac = p_fac_arr(idx_p);
                 params.p_fac_rearrange = 0.1*p_fac_arr(idx_p);                
                 %Length of the coherence block
-                params.tau_c = 200;
+%                 params.tau_c = 200;
                 
                 %Compute number of pilots per coherence block
-                params.tau_p = params.numUE+params.numUE_sub6;
+%                 params.tau_p = params.numUE+params.numUE_sub6;
                 
                 %Compute the prelog factor assuming only downlink data transmission
         %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
@@ -178,7 +184,7 @@ for idxBSDensity = 1:length(lambda_BS)
                 
                 %% PHY layer params
                 params.scs_mmw = 2e9;     %not using this parameter now
-                params.scs_sub6 = 2e7;   %sub-6 GHz bandwidth 100 MHz
+                params.scs_sub6 = params.Band;   %sub-6 GHz bandwidth 100 MHz
 %                 params.scs_sub6 = 12*15e3;   %sub-6 GHz bandwidth 100 MHz
                 params.num_sc_mmw = 1;    %not using this parameter now
                 params.num_sc_sub6 = 1;
@@ -253,11 +259,11 @@ for idxBSDensity = 1:length(lambda_BS)
                 Perf_CSI = params.Perf_CSI;
                 cov_area = params.cov_area;
                 %%
-                TAU_P_K_by_two = params.TAU_P_K_by_two;  
-                CH_estimation = params.CH_estimation;  
-                %%
-                LB = params.LB;  %Lower bound
-                UB = params.UB;  %Upper bound
+%                 TAU_P_K_by_two = params.TAU_P_K_by_two;  
+%                 CH_estimation = params.CH_estimation;  
+%                 %%
+%                 LB = params.LB;  %Lower bound
+%                 UB = params.UB;  %Upper bound
                 no_of_rea = params.no_of_rea;     % no.of channel realizations
                 %%
                 pilot_pow = params.pilot_pow; 
@@ -266,7 +272,7 @@ for idxBSDensity = 1:length(lambda_BS)
                 Band = params.Band; %Communication bandwidth
                 num_sc_sub6 = params.num_sc_sub6;
 %                 params.user_sc_alloc = randi([0,1],K,num_sc_sub6);
-                tau_c = params.tau_c;      % coherence block length  
+%                 tau_c = params.tau_c;      % coherence block length  
                 %[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);
                 %params.BETA = channelGain_GUE';
                 %params.ricianFactor = K_Rician';
@@ -317,56 +323,56 @@ for idxBSDensity = 1:length(lambda_BS)
                 params.R_gNB = R_gNB;
                 params.R_ue_mmW = R_ue_mmW;
                 params.R_ue_sub6 = R_ue_sub6;
-                outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-                outage_probability_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-                outage_duration_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-                outage_duration_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
-                
-                for idxDiscDelay = 1:length(protocolParams.discovery_time)
-                    for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
-                        for idxConnDelay = 1:length(protocolParams.connection_time)
-                            for idxSignalingAfterRachDelay = 1:length(protocolParams.signalingAfterRachTime)
-                                theta = protocolParams.theta;
-                                omega = 1/(protocolParams.connection_time(idxConnDelay) + protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay) + protocolParams.FailureDetectionTime(idxFailureDetectionDelay));
-                                psi = 1/(protocolParams.discovery_time(idxDiscDelay) + 1/params.mu);
-                                plos2 = pLoS2(params.locationsBS, [params.UE_locations;params.UE_locations_sub6], theta,omega,psi);
-                                plos = zeros(params.numUE,1);
-                                % [~,idx_max] = mink(plos2(:,1:params.numUE),2,1);
-                                % [~,idx_max] = mink(plos2(:,1:params.numUE),1,1);
-                                [~,idx_max] = mink(plos2(:,1:params.numUE),params.numGNB,1);
-                                for k = 1:params.numUE
-                                    % plos(k) = prod(plos2(:,k),1);
-                                    plos(k) = prod(plos2(idx_max(:,k),k),1);
-                                end
-%                                 rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
-                                for k = 1:params.numUE
-                                   % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                                   [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                                   % plos3 = pLoS3(theta,omega,params.coverageRange);
-                                  % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-%                                    if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
-%                                        p1 = 1;
-%                                        tos = 0;
-%                                    else
-%                                        % p1 = 1-plos4;
-%                                        % p1 = 1-plos(k);
-%                                        % p1 = 1-plos3;
-%                                        p1 = 1-pos3;
-%                                        tos = tos3;
-%                                    end
-                                   ue_idx = 1;
-                                   p_out = CF_outage_analytical(params,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity));
-%                                    outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
-                                   outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*pos3;
-                                   outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
-%                                    outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + tos;
-                                   outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*tos3;
-                                   outage_duration_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + tos3;
-                                end
-                            end
-                        end
-                    end
-                end                
+%                 outage_probability_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
+%                 outage_probability_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
+%                 outage_duration_analysis = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
+%                 outage_duration_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
+%                 
+%                 for idxDiscDelay = 1:length(protocolParams.discovery_time)
+%                     for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
+%                         for idxConnDelay = 1:length(protocolParams.connection_time)
+%                             for idxSignalingAfterRachDelay = 1:length(protocolParams.signalingAfterRachTime)
+%                                 theta = protocolParams.theta;
+%                                 omega = 1/(protocolParams.connection_time(idxConnDelay) + protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay) + protocolParams.FailureDetectionTime(idxFailureDetectionDelay));
+%                                 psi = 1/(protocolParams.discovery_time(idxDiscDelay) + 1/params.mu);
+%                                 plos2 = pLoS2(params.locationsBS, [params.UE_locations;params.UE_locations_sub6], theta,omega,psi);
+%                                 plos = zeros(params.numUE,1);
+%                                 % [~,idx_max] = mink(plos2(:,1:params.numUE),2,1);
+%                                 % [~,idx_max] = mink(plos2(:,1:params.numUE),1,1);
+%                                 [~,idx_max] = mink(plos2(:,1:params.numUE),params.numGNB,1);
+%                                 for k = 1:params.numUE
+%                                     % plos(k) = prod(plos2(:,k),1);
+%                                     plos(k) = prod(plos2(idx_max(:,k),k),1);
+%                                 end
+% %                                 rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
+%                                 for k = 1:params.numUE
+%                                    % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+%                                    [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+%                                    % plos3 = pLoS3(theta,omega,params.coverageRange);
+%                                   % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+% %                                    if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
+% %                                        p1 = 1;
+% %                                        tos = 0;
+% %                                    else
+% %                                        % p1 = 1-plos4;
+% %                                        % p1 = 1-plos(k);
+% %                                        % p1 = 1-plos3;
+% %                                        p1 = 1-pos3;
+% %                                        tos = tos3;
+% %                                    end
+%                                    ue_idx = 1;
+%                                    p_out = CF_outage_analytical(params,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity));
+% %                                    outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
+%                                    outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*pos3;
+%                                    outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
+% %                                    outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + tos;
+%                                    outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*tos3;
+%                                    outage_duration_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + tos3;
+%                                 end
+%                             end
+%                         end
+%                     end
+%                 end                
                 %% Mobile blockage events
                 tic
                 dataBS_mobile = [];
@@ -473,11 +479,11 @@ for idxBSDensity = 1:length(lambda_BS)
                                 frameDeliveryDelay      = thisOutputs.frameDeliveryDelay;
                                 outage_durations_wo_cf = thisOutputs.outage_durations_wo_cf;
                                 outage_durations_wi_cf = thisOutputs.outage_durations_wi_cf;
-                                figure
-                                cdfplot(outage_durations_wo_cf); hold on;
-                                cdfplot(outage_durations_wi_cf);
-                                saveas(gcf,'cdfplot','fig')
-                                saveas(gcf,'cdfplot','png')
+%                                 figure
+%                                 cdfplot(outage_durations_wo_cf); hold on;
+%                                 cdfplot(outage_durations_wi_cf);
+%                                 saveas(gcf,'cdfplot','fig')
+%                                 saveas(gcf,'cdfplot','png')
         
                                 for ue_idx = 1:params.numUE   %storing outage probability and duration for each user
                                     mean_outage_duration_wo_cf    = thisOutputs.mean_outage_duration_wo_cf(ue_idx);

@@ -61,7 +61,7 @@ N_UE_mmW = params.N_UE_mmW;
 N_UE_sub6 = params.N_UE_sub6;
 coverageRange = params.coverageRange;
 coverageRange_sub6 = params.coverageRange_sub6;
-tau_p = params.tau_p;
+% tau_p = params.tau_p;
 ASD_varphi = params.ASD_varphi;
 ASD_theta = params.ASD_theta;
 %% Define simulation setup
