@@ -344,7 +344,7 @@ while nextEventTime < params.simTime
 %                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs(2:end)) - rate_dl(ue_idxs(2:end))) <= rate_reduce_threshold)
 %                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl(ue_idxs_affected)) <= rate_reduce_threshold)
                         rate_dip_affected = mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl_after_handoff(ue_idxs_affected));
-                        lb = mean(rate_dl_after_handoff) - std(rate_dl_after_handoff);
+                        lb = mean(rate_dl_after_handoff(ue_idxs_affected)) - std(rate_dl_after_handoff(ue_idxs_affected));
                         if rate_dl_after_handoff(ue_idx) >= r_min && (rate_dip_affected <= rate_reduce_threshold) && (lb >= r_min_sub6)
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
