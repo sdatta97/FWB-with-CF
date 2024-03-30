@@ -76,8 +76,8 @@ end
 % squareLength = 1000; %meter
 
 %Communication bandwidth (Hz)
-% B = params.Band;
-B = params.scs_sub6;
+B = params.Band;
+% B = params.scs_sub6;
 
 %Noise figure (in dB)
 noiseFigure = 7;

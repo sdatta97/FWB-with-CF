@@ -170,7 +170,7 @@ for idxBSDensity = 1:length(lambda_BS)
             
             %% PHY layer params
             params.scs_mmw = 2e9;     %not using this parameter now
-            params.scs_sub6 = (params.Band)/2;   %sub-6 GHz bandwidth 100 MHz
+            params.scs_sub6 = [0.2*(params.Band), 0.8*(params.Band)];   %sub-6 GHz bandwidth 100 MHz
             params.num_sc_mmw = 1;    %not using this parameter now
             params.num_sc_sub6 = 2;   %sub-6 GHz considered as one full band
             
