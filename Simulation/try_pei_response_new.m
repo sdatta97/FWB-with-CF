@@ -289,15 +289,21 @@ for idxBSDensity = 1:length(lambda_BS)
     %                             user_sc_alloc (k,n) = 1;
     %                             user_cluster_map(k,c_idx) = 0;
     %                         end
-                            k = k_idxs(randi([1,numel(k_idxs)]));
-                            while (user_sc_alloc(k,n) > 0)
-                                k = k_idxs(randi([1,numel(k_idxs)]));
-                            end
-                            user_sc_alloc (k,n) = 1;
-                            n_allotted = n_allotted + 1;
-%                             if (n_allotted == floor(K/n_c))
-                            if (n_allotted == num_per_cluster(n))
-                                break;
+%                             k = k_idxs(randi([1,numel(k_idxs)]));
+%                             while (user_sc_alloc(k,n) > 0)
+%                                 k = k_idxs(randi([1,numel(k_idxs)]));
+%                             end
+                            unallocated_ues = setdiff(k_idxs,find(user_sc_alloc(:,n)));
+                            try
+                                k = unallocated_ues(randi([1,numel(unallocated_ues)]));
+                                user_sc_alloc (k,n) = 1;
+                                n_allotted = n_allotted + 1;
+    %                             if (n_allotted == floor(K/n_c))
+                                if (n_allotted == num_per_cluster(n))
+                                    break;
+                                end
+                            catch
+                                continue;
                             end
                         end
                     end
