@@ -289,6 +289,7 @@ for idxBSDensity = 1:length(lambda_BS)
     %                             user_sc_alloc (k,n) = 1;
     %                             user_cluster_map(k,c_idx) = 0;
     %                         end
+                            k = k_idxs(randi([1,numel(k_idxs)]));
                             while (user_sc_alloc(k,n) > 0)
                                 k = k_idxs(randi([1,numel(k_idxs)]));
                             end
