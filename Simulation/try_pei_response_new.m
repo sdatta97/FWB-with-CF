@@ -277,9 +277,11 @@ for idxBSDensity = 1:length(lambda_BS)
                     user_cluster_map(k,cluster_idxs(k)) = 1;
                 end
                 user_sc_alloc = zeros(K,num_sc_sub6);
+                num_per_cluster = [floor(0.2*K), ceil(0.8*K)];
                 for n = 1:num_sc_sub6
                     n_allotted = 0;
-                    while (n_allotted < floor(K/n_c))
+%                     while (n_allotted < floor(K/n_c))
+                    while (n_allotted < num_per_cluster(n))
                         for c_idx = 1:n_c
     %                         k = find(user_cluster_map(:,c_idx),1);
                             k_idxs = find(user_cluster_map(:,c_idx));
@@ -292,7 +294,8 @@ for idxBSDensity = 1:length(lambda_BS)
                             end
                             user_sc_alloc (k,n) = 1;
                             n_allotted = n_allotted + 1;
-                            if (n_allotted == floor(K/n_c))
+%                             if (n_allotted == floor(K/n_c))
+                            if (n_allotted == num_per_cluster(n))
                                 break;
                             end
                         end
