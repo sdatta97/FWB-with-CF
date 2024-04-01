@@ -231,6 +231,7 @@ for idxBSDensity = 1:length(lambda_BS)
                
                 N = params.num_antennas_per_gNB;  % antennas per AP
                 L = params.numGNB_sub6;
+                K_mmW = params.numUE;
                 K = params.numUE + params.numUE_sub6;  % --Ground UEs
                 snr_db = params.snr_db;
                 LOOP = length(params.snr_db);
@@ -259,57 +260,54 @@ for idxBSDensity = 1:length(lambda_BS)
                 
 %                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
-%                 stream = RandStream('mlfg6331_64');  % Random number stream
-%                 options = statset('UseParallel',1,'UseSubstreams',1,'Streams',stream);
-%                 [cluster_idxs, cluster_centroids, sum_cluster_distances, cluster_distances] = kmeans([real(UEpositions), imag(UEpositions)],num_sc_sub6, 'Options',options,'MaxIter',10000,'Display','final','Replicates',10);
-                idx = 0;
-                n_pc = 0; %num_sc_sub6;
-                eq_n = 1;
-                split_clust = 1.3;
-                init_iter = 1;
-                realign = 1;
-                drawfig = 1;
-                dot_size = [10,40];
-                [cluster_centroids, cluster_idxs, n_c] = centroid_fct([real(UEpositions), imag(UEpositions)],idx,n_pc,eq_n,split_clust,init_iter,realign,drawfig,dot_size);
-                num_sc_sub6 = params.num_sc_sub6;
-                user_cluster_map = zeros(K,num_sc_sub6);
-                for k = 1:K
-                    user_cluster_map(k,cluster_idxs(k)) = 1;
-                end
-                user_sc_alloc = zeros(K,num_sc_sub6);
-                num_per_cluster = [floor(0.2*K), ceil(0.8*K)];
-                for n = 1:num_sc_sub6
-                    n_allotted = 0;
-%                     while (n_allotted < floor(K/n_c))
-                    while (n_allotted < num_per_cluster(n))
-                        for c_idx = 1:n_c
-    %                         k = find(user_cluster_map(:,c_idx),1);
-                            k_idxs = find(user_cluster_map(:,c_idx));
-    %                         if(sum(user_sc_alloc (k,:)) == 0)
-    %                             user_sc_alloc (k,n) = 1;
-    %                             user_cluster_map(k,c_idx) = 0;
-    %                         end
-%                             k = k_idxs(randi([1,numel(k_idxs)]));
-%                             while (user_sc_alloc(k,n) > 0)
-%                                 k = k_idxs(randi([1,numel(k_idxs)]));
+%                 idx = 0;
+%                 n_pc = 0; %num_sc_sub6;
+%                 eq_n = 1;
+%                 split_clust = 1.3;
+%                 init_iter = 1;
+%                 realign = 1;
+%                 drawfig = 1;
+%                 dot_size = [10,40];
+%                 [cluster_centroids, cluster_idxs, n_c] = centroid_fct([real(UEpositions), imag(UEpositions)],idx,n_pc,eq_n,split_clust,init_iter,realign,drawfig,dot_size);
+%                 num_sc_sub6 = params.num_sc_sub6;
+%                 user_cluster_map = zeros(K,num_sc_sub6);
+%                 for k = 1:K
+%                     user_cluster_map(k,cluster_idxs(k)) = 1;
+%                 end
+%                 user_sc_alloc = zeros(K,num_sc_sub6);
+%                 num_per_cluster = [floor(0.2*K), ceil(0.8*K)];
+%                 for n = 1:num_sc_sub6
+%                     n_allotted = 0;
+% %                     while (n_allotted < floor(K/n_c))
+%                     while (n_allotted < num_per_cluster(n))
+%                         for c_idx = 1:n_c
+%     %                         k = find(user_cluster_map(:,c_idx),1);
+%                             k_idxs = find(user_cluster_map(:,c_idx));
+%     %                         if(sum(user_sc_alloc (k,:)) == 0)
+%     %                             user_sc_alloc (k,n) = 1;
+%     %                             user_cluster_map(k,c_idx) = 0;
+%     %                         end
+% %                             k = k_idxs(randi([1,numel(k_idxs)]));
+% %                             while (user_sc_alloc(k,n) > 0)
+% %                                 k = k_idxs(randi([1,numel(k_idxs)]));
+% %                             end
+%                             unallocated_ues = setdiff(k_idxs,find(user_sc_alloc(:,n)));
+%                             try
+%                                 k = unallocated_ues(randi([1,numel(unallocated_ues)]));
+%                                 user_sc_alloc (k,n) = 1;
+%                                 n_allotted = n_allotted + 1;
+%     %                             if (n_allotted == floor(K/n_c))
+%                                 if (n_allotted == num_per_cluster(n))
+%                                     break;
+%                                 end
+%                             catch
+%                                 continue;
 %                             end
-                            unallocated_ues = setdiff(k_idxs,find(user_sc_alloc(:,n)));
-                            try
-                                k = unallocated_ues(randi([1,numel(unallocated_ues)]));
-                                user_sc_alloc (k,n) = 1;
-                                n_allotted = n_allotted + 1;
-    %                             if (n_allotted == floor(K/n_c))
-                                if (n_allotted == num_per_cluster(n))
-                                    break;
-                                end
-                            catch
-                                continue;
-                            end
-                        end
-                    end
-                end
-                params.user_sc_alloc = user_sc_alloc;
-                                
+%                         end
+%                     end
+%                 end
+                num_sc_sub6 = params.num_sc_sub6;
+                user_sc_alloc = ones(K,num_sc_sub6);                                
                 params.BETA = db2pow(gainOverNoisedB);   
                 params.D = D;
                 params.R_gNB = R_gNB;
@@ -317,19 +315,23 @@ for idxBSDensity = 1:length(lambda_BS)
                 params.R_ue_sub6 = R_ue_sub6;
                 numUE = params.numUE;
                 sub6ConnectionState = zeros(numUE,1);
-                ap_idxs = find(D(:,1));
-                ue_idxs = 1;
-                for a = 1:length(ap_idxs)
-                    ap_idx = ap_idxs(a);
-                    ue_idxs = union(ue_idxs,find(D(ap_idx,:)));
-                end
+%                 ap_idxs = find(D(:,1));
+%                 ue_idxs = 1;
+%                 for a = 1:length(ap_idxs)
+%                     ap_idx = ap_idxs(a);
+%                     ue_idxs = union(ue_idxs,find(D(ap_idx,:)));
+%                 end
                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
                 ue_idx = 1;
                 rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 sub6ConnectionState(ue_idx) = 1;
-                [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+%                 [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                user_sc_alloc(1,2) = 0;
+                user_sc_alloc(ue_idxs_affected,1) = 0;
+                params.user_sc_alloc = user_sc_alloc;
                 params.ue_rearranged = ue_idxs_affected;
-                [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+%                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
 %                 rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                 rate_dl_after_handoff = compute_link_rates_MIMO_fdm(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 rate_dl_after_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
@@ -358,8 +360,8 @@ for idxBSDensity = 1:length(lambda_BS)
                     'powFactor,','rate_before_handoff,','rate_after_handoff,','rate_before_handoff_affected,','rate_after_handoff_affected,','rate_mmW\n'];  
                 fprintf(fileID,output_categories);
                 min_rate_req = params.r_min(1);   
-                mean_rate_before_handoff = mean(rate_dl_before_handoff(2:end));
-                mean_rate_after_handoff = mean(rate_dl_after_handoff(2:end)); 
+                mean_rate_before_handoff = mean(rate_dl_before_handoff((1+K_mmW):end));
+                mean_rate_after_handoff = mean(rate_dl_after_handoff((1+K_mmW):end)); 
                 mean_rate_before_handoff_affected = mean(rate_dl_before_handoff(ue_idxs_affected));
                 mean_rate_after_handoff_affected = mean(rate_dl_after_handoff(ue_idxs_affected)); 
                 rate_mmW = rate_dl_after_handoff (1);
