@@ -1,1 +1,2 @@
 UE idx,lambdaBS,lambdaUE,numBlockers,powFactor,rate_before_handoff,rate_after_handoff,rate_before_handoff_affected,rate_after_handoff_affected,rate_mmW
+1,25,150,400,100,180842875.8229558765888214,279912665.1805726885795593,149978547.8572269082069397,181385900.8341049849987030,2181290644.7347755432128906
