@@ -15,7 +15,7 @@ tStart = tic;
 % %RNG seed.
 % rng(str2double(aID),'twister');
 % aID = randi([0, 99]);
-for aID = 0:99
+for aID = 19:99
     rng(aID,'twister');
     %% GUE channel parameters
     params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
@@ -58,7 +58,7 @@ for aID = 0:99
     % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
     
     %Power factor division
-    p_fac_arr = 10.^(0:1:5);
+    p_fac_arr = 10.^(0:1:4);
     % params.p_fac = 10;
     
     %Prepare to save simulation results
