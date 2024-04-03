@@ -317,6 +317,7 @@ for idxBSDensity = 1:length(lambda_BS)
     %                     end
     %                 end
     %                 params.user_sc_alloc = user_sc_alloc;
+                    num_sc_sub6 = params.num_sc_sub6;
                     params.BETA = db2pow(gainOverNoisedB);   
                     params.D = D;
                     params.R_gNB = R_gNB;
