@@ -331,13 +331,14 @@ while nextEventTime < params.simTime
 %                             params.p_fac = p_fac;
 %                         end
                         sub6ConnectionState(ue_idx) = 1;
-                        D_old = params.D;
-                        [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+%                         D_old = params.D;
+%                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                        [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
                         params.ue_rearranged = ue_idxs_affected;
 %                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
 %                         rate_dl = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                        rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-%                         rate_dl = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+%                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        rate_dl_after_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
 %                         if rate_dl(ue_idx) >= r_min(ue_idx)
@@ -345,15 +346,16 @@ while nextEventTime < params.simTime
 %                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl(ue_idxs_affected)) <= rate_reduce_threshold)
                         rate_dip_affected = mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl_after_handoff(ue_idxs_affected));
 %                         lb = mean(rate_dl_after_handoff(ue_idxs_affected)) - std(rate_dl_after_handoff(ue_idxs_affected));
-                        lb = quantile(rate_dl_after_handoff(ue_idxs_affected),params.lb_thres);
+%                         lb = quantile(rate_dl_after_handoff(ue_idxs_affected),params.lb_thres);
+                        lb = quantile(rate_dl_after_handoff((1+params.numUE):end),params.lb_thres);
                         if rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6) %&& (rate_dip_affected <= rate_reduce_threshold) 
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 1;
                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
-                        else
-                            params.D = D_old;
+%                         else
+%                             params.D = D_old;
                         end
                     end
                     %BS didnt recover now we declare beam faiure and go to
