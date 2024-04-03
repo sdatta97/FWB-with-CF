@@ -1,7 +1,7 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = 'C:/Users/dsoum/Desktop/outageData/outageResultsvaryinglbthres/outage_25';
+projectdir = 'C:\Users\dsoum\Desktop\impactData\impactData_new_50_50_fdm_pow\pf_10000';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
@@ -23,15 +23,15 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
 % end
-changingVars = cell(1,length(colNames)-4);
-for i=1:(length(colNames)-4)
-    changingVars{i} = colNames{i};
-end
-% changingVars = cell(1,length(colNames)-5);
-% for i=1:(length(colNames)-5)
+% changingVars = cell(1,length(colNames)-4);
+% for i=1:(length(colNames)-4)
 %     changingVars{i} = colNames{i};
 % end
+changingVars = cell(1,length(colNames)-5);
+for i=1:(length(colNames)-5)
+    changingVars{i} = colNames{i};
+end
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
 
-writetable(summaryTable,'./outage_lb_25.txt')
-writetable(summaryTable,'./outage_lb_25.csv')
+writetable(summaryTable,'./impact_new_50_50_fdm_pf_10000.txt')
+writetable(summaryTable,'./impact_new_50_50_fdm_pf_10000.csv')

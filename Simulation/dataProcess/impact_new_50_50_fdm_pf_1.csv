@@ -1,0 +1,2 @@
+UEIdx,lambdaBS,lambdaUE,numBlockers,powFactor,GroupCount,mean_rate_before_handoff,std_rate_before_handoff,mean_rate_after_handoff,std_rate_after_handoff,mean_rate_before_handoff_affected,std_rate_before_handoff_affected,mean_rate_after_handoff_affected,std_rate_after_handoff_affected,mean_rate_mmW,std_rate_mmW
+1,25,150,400,1,75,182086001.020269,13441372.7429607,174792558.31807,14706055.1778792,143728100.513168,33958418.3093508,91253161.8967758,28618289.9890166,2454833832.48111,2105008579.68139

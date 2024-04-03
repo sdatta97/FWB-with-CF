@@ -68,7 +68,7 @@ if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
             if ismember(m,Serv{k})
                 for n = 1:num_sc_sub6
                     %term = (N_AP*N_UE_sub6*num_sc_sub6*beta_uc(m,:)*user_sc_alloc(:,n));
-                    term = (N_AP*(N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n))));                      
+                    term = num_sc_sub6*N_AP*(N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                      
                     if term > 0
                         if ismember(k,ue_rearranged) 
                             eta_eq(m,k,n) = p_fac_rearrange/term;
@@ -88,7 +88,7 @@ else
                 if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
                     for n = 1:num_sc_sub6
 %                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
-                        term = N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                                              
+                        term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                                              
                         if term > 0
                             eta_eq(m,k,n) = p_fac/term;
                         end
@@ -97,9 +97,9 @@ else
 %                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
                     for n = 1:num_sc_sub6
 %                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
-                        term = N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                        
+                        term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                        
                         if term > 0
-                            if ismember(k,ue_rearranged) %term = (N_AP*N_UE_sub6*num_sc_sub6*beta_uc(m,:)*user_sc_alloc(:,n));
+                            if ismember(k,ue_rearranged) 
                                 eta_eq(m,k,n) = p_fac_rearrange/term;
                             else
                                 eta_eq(m,k,n) = 1/term;
