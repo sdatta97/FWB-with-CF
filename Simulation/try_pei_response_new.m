@@ -325,7 +325,7 @@ for idxBSDensity = 1:length(lambda_BS)
 %                 end
                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
                 ue_idx = 1;
-%                 rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 sub6ConnectionState(ue_idx) = 1;
 %                 [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                 [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
