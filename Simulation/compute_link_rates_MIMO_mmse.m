@@ -84,7 +84,7 @@ dl_mmse_precoder_mmW = zeros(size(channel_est_dl_mmW));
 dl_mmse_precoder = zeros(size(channel_est_dl));
 for m = 1:M
     for k = 1:K_mmW
-        inv_matrix = zeros(Ntx,N_UE_mmW);
+        inv_matrix = eye(Ntx);
         for q = 1:K_mmW
             if ismember(m,Serv{q})
                 inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
@@ -95,11 +95,10 @@ for m = 1:M
                 inv_matrix = inv_matrix + p_d*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
             end
         end
-        inv_matrix = inv_matrix + eye(Ntx);
         dl_mmse_precoder_mmW(m,k,:,:) = reshape(dl_mmse_precoder_mmW(m,k,:,:),[Ntx,N_UE_mmW]) + p_d*inv_matrix\(D(m,k)*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]));
     end
     for k = 1:K-K_mmW
-        inv_matrix = zeros(Ntx,N_UE_sub6);
+        inv_matrix = eye(Ntx);
         for q = 1:K_mmW
             if ismember(m,Serv{q})
                 inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
@@ -110,7 +109,6 @@ for m = 1:M
                 inv_matrix = inv_matrix +  p_d*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
             end
         end
-        inv_matrix = inv_matrix + eye(Ntx);
         dl_mmse_precoder(m,k,:,:) = reshape(dl_mmse_precoder(m,k,:,:),[Ntx,N_UE_sub6]) + p_d*inv_matrix\(D(m,k+K_mmW)*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]));
     end
 end
