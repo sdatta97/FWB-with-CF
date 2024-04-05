@@ -10,6 +10,17 @@ N_UE_sub6 = size(channel_dl,4);
 p_d = params.rho_tot; % 1*K;
 p_fac = params.p_fac;
 D = params.D;
+
+%Communication bandwidth (Hz)
+B = params.Band;
+% B = params.scs_sub6;
+
+%Noise figure (in dB)
+noiseFigure = 7;
+
+%Compute noise power (in dBm)
+noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
+noiseVariance = db2pow(noiseVariancedBm-30);
 % perm_vec  = repmat(randperm(tau_p),1,2);
 % phi_index = perm_vec(1:K);
 % for k = 1:K
@@ -84,29 +95,29 @@ dl_mmse_precoder_mmW = zeros(size(channel_est_dl_mmW));
 dl_mmse_precoder = zeros(size(channel_est_dl));
 for m = 1:M
     for k = 1:K_mmW
-        inv_matrix = eye(Ntx);
+        inv_matrix = noiseVariance*eye(Ntx);
         for q = 1:K_mmW
             if ismember(m,Serv{q})
-                inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
+                inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
             end
         end
         for q = 1:K-K_mmW
             if ismember(m,Serv{q+K_mmW})
-                inv_matrix = inv_matrix + p_d*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
+                inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
             end
         end
         dl_mmse_precoder_mmW(m,k,:,:) = reshape(dl_mmse_precoder_mmW(m,k,:,:),[Ntx,N_UE_mmW]) + p_d*inv_matrix\(reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]));
     end
     for k = 1:K-K_mmW
-        inv_matrix = eye(Ntx);
+        inv_matrix = noiseVariance*eye(Ntx);
         for q = 1:K_mmW
             if ismember(m,Serv{q})
-                inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
+                inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
             end
         end
         for q = 1:K-K_mmW
             if ismember(m,Serv{q+K_mmW})
-                inv_matrix = inv_matrix +  p_d*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
+                inv_matrix = inv_matrix +  p_d*noiseVariance*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
             end
         end
         dl_mmse_precoder(m,k,:,:) = reshape(dl_mmse_precoder(m,k,:,:),[Ntx,N_UE_sub6]) + p_d*inv_matrix\(reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]));
