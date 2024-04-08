@@ -114,8 +114,8 @@ for idxBSDensity = 1:length(lambda_BS)
     while (n==0)
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
     end
-    params.numGNB = 1;
-    %     params.numGNB = n;
+    % params.numGNB = 1;
+    params.numGNB = n;
     % params.numGNB = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
     % params.numGNB = floor(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
     params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
@@ -218,50 +218,46 @@ for idxBSDensity = 1:length(lambda_BS)
             % real RACH delay 20ms plus a extra delay coming from signaling around 10ms
             % protocolParams.signalingAfterRachTime = [5 10 20]*10^(-3);
             protocolParams.signalingAfterRachTime = 0; %20*10^(-3);
+            %% protocol params from other paper
+            frac = (mean(params.hb)-params.hr)/(params.ht-params.hr);
+            protocolParams.theta = 2*params.V.*params.lambdaBlockers*frac/pi;
+            % density_limits = [30,40,50,60,70];      % up to how many BS in coverage area, it will be ok since poisson distr.
+            % K_list = [1,2,3,4];                      % Degree of Connectivity
+            % protocolParams.omega_list = 1./protocolParams.connection_time;
+            % self_blockage = 5/6;
+           
+            N = params.num_antennas_per_gNB;  % antennas per AP
+            L = params.numGNB_sub6;
+            K_mmW = params.numUE;
+            K = params.numUE + params.numUE_sub6;  % --Ground UEs
+            snr_db = params.snr_db;
+            LOOP = length(params.snr_db);
+            asd_length = length(params.ASD_VALUE);
+            hi_length = length(params.Kt_Kr_vsUE);
+            ASD_VALUE = params.ASD_VALUE;
+            ASD_CORR = params.ASD_CORR;
+            Kt_Kr_vsUE = params.Kt_Kr_vsUE;
+            K_Factor = params.K_Factor;
+            RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
+            Perf_CSI = params.Perf_CSI;
+            cov_area = params.cov_area;
+            %%
+            TAU_P_K_by_two = params.TAU_P_K_by_two;  
+            CH_estimation = params.CH_estimation;  
+            %%
+            LB = params.LB;  %Lower bound
+            UB = params.UB;  %Upper bound
+            no_of_rea = params.no_of_rea;     % no.of channel realizations
+            %%
+            pilot_pow = params.pilot_pow; 
+            noiseFigure = params.noiseFigure;
+            sigma_sf = params.sigma_sf;
+            Band = params.Band; %Communication bandwidth
+            tau_c = params.tau_c;      % coherence block length  
             
-            for p_idx = 1:length(p_fac_arr)
-                params.p_fac = p_fac_arr(p_idx);
-                params.p_fac_rearrange = 0.1*p_fac_arr(p_idx);                
-                %% protocol params from other paper
-                frac = (mean(params.hb)-params.hr)/(params.ht-params.hr);
-                protocolParams.theta = 2*params.V.*params.lambdaBlockers*frac/pi;
-                % density_limits = [30,40,50,60,70];      % up to how many BS in coverage area, it will be ok since poisson distr.
-                % K_list = [1,2,3,4];                      % Degree of Connectivity
-                % protocolParams.omega_list = 1./protocolParams.connection_time;
-                % self_blockage = 5/6;
-               
-                N = params.num_antennas_per_gNB;  % antennas per AP
-                L = params.numGNB_sub6;
-                K_mmW = params.numUE;
-                K = params.numUE + params.numUE_sub6;  % --Ground UEs
-                snr_db = params.snr_db;
-                LOOP = length(params.snr_db);
-                asd_length = length(params.ASD_VALUE);
-                hi_length = length(params.Kt_Kr_vsUE);
-                ASD_VALUE = params.ASD_VALUE;
-                ASD_CORR = params.ASD_CORR;
-                Kt_Kr_vsUE = params.Kt_Kr_vsUE;
-                K_Factor = params.K_Factor;
-                RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
-                Perf_CSI = params.Perf_CSI;
-                cov_area = params.cov_area;
-                %%
-                TAU_P_K_by_two = params.TAU_P_K_by_two;  
-                CH_estimation = params.CH_estimation;  
-                %%
-                LB = params.LB;  %Lower bound
-                UB = params.UB;  %Upper bound
-                no_of_rea = params.no_of_rea;     % no.of channel realizations
-                %%
-                pilot_pow = params.pilot_pow; 
-                noiseFigure = params.noiseFigure;
-                sigma_sf = params.sigma_sf;
-                Band = params.Band; %Communication bandwidth
-                tau_c = params.tau_c;      % coherence block length  
-                
 %                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
-                [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
-                % [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,aID);
+            [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
+            % [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,aID);
 %                 idx = 0;
 %                 n_pc = 0; %num_sc_sub6;
 %                 eq_n = 1;
@@ -308,32 +304,34 @@ for idxBSDensity = 1:length(lambda_BS)
 %                         end
 %                     end
 %                 end
-                num_sc_sub6 = params.num_sc_sub6;
-                user_sc_alloc = ones(K,num_sc_sub6);                                
-                params.BETA = db2pow(gainOverNoisedB);   
-                params.D = D;
-                params.R_gNB = R_gNB;
-                params.R_ue_mmW = R_ue_mmW;
-                params.R_ue_sub6 = R_ue_sub6;
-                numUE = params.numUE;
-                sub6ConnectionState = zeros(numUE,1);
+            num_sc_sub6 = params.num_sc_sub6;
+            user_sc_alloc = ones(K,num_sc_sub6);                                
+            params.BETA = db2pow(gainOverNoisedB);   
+            params.D = D;
+            params.R_gNB = R_gNB;
+            params.R_ue_mmW = R_ue_mmW;
+            params.R_ue_sub6 = R_ue_sub6;
+            numUE = params.numUE;
+            sub6ConnectionState = zeros(numUE,1);
 %                 ap_idxs = find(D(:,1));
 %                 ue_idxs = 1;
 %                 for a = 1:length(ap_idxs)
 %                     ap_idx = ap_idxs(a);
 %                     ue_idxs = union(ue_idxs,find(D(ap_idx,:)));
 %                 end
-                [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+            [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params); 
+            for p_idx = 1:length(p_fac_arr)
+                params.p_fac = p_fac_arr(p_idx);
+                params.p_fac_rearrange = 0.1*p_fac_arr(p_idx); 
                 ue_idx = 1;
                 rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                 sub6ConnectionState(ue_idx) = 1;
-%                 [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+    %                 [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                 [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
-%                 user_sc_alloc(1,2) = 0;
-%                 user_sc_alloc(ue_idxs_affected,1) = 0;
-%                 params.user_sc_alloc = user_sc_alloc;
-%                 params.ue_rearranged = ue_idxs_affected;
-%                 [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+    %                 user_sc_alloc(1,2) = 0;
+    %                 user_sc_alloc(ue_idxs_affected,1) = 0;
+    %                 params.user_sc_alloc = user_sc_alloc;
+%                 params.ue_rearranged = ue_idxs_affected;           
 %                 rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                 rate_dl_after_handoff = compute_link_rates_MIMO_fdm(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                 rate_dl_after_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
