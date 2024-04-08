@@ -139,8 +139,19 @@ for m = 1:M
 end
 % dl_mmse_precoder_mmW = conj(channel_est_dl_mmW);
 % dl_mmse_precoder = conj(channel_est_dl);
-dl_mmse_precoder_mmW = dl_mmse_precoder_mmW.*(sqrt(eta_eq(:,1:K_mmW))./(sqrt(scaling_LP_mmse(:,1:K_mmW))));
-dl_mmse_precoder = dl_mmse_precoder.*(sqrt(eta_eq(:,(1+K_mmW):K))./(sqrt(scaling_LP_mmse(:,(1+K_mmW):K))));
+for m = 1:M
+    servedUEs = find(D(m,:)==1);
+    for k = 1:K_mmW
+        if ismember(k,servedUEs)
+            dl_mmse_precoder_mmW(m,k) = dl_mmse_precoder_mmW(m,k)*(sqrt(eta_eq(m,k))/(sqrt(scaling_LP_mmse(m,k))));
+        end
+    end
+    for k = 1:K-K_mmW
+        if ismember(k+K_mmW,servedUEs)
+            dl_mmse_precoder(m,k) = dl_mmse_precoder(m,k)*(sqrt(eta_eq(m,k+K_mmW))/(sqrt(scaling_LP_mmse(m,k+K_mmW))));
+        end
+    end
+end
 for k = 1:K_mmW
     for q = 1:K_mmW
         for m = 1:M
