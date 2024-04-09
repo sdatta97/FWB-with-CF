@@ -155,14 +155,14 @@ end
 for k = 1:K_mmW
     for q = 1:K_mmW
         for m = 1:M
-            if (ismember(m,Serv{k}) && ismember(m,Serv{q}))
+            if ismember(m,Serv{q})
                 D_mmW_mmW(k,q,:,:) = reshape(D_mmW_mmW(k,q,:,:),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(dl_mmse_precoder_mmW(m,q,:,:),[Ntx,N_UE_mmW]);
             end
         end
     end
     for q = 1:K-K_mmW
         for m = 1:M
-            if (ismember(m,Serv{k}) && ismember(m,Serv{q+K_mmW}))
+            if ismember(m,Serv{q+K_mmW})
                 D_mmW_sub6(k,q,:,:) = reshape(D_mmW_sub6(k,q,:,:),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(dl_mmse_precoder(m,q,:,:),[Ntx,N_UE_sub6]);
             end
         end
@@ -171,14 +171,14 @@ end
 for k = 1:K-K_mmW
     for q = 1:K_mmW
         for m = 1:M
-            if (ismember(m,Serv{k+K_mmW}) && ismember(m,Serv{q}))
+            if ismember(m,Serv{q})
                 D_sub6_mmW(k,q,:,:) = reshape(D_sub6_mmW(k,q,:,:),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(dl_mmse_precoder_mmW(m,q,:,:),[Ntx,N_UE_mmW]);
             end
         end
     end
     for q = 1:K-K_mmW
         for m = 1:M
-            if (ismember(m,Serv{k+K_mmW}) && ismember(m,Serv{q+K_mmW}))
+            if ismember(m,Serv{q+K_mmW})
                 D_sub6_sub6(k,q,:,:) = reshape(D_sub6_sub6(k,q,:,:),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(dl_mmse_precoder(m,q,:,:),[Ntx,N_UE_sub6]);
             end
         end
