@@ -15,7 +15,7 @@ tStart = tic;
 %RNG seed.
 % rng(str2double(aID),'twister');
 % aID = randi([0, 99]);
-for aID = 0:99
+for aID = 1:99
     rng(aID,'twister');
     %% GUE channel parameters
     params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
