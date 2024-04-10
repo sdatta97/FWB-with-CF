@@ -319,9 +319,10 @@ while nextEventTime < params.simTime
                     else                        
                         sub6ConnectionState = UE.sub6ConnectionState;
                         [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-                        rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                         
 %                         rate_dl_before_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if (sub6ConnectionState == zeros(params.numUE,1))
 %                             p_fac = params.p_fac;
 %                             params.p_fac = 0;
@@ -334,15 +335,16 @@ while nextEventTime < params.simTime
 %                         D_old = params.D;
 %                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
-                        user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
-                        user_sc_alloc(ue_idx,2) = 0;
-                        user_sc_alloc(ue_idxs_affected,1) = 0;
-                        params.user_sc_alloc = user_sc_alloc;
-                        params.ue_rearranged = ue_idxs_affected;
+                        % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
+                        % user_sc_alloc(ue_idx,2) = 0;
+                        % user_sc_alloc(ue_idxs_affected,1) = 0;
+                        % params.user_sc_alloc = user_sc_alloc;
+                        % params.ue_rearranged = ue_idxs_affected;
 %                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
 %                         rate_dl = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                        rate_dl_after_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        % rate_dl_after_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                         rate_dl_after_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                 
 %                         rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
 %                         if rate_dl(ue_idx) >= r_min(ue_idx)
