@@ -8,40 +8,7 @@ Ntx = size(channel_dl,3);
 N_UE_mmW = size(channel_dl_mmW,4);
 N_UE_sub6 = size(channel_dl,4);
 p_d = params.rho_tot; % 1*K;
-p_fac = params.p_fac;
 D = params.D;
-
-%Communication bandwidth (Hz)
-B = params.Band;
-% B = params.scs_sub6;
-
-% %Noise figure (in dB)
-% noiseFigure = 7;
-% 
-% %Compute noise power (in dBm)
-% noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
-% noiseVariance = db2pow(noiseVariancedBm-30);
-% perm_vec  = repmat(randperm(tau_p),1,2);
-% phi_index = perm_vec(1:K);
-% for k = 1:K
-%     PHI(:,k) = PHI1(:,phi_index(k));
-% end
-% gamma_num = zeros(M,K);
-% gamma_den = zeros(M,K);
-% Gamma = zeros(M,K);
-% for m = 1:M
-%     for k = 1:K
-%         gamma_num(m,k) = tau_p*p_p*(BETA(m,k)^2);
-%         gamma_den_temp = zeros(1,K);
-%         for j = 1:K
-%             gamma_den_temp(j) = BETA(m,j)*(abs(PHI(:,j)'*PHI(:,k))^2);
-%         end
-% 
-%         gamma_den(m,k) = tau_p*p_p*sum(gamma_den_temp)+1;
-% 
-%         Gamma(m,k) = gamma_num(m,k)/gamma_den(m,k);
-%     end
-% end
 BETA = params.BETA;
 beta_uc = zeros(size(BETA));
 
