@@ -23,8 +23,7 @@ function p_out = CF_outage_analytical(params,ue_idx,lambda_BS,lambda_UE)
 %     N_bar = ceil(lambda_UE*pi*R^2);
 %     F1 = @(t) (exp(-2*pi*lambda_BS*(0.5*(R^2-r0^2) - jfunc(-1j.*t.*ps,N_bar,1j.*(t./T).*(ps*Ns),N,r0,R))));
 %     F2 = @(t) (exp(-2*pi*lambda_BS*(0.5*(R_inf^2-R^2) - jfunc(-1j.*t.*ps,N_bar,0,N-N_bar,R,R_inf))));
-% %     fun = @(t) ((1/t).*fourier(exp(1j*t)*((1-1j*t*(ps*(1+r0/d0)^(-mu)))^(-N_bar))*((1+1j*(t/T)*(ps*Ns*(1+r0/d0)^(-mu)))^(-N))*(F1(t)*F2(t))));
-%     fun = @(t) ((1./t).*fft(exp(1j.*t).*((1-1j.*t.*(ps*(1+r0/d0)^(-mu))).^(-N_bar)).*((1+1j.*(t./T).*(ps*Ns*(1+r0/d0)^(-mu))).^(-N)).*(F1(t).*F2(t))));
+%     fun = @(t) ((1./t).*imag(exp(1j.*t).*((1-1j.*t.*(ps*(1+r0/d0)^(-mu))).^(-N_bar)).*((1+1j.*(t./T).*(ps*Ns*(1+r0/d0)^(-mu))).^(-N)).*(F1(t).*F2(t))));
 % %     syms t
 % %     p_out = 0.5 - (1/pi)*integral(fun(t),0,10);
 %     t_arr = 1; %1:1:10; 
@@ -38,8 +37,6 @@ function p_out = CF_outage_analytical(params,ue_idx,lambda_BS,lambda_UE)
     N_bar = ceil(lambda_UE*pi*R^2);
     F1 = @(t) (exp(-2*pi*lambda_BS*(0.5*(R^2-r0^2) - jfunc(-1j*t*ps,N_bar,1j*(t/T)*(ps*Ns),N,r0,R,d0,mu))));
     F2 = @(t) (exp(-2*pi*lambda_BS*(0.5*(R_inf^2-R^2) - jfunc(-1j*t*ps,N_bar,-1j*t*pz,N-N_bar,R,R_inf,d0,mu))));
-%     fun = @(t) ((1/t).*fourier(exp(1j*t)*((1-1j*t*(ps*(1+r0/d0)^(-mu)))^(-N_bar))*((1+1j*(t/T)*(ps*Ns*(1+r0/d0)^(-mu)))^(-N))*(F1(t)*F2(t))));
-%     fun = @(t) ((1/t)*fft(exp(1j*t)*((1-1j*t*(ps*(1+r0/d0)^(-mu)))^(-N_bar))*((1+1j*(t/T)*(ps*Ns*(1+r0/d0)^(-mu)))^(-N))*(F1(t)*F2(t))));
     fun = @(t) ((1/t)*imag(exp(1j*t*noise_var)*((1-1j*t*(ps*(1+r0/d0)^(-mu)))^(-N_bar))*((1+1j*(t/T)*(ps*Ns*(1+r0/d0)^(-mu)))^(-N))*(F1(t)*F2(t))));
 %     syms t
 %     p_out = 0.5 - (1/pi)*integral(fun(t),0,10);
