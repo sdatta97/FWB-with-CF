@@ -1,8 +1,8 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = 'C:\Users\dsoum\FWB-with-CF\Simulation\resultData\impactResults';
-dinfo = dir(fullfile(projectdir, '*mmse.csv'));   %use appropriate extension
+projectdir = 'C:\Users\dsoum\Desktop\outageData\outageResultsvaryinglbthres_mmse\outage_10';
+dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
 tables = cell(nfiles,1);
@@ -23,15 +23,15 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
 % end
-% changingVars = cell(1,length(colNames)-4);
-% for i=1:(length(colNames)-4)
-%     changingVars{i} = colNames{i};
-% end
-changingVars = cell(1,length(colNames)-5);
-for i=1:(length(colNames)-5)
+changingVars = cell(1,length(colNames)-4);
+for i=1:(length(colNames)-4)
     changingVars{i} = colNames{i};
 end
+% changingVars = cell(1,length(colNames)-5);
+% for i=1:(length(colNames)-5)
+%     changingVars{i} = colNames{i};
+% end
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
 
-writetable(summaryTable,'./impact_mmse.txt')
-writetable(summaryTable,'./impact_mmse.csv')
+writetable(summaryTable,'./outage_mmse_lb_thres_10.txt')
+writetable(summaryTable,'./outage_mmse_lb_thres_10.csv')
