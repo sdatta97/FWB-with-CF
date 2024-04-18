@@ -27,13 +27,13 @@ ylim([icdf('Normal',[pTicks(1) pTicks(end)], 0, 1)])
 ylabel('Probability');
 xlabel('Significant wave height (m)');
 grid on
-suptitle(['Compare this graph with Ochi (1992), Fig. 4b ' ...
+title(['Compare this graph with Ochi (1992), Fig. 4b ' ...
      '(doi: 10.1061/9780872629332.038).']);
 
 
 % Test #2: Does the parameter estimation work correctly?
 % Unfortunately, for the distribution shown in Ochi, Fig a, the MLE does 
-% not converge. To repruce this problem the following three lines of 
+% not converge. To reproduce this problem the following three lines of 
 % code can be uncommented:
 % pdTrue = GeneralizedGamma(15.77, 0.612, 8.71);
 % hsPoints =   [1    2    4     6    8     10    ]; % from Ochi (1992), Fig. 4a
@@ -87,5 +87,5 @@ text(1.15, mean(mEstimated), [num2str(mean(mEstimated), '%1.3f') '+-' ...
     num2str(std(mEstimated), '%1.3f')], 'fontsize', 8, ...
     'verticalalignment', 'bottom'); 
 box off
-suptitle(['Parameter estimation, true parameters: ' ...
+title(['Parameter estimation, true parameters: ' ...
     num2str(pdTrue.Lambda) ', ' num2str(pdTrue.C) ', ' num2str(pdTrue.M)]);

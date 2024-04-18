@@ -361,7 +361,8 @@ for idxBSDensity = 1:length(lambda_BS)
     %                                        tos = tos3;
     %                                    end
                                        ue_idx = 1;
-                                       p_out = CF_outage_analytical(params,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity));
+                                       % p_out = CF_outage_analytical(params,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity));
+                                       p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity));
     %                                    outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
                                        outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*pos3;
                                        outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
