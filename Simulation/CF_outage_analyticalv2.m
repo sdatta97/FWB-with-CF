@@ -14,8 +14,20 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     K_mmW = params.numUE;
     p_d = params.rho_tot;
     B = params.Band;
-    rmin = params.r_min_sub6 (1);
+    rmin = params.r_min_sub6(1);
+    %Communication bandwidth (Hz)
+    B = params.Band;
+    % B = params.scs_sub6;
+    
+    %Noise figure (in dB)
+    noiseFigure = 7;
+    
+    %Compute noise power (in dBm)
+    noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
+    % noisevar = db2pow(noiseVariancedBm);
+    noisevar = 1;
     BETA = params.BETA;
+    % BETA = (params.BETA)*noisevar;
     beta_uc = zeros(size(BETA));
     sub6ConnectionState = params.sub6ConnectionState;
     %Prepare array to store the number of APs serving a specficic UE
@@ -67,10 +79,10 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
                         N_tilde_den(k) = N_tilde_den(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
                         beta_tilde_num(k) = beta_tilde_num(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
                         beta_tilde_den(k) = beta_tilde_den(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
-                        k_tilde_num(k) = k_tilde_num(k) + beta(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
-                        k_tilde_den(k) = k_tilde_den(k) + p_d*(beta(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                        theta_tilde_num(k) = theta_tilde_num(k) + p_d*(beta(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                        theta_tilde_den(k) = theta_tilde_den(k) + p_d*beta(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
+                        k_tilde_num(k) = k_tilde_num(k) + BETA(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
+                        k_tilde_den(k) = k_tilde_den(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                        theta_tilde_num(k) = theta_tilde_num(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                        theta_tilde_den(k) = theta_tilde_den(k) + p_d*BETA(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
                     end
                 end
             end
@@ -91,10 +103,10 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
                             N_tilde_den(k) = N_tilde_den(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
                             beta_tilde_num(k) = beta_tilde_num(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
                             beta_tilde_den(k) = beta_tilde_den(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
-                            k_tilde_num(k) = k_tilde_num(k) + beta(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
-                            k_tilde_den(k) = k_tilde_den(k) + p_d*(beta(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_num(k) = theta_tilde_num(k) + p_d*(beta(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_den(k) = theta_tilde_den(k) + p_d*beta(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
+                            k_tilde_num(k) = k_tilde_num(k) + BETA(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
+                            k_tilde_den(k) = k_tilde_den(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                            theta_tilde_num(k) = theta_tilde_num(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                            theta_tilde_den(k) = theta_tilde_den(k) + p_d*BETA(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
                         end
                     elseif (k>K_mmW)
     %                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
@@ -112,10 +124,10 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
                             N_tilde_den(k) = N_tilde_den(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
                             beta_tilde_num(k) = beta_tilde_num(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
                             beta_tilde_den(k) = beta_tilde_den(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
-                            k_tilde_num(k) = k_tilde_num(k) + beta(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
-                            k_tilde_den(k) = k_tilde_den(k) + p_d*(beta(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_num(k) = theta_tilde_num(k) + p_d*(beta(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_den(k) = theta_tilde_den(k) + p_d*beta(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
+                            k_tilde_num(k) = k_tilde_num(k) + BETA(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
+                            k_tilde_den(k) = k_tilde_den(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                            theta_tilde_num(k) = theta_tilde_num(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                            theta_tilde_den(k) = theta_tilde_den(k) + p_d*BETA(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
                         end
                     end
                 end
@@ -133,6 +145,13 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
         if(theta_tilde_den(k) > 0)
             theta_tilde(k) = (theta_tilde_num(k)^2)/(theta_tilde_den(k));
         end
-    end  
-    pdTrue = GeneralizedGamma(1.37, 0.98, 1.60);
+    end 
+    x = (rmin*noisevar):0.1*(rmin*noisevar):2*(rmin*noisevar);
+    y = (x./rmin) - noisevar;
+    for k = 1:K
+        pdTrue = GeneralizedGamma(1/beta_tilde(k), 2, 0.5*N_tilde(k));
+        f = pdTrue.pdf(x);
+        F = pdTrue.cdf(x);
+        fy = gamcdf(y,k_tilde(k),theta_tilde(k));
+    end
 end
