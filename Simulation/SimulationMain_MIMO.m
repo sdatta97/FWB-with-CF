@@ -106,7 +106,7 @@ lambda_UE_sub6 = 225; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-lb_thresh = [0.05, 0.1]; %[0.1, 0.25, 0.5];
+lb_thresh = [0, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
