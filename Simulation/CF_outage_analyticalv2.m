@@ -146,16 +146,19 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
             theta_tilde(k) = theta_tilde_num(k)/theta_tilde_den(k);
         end
     end 
-    x = (rmin*noisevar):0.01*(rmin*noisevar):1.1*(rmin*noisevar);
-    y = (x./rmin) - noisevar;
+    % x = (rmin*noisevar):0.01*(rmin*noisevar):1.1*(rmin*noisevar);
+    % y = (x./rmin) - noisevar;
+    y = (1:0.1:2)*noisevar;
+    x = rmin*(y+noisevar);
     for k = 1:K
         pdTrue = GeneralizedGamma(1/beta_tilde(k), 2, 0.5*N_tilde(k));
         f = pdTrue.pdf(x);
         F = pdTrue.cdf(x);
         if k_tilde(k)>0
-            Fy = gamcdf(y,k_tilde(k),theta_tilde(k));
+            fy = gampdf(y,k_tilde(k),theta_tilde(k));
         else
-            Fy = ones(size(y));
+            fy = zeros(size(y));
+            fy(1) = Inf;
         end
     end
 end
