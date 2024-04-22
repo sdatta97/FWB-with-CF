@@ -60,14 +60,31 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     k_tilde_den = zeros(K,1);
     theta_tilde_num = zeros(K,1);
     theta_tilde_den = zeros(K,1);    
-    if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
-        ues_not_rearranged = setdiff((1+K_mmW):K,ue_rearranged);
-        for m = 1:M
-            for k = 1+K_mmW:K
-                if ismember(m,Serv{k})
+    ues_not_rearranged = setdiff((1+K_mmW):K,ue_rearranged);
+    for m = 1:M
+        for k = 1:K
+            if ismember(m,Serv{k})
+                if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
                     for n = 1:num_sc_sub6
-                        %term = (N_AP*N_UE_sub6*num_sc_sub6*beta_uc(m,:)*user_sc_alloc(:,n));
-                        term = num_sc_sub6*N_AP*(N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                      
+%                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
+                        term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                                              
+                        if term > 0
+                            eta_eq(m,k,n) = p_fac/term;
+                        end
+                        N_tilde_num(k) = N_tilde_num(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
+                        N_tilde_den(k) = N_tilde_den(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
+                        beta_tilde_num(k) = beta_tilde_num(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
+                        beta_tilde_den(k) = beta_tilde_den(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
+                        k_tilde_num(k) = k_tilde_num(k) + BETA(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
+                        k_tilde_den(k) = k_tilde_den(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                        theta_tilde_num(k) = theta_tilde_num(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
+                        theta_tilde_den(k) = theta_tilde_den(k) + p_d*BETA(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
+                    end
+                elseif (k>K_mmW)
+%                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
+                    for n = 1:num_sc_sub6
+%                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
+                        term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                        
                         if term > 0
                             if ismember(k,ue_rearranged) 
                                 eta_eq(m,k,n) = p_fac_rearrange/term;
@@ -83,52 +100,6 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
                         k_tilde_den(k) = k_tilde_den(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
                         theta_tilde_num(k) = theta_tilde_num(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
                         theta_tilde_den(k) = theta_tilde_den(k) + p_d*BETA(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
-                    end
-                end
-            end
-        end
-    else
-        ues_not_rearranged = setdiff((1+K_mmW):K,ue_rearranged);
-        for m = 1:M
-            for k = 1:K
-                if ismember(m,Serv{k})
-                    if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
-                        for n = 1:num_sc_sub6
-    %                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
-                            term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                                              
-                            if term > 0
-                                eta_eq(m,k,n) = p_fac/term;
-                            end
-                            N_tilde_num(k) = N_tilde_num(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
-                            N_tilde_den(k) = N_tilde_den(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
-                            beta_tilde_num(k) = beta_tilde_num(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
-                            beta_tilde_den(k) = beta_tilde_den(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
-                            k_tilde_num(k) = k_tilde_num(k) + BETA(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
-                            k_tilde_den(k) = k_tilde_den(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_num(k) = theta_tilde_num(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_den(k) = theta_tilde_den(k) + p_d*BETA(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
-                        end
-                    elseif (k>K_mmW)
-    %                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
-                        for n = 1:num_sc_sub6
-    %                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
-                            term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                        
-                            if term > 0
-                                if ismember(k,ue_rearranged) 
-                                    eta_eq(m,k,n) = p_fac_rearrange/term;
-                                else
-                                    eta_eq(m,k,n) = 1/term;
-                                end
-                            end
-                            N_tilde_num(k) = N_tilde_num(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
-                            N_tilde_den(k) = N_tilde_den(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
-                            beta_tilde_num(k) = beta_tilde_num(k) + p_d*eta_eq(m,k,n)*(beta_uc(m,k))^2;
-                            beta_tilde_den(k) = beta_tilde_den(k) + sqrt(p_d*eta_eq(m,k,n))*beta_uc(m,k);
-                            k_tilde_num(k) = k_tilde_num(k) + BETA(m,k)*sqrt(p_d*sum(eta_eq(m,setdiff(1:K,k),n).*beta_uc(m,setdiff(1:K,k))));
-                            k_tilde_den(k) = k_tilde_den(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_num(k) = theta_tilde_num(k) + p_d*(BETA(m,k)^2)*sum(eta_eq(m,setdiff(1:K,k),n).*(beta_uc(m,setdiff(1:K,k))).^2);
-                            theta_tilde_den(k) = theta_tilde_den(k) + p_d*BETA(m,k)*sum(sqrt(eta_eq(m,setdiff(1:K,k),n)).*(beta_uc(m,setdiff(1:K,k))));                      
-                        end
                     end
                 end
             end
