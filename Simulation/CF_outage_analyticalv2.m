@@ -148,10 +148,11 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     end 
     % x = (rmin*noisevar):0.01*(rmin*noisevar):1.1*(rmin*noisevar);
     % y = (x./rmin) - noisevar;
-    y = (1:0.1:2)*noisevar;
+    y = (0:0.001:10)*noisevar;
     x = rmin*(y+noisevar);
     for k = 1:K
         pdTrue = GeneralizedGamma(1/beta_tilde(k), 2, 0.5*N_tilde(k));
+
         f = pdTrue.pdf(x);
         F = pdTrue.cdf(x);
         if k_tilde(k)>0
