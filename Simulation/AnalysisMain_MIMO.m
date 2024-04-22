@@ -108,7 +108,7 @@ lambda_UE_sub6 = 150; %100:50:200; %[30:20:90, 100]; %100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-lb_thresh = [0.05, 0.1]; %[0.1, 0.25, 0.5];
+lb_thresh = 0; % [0.05, 0.1]; %[0.1, 0.25, 0.5];
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
@@ -393,15 +393,11 @@ for idxBSDensity = 1:length(lambda_BS)
                     %Taking care of folder directory creation etc
                     dataFolder = 'resultData';
                     outageFolder = strcat(dataFolder,'/outageResults');
-                    eventFolder = strcat(dataFolder,'/allResults');
                     if not(isfolder(dataFolder))
                         mkdir(dataFolder)
                     end
                     if not(isfolder(outageFolder))
                         mkdir(outageFolder)
-                    end
-                    if not(isfolder(eventFolder))
-                        mkdir(eventFolder)
                     end
             
             
@@ -423,9 +419,6 @@ for idxBSDensity = 1:length(lambda_BS)
                         'UE_',num2str(lambda_BS(idxBSDensity)),...
                         'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
                         'lambdaUE_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin), "Pow_fac", num2str(params.p_fac), "lb_thres", num2str(100*params.lb_thres));
-                    results_save_string = strcat(eventFolder,result_string,'.mat');
-                    save(results_save_string,'simOutputs','protocolParams','dataDescription')
-            
                     %Since we are mostly interested in blockage probability, we want to
                     %transfer the data quickly to our local machine from server. We will save
                     %the results as a txt file.
@@ -450,8 +443,8 @@ for idxBSDensity = 1:length(lambda_BS)
                                     failureDetectionDelay   = protocolParams.FailureDetectionTime(idxFailureDetectionDelay);
                                     connDelay               = protocolParams.connection_time(idxConnDelay);
                                     signalingAfterRachDelay = protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay);
-                                    frameHopCount           = params.frameHopCount;
-                                    frameDeliveryDelay      = params.frameDeliveryDelay;
+                                    frameHopCount           = protocolParams.frameHopCount;
+                                    frameDeliveryDelay      = protocolParams.frameDeliveryDelay;
             
                                     for ue_idx = 1:params.numUE   %storing outage probability and duration for each user     
                                         out_prob_analysis = outage_probability_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
