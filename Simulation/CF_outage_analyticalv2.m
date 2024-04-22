@@ -13,21 +13,21 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     K = params.numUE+params.numUE_sub6;
     K_mmW = params.numUE;
     p_d = params.rho_tot;
-    B = params.Band;
     rmin = params.r_min_sub6(1);
     % %Communication bandwidth (Hz)
     % B = params.Band;
-    % % B = params.scs_sub6;
-    % 
-    % %Noise figure (in dB)
-    % noiseFigure = 7;
-    % 
-    % %Compute noise power (in dBm)
-    % noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
-    % noisevar = db2pow(noiseVariancedBm);
-    noisevar = 1;
-    BETA = params.BETA;
+    B = params.scs_sub6;
+
+    %Noise figure (in dB)
+    noiseFigure = 7;
+
+    %Compute noise power (in dBm)
+    noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
+    noisevar = db2pow(noiseVariancedBm(1));
+    % noisevar = 1;
+    % BETA = params.BETA;
     % BETA = (params.BETA)*noisevar;
+    BETA = (params.BETA).*(noisevar(1));
     beta_uc = zeros(size(BETA));
     sub6ConnectionState = params.sub6ConnectionState;
     %Prepare array to store the number of APs serving a specficic UE
@@ -109,14 +109,12 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     beta_tilde = beta_tilde_num./beta_tilde_den;
     k_tilde = zeros(K,1);
     theta_tilde = zeros(K,1);
-    for k = 1:K
-        if(k_tilde_den(k) > 0)
-            k_tilde(k) = N*(k_tilde_num(k))^2/(k_tilde_den(k));
-        end
-        if(theta_tilde_den(k) > 0)
-            theta_tilde(k) = theta_tilde_num(k)/theta_tilde_den(k);
-        end
-    end 
+    if(k_tilde_den(k) > 0)
+        k_tilde(k) = N*(k_tilde_num(k))^2/(k_tilde_den(k));
+    end
+    if(theta_tilde_den(k) > 0)
+        theta_tilde(k) = theta_tilde_num(k)/theta_tilde_den(k);
+    end
     % x = (rmin*noisevar):0.01*(rmin*noisevar):1.1*(rmin*noisevar);
     % y = (x./rmin) - noisevar;
     y = (0:0.001:10)*noisevar;
