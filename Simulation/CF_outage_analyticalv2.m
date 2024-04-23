@@ -13,8 +13,8 @@ function p_out = CF_outage_analyticalv2(params,ue_idx)
     K_mmW = params.numUE;
     p_d = params.rho_tot;
     rmin = params.r_min(1);
-    % %Communication bandwidth (Hz)
-    % B = params.Band;
+    %Communication bandwidth (Hz)
+    B = params.Band;
     B = scs_sub6;
 
     %Noise figure (in dB)
@@ -125,13 +125,19 @@ function p_out = CF_outage_analyticalv2(params,ue_idx)
         % sigma = sqrt(k_tilde(ue_idx))*theta_tilde(ue_idx);
         % y = (mu-sigma):noisevar:(mu+sigma);
         % y =  0:noisevar:(2*mu);
-        y = 0:1e-10:0.001;
-        stepsize = 1e-10;
+        stepsize = (0.01*mu);
+        y = stepsize:stepsize:10*mu;
         fy = gampdf(y,k_tilde(k),theta_tilde(k));
+        [val, idx] = find(fy);
+        if isscalar(val)
+            y = y(idx);
+            stepsize = 1;
+            fy = 1/stepsize;
+        end
     else
         y = 0;
         stepsize = 1;
-        fy = 1/noisevar;
+        fy = 1/stepsize;
     end
     x = rmin*(y+noisevar);
     % f = pdTrue.pdf(x);

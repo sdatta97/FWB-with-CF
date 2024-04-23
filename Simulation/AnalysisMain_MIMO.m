@@ -1,22 +1,22 @@
 close all;
 clear;
 tStart = tic;
-% aID = getenv('SLURM_ARRAY_TASK_ID');
-% 
-% % This is for running on a cluster in parallel
-% % the bash script should give the aID as input
-% if (isempty(aID))
-%     warning('aID is empty. Trying SLURM ID.')
-%     aID = getenv('SLURM_ARRAY_TASK_ID');
-% end
-% if(isempty(aID))
-%     warning('aID is empty. Replacing it with 0010.')
-%     aID = '0022';
-% end
-% %RNG seed.
-% rng(str2double(aID),'twister');
-for aID = 0:1:99
-    rng(aID,'twister');
+aID = getenv('SLURM_ARRAY_TASK_ID');
+
+% This is for running on a cluster in parallel
+% the bash script should give the aID as input
+if (isempty(aID))
+    warning('aID is empty. Trying SLURM ID.')
+    aID = getenv('SLURM_ARRAY_TASK_ID');
+end
+if(isempty(aID))
+    warning('aID is empty. Replacing it with 0010.')
+    aID = '0022';
+end
+%RNG seed.
+rng(str2double(aID),'twister');
+% for aID = 0:1:99
+%     rng(aID,'twister');
     %% GUE channel parameters
     params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
     params.RAYLEIGH=0;   %1= rayleigh, % 0=rician
@@ -98,7 +98,7 @@ for aID = 0:1:99
     % params.N_UE_sub6 = 4;
     params.N_UE_mmW = 1;
     params.N_UE_sub6 = 1;
-    rmin_arr = 4*10^8;
+    rmin_arr = 10.^(0:1:10); %4*10^8;
     % params.r_min = rmin*rand(params.numUE,1);
     % lambda_BS = 50:50:200;%densityBS
     lambda_BS = 25;
@@ -280,8 +280,8 @@ for aID = 0:1:99
                         %params.ricianFactor = K_Rician';
                 %         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
         %                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
-                        % [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
-                        [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,aID);
+                        [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
+                        % [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,aID);
         %                 stream = RandStream('mlfg6331_64');  % Random number stream
         %                 options = statset('UseParallel',1,'UseSubstreams',1,'Streams',stream);
         %                 [cluster_idxs, cluster_centroids, sum_cluster_distances, cluster_distances] = kmeans([real(UEpositions), imag(UEpositions)],num_sc_sub6, 'Options',options,'MaxIter',10000,'Display','final','Replicates',10);
@@ -468,4 +468,4 @@ for aID = 0:1:99
     end
     tEnd = toc(tStart);
     fprintf('Total runtime: %f seconds\n',tEnd)
-end
+% end
