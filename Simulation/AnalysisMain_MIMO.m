@@ -321,7 +321,6 @@ for aID = 0:1:99
         %                     end
         %                 end
         %                 params.user_sc_alloc = user_sc_alloc;
-                        num_sc_sub6 = params.num_sc_sub6;
                         params.BETA = db2pow(gainOverNoisedB);   
                         params.D = D;
                         params.R_gNB = R_gNB;
@@ -333,7 +332,6 @@ for aID = 0:1:99
                         outage_duration_analysis_wo_cf = zeros(params.numUE,length(protocolParams.discovery_time),length(protocolParams.connection_time));
                         numUE = params.numUE;
                         numUE_sub6 = params.numUE_sub6;
-                        num_sc_sub6 = params.num_sc_sub6;
                         for idxDiscDelay = 1:length(protocolParams.discovery_time)
                             for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
                                 for idxConnDelay = 1:length(protocolParams.connection_time)
@@ -454,7 +452,7 @@ for aID = 0:1:99
                                             fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
                                                 discDelay,failureDetectionDelay,connDelay,...
                                                 signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
-                                                min_rate_req, p_fac, lb_thres, out_prob_analysis, out_prob_analysis_wo_cf, out_dur_analysis, out_dur_analysis_wo_cf);
+                                                min_rate_req, p_fac, lb_thres, out_dur_analysis_wo_cf, out_prob_analysis_wo_cf, out_dur_analysis, out_prob_analysis);
                                         end
                                     end
                                 end
