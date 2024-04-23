@@ -16,7 +16,7 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     rmin = params.r_min_sub6(1);
     % %Communication bandwidth (Hz)
     % B = params.Band;
-    B = params.scs_sub6;
+    B = scs_sub6;
 
     %Noise figure (in dB)
     noiseFigure = 7;
@@ -26,8 +26,7 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     noisevar = db2pow(noiseVariancedBm(1));
     % noisevar = 1;
     % BETA = params.BETA;
-    % BETA = (params.BETA)*noisevar;
-    BETA = (params.BETA).*(noisevar(1));
+    BETA = (params.BETA)*noisevar;
     beta_uc = zeros(size(BETA));
     sub6ConnectionState = params.sub6ConnectionState;
     %Prepare array to store the number of APs serving a specficic UE
