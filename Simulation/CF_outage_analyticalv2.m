@@ -15,15 +15,15 @@ function p_out = CF_outage_analyticalv2(params,ue_idx)
     rmin = params.r_min(1);
     % %Communication bandwidth (Hz)
     % B = params.Band;
-    % B = scs_sub6;
-    % 
-    % %Noise figure (in dB)
-    % noiseFigure = 7;
-    % 
-    % %Compute noise power (in dBm)
-    % noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
-    % noisevar = db2pow(noiseVariancedBm(1));
-    noisevar = 1;
+    B = scs_sub6;
+
+    %Noise figure (in dB)
+    noiseFigure = 7;
+
+    %Compute noise power (in dBm)
+    noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
+    noisevar = db2pow(noiseVariancedBm(1));
+    % noisevar = 1;
     % BETA = params.BETA;
     BETA = (params.BETA)*noisevar;
     beta_uc = zeros(size(BETA));
