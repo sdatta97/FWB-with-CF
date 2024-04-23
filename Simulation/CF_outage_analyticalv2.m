@@ -1,5 +1,4 @@
-function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
-    p_out = 0.5;
+function p_out = CF_outage_analyticalv2(params,ue_idx)
     D = params.D;
     ue_rearranged = params.ue_rearranged;
     p_fac = params.p_fac;
@@ -13,18 +12,18 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     K = params.numUE+params.numUE_sub6;
     K_mmW = params.numUE;
     p_d = params.rho_tot;
-    rmin = params.r_min_sub6(1);
+    rmin = params.r_min(1);
     % %Communication bandwidth (Hz)
     % B = params.Band;
-    B = scs_sub6;
-
-    %Noise figure (in dB)
-    noiseFigure = 7;
-
-    %Compute noise power (in dBm)
-    noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
-    noisevar = db2pow(noiseVariancedBm(1));
-    % noisevar = 1;
+    % B = scs_sub6;
+    % 
+    % %Noise figure (in dB)
+    % noiseFigure = 7;
+    % 
+    % %Compute noise power (in dBm)
+    % noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
+    % noisevar = db2pow(noiseVariancedBm(1));
+    noisevar = 1;
     % BETA = params.BETA;
     BETA = (params.BETA)*noisevar;
     beta_uc = zeros(size(BETA));
@@ -119,7 +118,7 @@ function p_out = CF_outage_analyticalv2(params,ue_idx,lambda_BS,lambda_UE)
     y = (0:0.001:10)*noisevar;
     x = rmin*(y+noisevar);
     % for k = 1:K
-    k = 1;
+    k = ue_idx;
     pdTrue = GeneralizedGamma(1/beta_tilde(k), 2, 0.5*N_tilde(k));
 
     f = pdTrue.pdf(x);
