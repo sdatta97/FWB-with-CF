@@ -376,6 +376,9 @@ for aID = 0:1:99
                                            params.sub6ConnectionState(ue_idx) = 1;
                                            % p_out = CF_outage_analytical(params,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity));
                                            p_out = CF_outage_analyticalv2(params,ue_idx);
+                                           if (p_out > 1)
+                                               disp("check")
+                                           end
         %                                    outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
                                            outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*pos3;
                                            outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
@@ -399,8 +402,8 @@ for aID = 0:1:99
                         if not(isfolder(outageFolder))
                             mkdir(outageFolder)
                         end
-                
-                
+
+
                         %Saving all results as a structure
                         dataDescription = {'simOutputs is a 4D array';...
                             ', for mesh of params ordered as follows';...
@@ -410,7 +413,7 @@ for aID = 0:1:99
                             'Fourth Dimension: signalingAfterRachTime';...
                             '=================================';...
                             'Each element is a struct'};
-                
+
                         numUE = params.numUE;
                         numUE_sub6 = params.numUE_sub6;
                         numBS = size(params.locationsBS,1);
@@ -428,9 +431,9 @@ for aID = 0:1:99
                             'discoveryDelay,','failureDetectionDelay,','connectionSetupDelay,',...
                             'signalingAfterRachDelay,','frameHopCount,','frameDeliveryDelay,'...
                             'minRatereq,','powerFac,','lower_bound_thresh,', 'meanOutageDuration_wo_CF,','outageProbability_wo_CF,','meanOutageDuration,','outageProbability\n'];
-                
+
                         fprintf(fileID,output_categories);
-                
+
                         for idxDiscDelay = 1:length(protocolParams.discovery_time)
                             for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
                                 for idxConnDelay = 1:length(protocolParams.connection_time)

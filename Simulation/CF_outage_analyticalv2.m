@@ -127,8 +127,8 @@ function p_out = CF_outage_analyticalv2(params,ue_idx)
         % y =  0:noisevar:(2*mu);
         stepsize = (0.01*mu);
         y = stepsize:stepsize:10*mu;
-        fy = gampdf(y,k_tilde(k),theta_tilde(k));
-        [val, idx] = find(fy);
+        fy = gampdf(y,k_tilde(ue_idx),theta_tilde(ue_idx));
+        [val, idx] = find(fy>1e-50);
         if isscalar(val)
             y = y(idx);
             stepsize = 1;
