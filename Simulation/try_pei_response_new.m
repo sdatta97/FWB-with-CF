@@ -45,7 +45,7 @@ for aID = 1:99
     %% Define simulation setup
     
     %Angular standard deviation in the local scattering model (in radians)
-    params.ASD_varphi = 0; %deg2rad(30); %azimuth angle
+    params.ASD_varphi = deg2rad(30); %azimuth angle
     params.ASD_theta = 0; %deg2rad(15);  %elevation angle
     
     %Total uplink transmit power per UE (mW)
@@ -78,7 +78,7 @@ for aID = 1:99
     params.areaDimensions = [width_area, length_area, height_transmitter];
     
     
-    params.coverageRange_sub6 = 1000;
+    params.coverageRange_sub6 = 430;
     length_area_sub6 = 2*params.coverageRange_sub6;   
     width_area_sub6 = 2*params.coverageRange_sub6;
     height_transmitter_sub6 = 5;
@@ -103,16 +103,16 @@ for aID = 1:99
     % num_BS_arr = [2,5,10,20]; %densityBS
     % numUE_sub6_arr = 2:2:10;
     % numUE_sub6_arr = 10;
-    lambda_UE_sub6 = 150; % [30:20:90, 100]; %:100:2000;
+    lambda_UE_sub6 = 200:10:250; % [30:20:90, 100]; %:100:2000;
     % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
     params.loss_pc_thresh = 10;
     params.Lmax=4;
     for idxBSDensity = 1:length(lambda_BS)
         %% gNB locations
         % params.numGNB = 10;
-        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+        n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
         while (n==0)
-            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+            n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
         end
         % params.numGNB = 1;
         params.numGNB = n;
@@ -256,8 +256,8 @@ for aID = 1:99
                 tau_c = params.tau_c;      % coherence block length  
                 
     %                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
-                [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
-                % [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,aID);
+                % [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
+                [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,aID);
     %                 idx = 0;
     %                 n_pc = 0; %num_sc_sub6;
     %                 eq_n = 1;
