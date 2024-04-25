@@ -32,7 +32,8 @@ for kk_idx = 1:length(ue_idxs)
     [~,other_ap_idxs_idxs] = sort(chgains(other_ap_idxs,k),'descend'); 
     other_ap_idxs = other_ap_idxs(other_ap_idxs_idxs);
     ap_idxs_affected = intersect(ap_idxs,ap_idxs_k);
-    for m = 1:length(ap_idxs_affected)
+    % for m = 1:length(ap_idxs_affected)
+    for m = 1:min(length(ap_idxs_affected),length(other_ap_idxs))
         if (numel(other_ap_idxs) > 0)
 %             other_ue_idxs = setdiff(find(D(other_ap_idxs(m),:)),k);
 %             [~,k_idx_idx] = min(chgains(other_ap_idxs(m),other_ue_idxs)); 
