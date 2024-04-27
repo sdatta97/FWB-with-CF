@@ -111,10 +111,10 @@ for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
 %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-    n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+    n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
     while (n==0)
 %         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
-        n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
     end
     params.numGNB = n;
     % params.numGNB = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
@@ -194,7 +194,7 @@ for idxBSDensity = 1:length(lambda_BS)
                     lookAngleCell{1} = [0,360];
                     
                     %% Blocker Properties and Simulation Duration
-                    params.lambdaBlockers = 0.01; %How many blockers around
+                    params.lambdaBlockers = 0.1; %How many blockers around
                     params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
             %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
                     params.V = 1; %velocity of blocker m/s

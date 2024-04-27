@@ -15,7 +15,7 @@ tStart = tic;
 %RNG seed.
 % rng(str2double(aID),'twister');
 % aID = randi([0, 99]);
-for aID = 56:99
+for aID = 1:99
     rng(aID,'twister');
     %% GUE channel parameters
     params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
@@ -110,9 +110,9 @@ for aID = 56:99
     for idxBSDensity = 1:length(lambda_BS)
         %% gNB locations
         % params.numGNB = 10;
-        n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
         while (n==0)
-            n = poissrnd(0.2*lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
         end
         % params.numGNB = 1;
         params.numGNB = n;
