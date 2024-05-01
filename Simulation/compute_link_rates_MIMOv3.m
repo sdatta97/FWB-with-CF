@@ -178,7 +178,7 @@ for n_idx = 1:num_sc_sub6
                    MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(reshape(D_mmW_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
                 end
                 snr_num_mmW(k,n) = DS_mmW(k,n);
-                snr_den_mmW(k,n) = MUI_mmW(k,n) + noise_mmW(k,n);
+                snr_den_mmW(k,n) = MSI_mmW(k,n) + MUI_mmW(k,n) + noise_mmW(k,n);
                 rate_dl(k) = rate_dl(k) + scs(1)*TAU_FAC*log2(1+snr_num_mmW(k,n)/snr_den_mmW(k,n));
             end
         end
@@ -204,7 +204,7 @@ for n_idx = 1:num_sc_sub6
                MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(reshape(D_sub6_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
             end
             snr_num_sub6(k,n) = DS_sub6(k,n);
-            snr_den_sub6(k,n) = MUI_sub6(k,n) + noise_sub6(k,n);
+            snr_den_sub6(k,n) = MSI_sub6(k,n) + MUI_sub6(k,n) + noise_sub6(k,n);
             rate_dl(k+K_mmW) = rate_dl(k+K_mmW) + scs(2)*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
         end
     end
