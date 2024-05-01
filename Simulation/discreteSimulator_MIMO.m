@@ -350,17 +350,17 @@ while nextEventTime < params.simTime
                         params.Band = bw_alloc;
                         rate_dl_after_handoff_mmW_only = compute_link_rates_MIMO_mmW_only(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);  
                         params.Band = Band;
-                        rate_dl_after_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                 
+                        % rate_dl_after_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                 
 %                         rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
 %                         if rate_dl(ue_idx) >= r_min(ue_idx)
 %                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs(2:end)) - rate_dl(ue_idxs(2:end))) <= rate_reduce_threshold)
 %                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl(ue_idxs_affected)) <= rate_reduce_threshold)
-                        rate_dip_affected = mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl_after_handoff(ue_idxs_affected));
+                        % rate_dip_affected = mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl_after_handoff(ue_idxs_affected));
 %                         lb = mean(rate_dl_after_handoff(ue_idxs_affected)) - std(rate_dl_after_handoff(ue_idxs_affected));
 %                         lb = quantile(rate_dl_after_handoff(ue_idxs_affected),params.lb_thres);
-                        lb = quantile(rate_dl_after_handoff((1+numUE):end),params.lb_thres);
-                        if (rate_dl_after_handoff_mmW_only >= r_min) || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
+                        % lb = quantile(rate_dl_after_handoff((1+numUE):end),params.lb_thres);
+                        if (rate_dl_after_handoff_mmW_only >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
