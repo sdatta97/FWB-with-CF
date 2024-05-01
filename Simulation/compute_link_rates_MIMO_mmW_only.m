@@ -60,8 +60,9 @@ else
     for m = 1:M
        if ismember(m,Serv{ue_idx})
             if ((ue_idx<=K_mmW) && (sub6ConnectionState(ue_idx) == 1))
-                eta_eq(m) = 1/(N_AP*N_UE_mmW*beta_uc(m,ue_idx));
-            end
+                % eta_eq(m) = 1/(N_AP*N_UE_mmW*beta_uc(m,ue_idx));
+                 eta_eq(m) = 1/trace(reshape(conj(channel_est_dl_mmW(m,ue_idx,:,:)),[Ntx,N_UE_mmW])*(reshape(conj(channel_est_dl_mmW(m,ue_idx,:,:)),[Ntx,N_UE_mmW]))');
+           end
         end
     end
     D_mmW_mmW = zeros(N_UE_mmW,N_UE_mmW);

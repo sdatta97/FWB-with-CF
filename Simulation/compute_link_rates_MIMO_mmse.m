@@ -31,29 +31,6 @@ for k = 1:K
 end
 
 %% initialization of c
-eta_eq = zeros(M,K);
-N_AP = params.num_antennas_per_gNB;
-if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
-    for m = 1:M
-        for k = 1+K_mmW:K
-            if ismember(m,Serv{k})
-                eta_eq(m,k) = 1/(N_AP*N_UE_sub6*sum(beta_uc(m,:)));
-            end
-        end
-    end
-else
-    for m = 1:M
-        for k = 1:K
-            if ismember(m,Serv{k})
-                if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
-                    eta_eq(m,k) = 1/(N_AP*(N_UE_mmW*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,:))));
-                elseif (k>K_mmW)
-                    eta_eq(m,k) = 1/(N_AP*(N_UE_mmW*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,:))));
-                end
-            end
-        end
-    end
-end
 D_mmW_mmW = zeros(K_mmW,K_mmW,N_UE_mmW,N_UE_mmW);
 D_mmW_sub6 = zeros(K_mmW,K-K_mmW,N_UE_mmW,N_UE_sub6);
 D_sub6_mmW = zeros(K-K_mmW,K_mmW,N_UE_sub6,N_UE_mmW);
@@ -116,6 +93,40 @@ for m = 1:M
     for k = 1:K-K_mmW
         if ismember(m,Serv{k+K_mmW})
             dl_mmse_precoder(m,k,:,:) = dl_mmse_precoder(m,k,:,:)./sqrt(scaling_LP_mmse(m,k+K_mmW));
+        end
+    end
+end
+eta_eq = zeros(M,K);
+N_AP = params.num_antennas_per_gNB;
+if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
+    for m = 1:M
+        term = 0;
+        for k = 1+K_mmW:K
+            if ismember(m,Serv{k})
+                % eta_eq(m,k) = 1/(N_AP*N_UE_sub6*sum(beta_uc(m,:)));
+                term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:),[N_AP,N_UE_sub6])');
+            end
+        end
+        if (term > 0)
+            eta_eq(m,:) = (1/term)*D(m,:);
+        end
+    end
+else
+    for m = 1:M
+        term = 0;
+        for k = 1:K
+            if ismember(m,Serv{k})
+                if ((k<=K_mmW) && (sub6ConnectionState(k) == 1))
+                    % eta_eq(m,k) = 1/(N_AP*(N_UE_mmW*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,:))));
+                    term = term + trace(reshape(dl_mmse_precoder_mmW(m,k,:,:),[N_AP,N_UE_mmW])*reshape(dl_mmse_precoder_mmW(m,k,:,:),[N_AP,N_UE_mmW])');
+                elseif (k>K_mmW)
+                    % eta_eq(m,k) = 1/(N_AP*(N_UE_mmW*(beta_uc(m,1:K_mmW).*sub6ConnectionState)+N_UE_sub6*sum(beta_uc(m,:))));
+                    term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:),[N_AP,N_UE_sub6])');
+                end
+            end
+        end
+        if (term > 0)
+            eta_eq(m,:) = (1/term)*D(m,:);
         end
     end
 end
