@@ -106,7 +106,7 @@ lambda_UE_sub6 = 2000; %[250:250:1000, 1500, 2000]; %200:10:250; %150; %100:50:2
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-lb_thresh = 0:0.25:1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
+lb_thresh = 0; %0:0.25:1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
 for idxBSDensity = 1:length(lambda_BS)
     %% gNB locations
     % params.numGNB = 10;
@@ -167,7 +167,7 @@ for idxBSDensity = 1:length(lambda_BS)
     %                 params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
                     params.rate_reduce_threshold = 5e7;
                     params.p_fac = p_fac_arr(idx_p);
-                    params.p_fac_rearrange = 0.1*p_fac_arr(idx_p);                
+                    params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);                
                     %Length of the coherence block
     %                 params.tau_c = 200;
                     
@@ -270,6 +270,7 @@ for idxBSDensity = 1:length(lambda_BS)
                     sigma_sf = params.sigma_sf;
                     Band = params.Band; %Communication bandwidth
                     num_sc_sub6 = params.num_sc_sub6;
+                    params.user_sc_alloc = randi([1,num_sc_sub6],K,1);
     %                 params.user_sc_alloc = randi([0,1],K,num_sc_sub6);
     %                 tau_c = params.tau_c;      % coherence block length  
                     %[channelGain_GUE,R_GUE,h_LOS_GUE,K_Rician,PLOS_GUE] = channel_cellfree_GUE3(K,L,N,ASD_VALUE,ASD_CORR,RAYLEIGH,0,K_Factor,cov_area,Band, [params.locationsBS; params.locationsBS_sub6], [params.UE_locations; params.UE_locations_sub6]);

@@ -7,6 +7,7 @@ dataBS_mobile = simInputs.dataBS_mobile; %{(ue_idx-1)*params.numGNB+1:ue_idx*par
 r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
 rate_reduce_threshold = params.rate_reduce_threshold;
+Band = params.Band;
 D = params.D;
 ap_idxs = find(D(:,1));
 ue_idxs = 1;
@@ -335,21 +336,27 @@ while nextEventTime < params.simTime
 %                         D_old = params.D;
 %                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
-                        lb = quantile(rate_dl_before_handoff((1+numUE):end)./params.Band,params.lb_thres);
-                        bw_alloc = 100e6 - params.r_min_sub6/lb;
-                        % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
-                        % user_sc_alloc(ue_idx,2) = 0;
-                        % user_sc_alloc(ue_idxs_affected,1) = 0;
-                        % params.user_sc_alloc = user_sc_alloc;
+                        % lb = quantile(rate_dl_before_handoff((1+numUE):end)./params.Band,params.lb_thres);
+                        lb = quantile(rate_dl_before_handoff(ue_idxs_affected)./Band,params.lb_thres);
+                        bw_alloc = Band - r_min_sub6/lb;
+                        params.scs_sub6(1) = bw_alloc;
+                        params.scs_sub6(2) = Band - bw_alloc;
                         % params.ue_rearranged = ue_idxs_affected;
-%                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                        ues_not_affected = setdiff((1+K_mmW):K,ue_idxs_affected);
+                        % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
+                        user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);                               
+                        user_sc_alloc(ue_idx) = 1;
+                        user_sc_alloc(ues_not_affected) = 1;
+                        user_sc_alloc(ue_idxs_affected) = 2;
+                        params.user_sc_alloc = user_sc_alloc;
 %                         rate_dl = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                         % rate_dl_after_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                        Band = params.Band;
-                        params.Band = bw_alloc;
-                        rate_dl_after_handoff_mmW_only = compute_link_rates_MIMO_mmW_only(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);  
-                        params.Band = Band;
+                        rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        % Band = params.Band;
+                        % params.Band = bw_alloc;
+                        % rate_dl_after_handoff_mmW_only = compute_link_rates_MIMO_mmW_only(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);  
+                        % params.Band = Band;
                         % rate_dl_after_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                 
 %                         rate_dl = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);                                              
 %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
@@ -360,7 +367,9 @@ while nextEventTime < params.simTime
 %                         lb = mean(rate_dl_after_handoff(ue_idxs_affected)) - std(rate_dl_after_handoff(ue_idxs_affected));
 %                         lb = quantile(rate_dl_after_handoff(ue_idxs_affected),params.lb_thres);
                         % lb = quantile(rate_dl_after_handoff((1+numUE):end),params.lb_thres);
-                        if (rate_dl_after_handoff_mmW_only >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
+                        lb = quantile(rate_dl_after_handoff(ues_not_affected),params.lb_thres);
+                        % if (rate_dl_after_handoff_mmW_only >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
+                        if (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
