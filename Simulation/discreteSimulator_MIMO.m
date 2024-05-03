@@ -345,9 +345,12 @@ while nextEventTime < params.simTime
                         ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),ue_idxs_affected);
                         % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
                         user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);                               
-                        user_sc_alloc(ue_idx) = 1;
-                        user_sc_alloc(ues_not_affected) = 1;
-                        user_sc_alloc(ue_idxs_affected) = 2;
+                        user_sc_alloc(ue_idx,1) = 1;
+                        user_sc_alloc(ue_idx,2) = 0;
+                        user_sc_alloc(ues_not_affected,1) = 1;
+                        user_sc_alloc(ues_not_affected,2) = 1;
+                        user_sc_alloc(ue_idxs_affected,1) = 0;
+                        user_sc_alloc(ue_idxs_affected,2) = 1;
                         params.user_sc_alloc = user_sc_alloc;
 %                         rate_dl = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
