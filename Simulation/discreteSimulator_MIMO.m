@@ -342,7 +342,7 @@ while nextEventTime < params.simTime
                         params.scs_sub6(1) = bw_alloc;
                         params.scs_sub6(2) = Band - bw_alloc;
                         % params.ue_rearranged = ue_idxs_affected;
-                        ues_not_affected = setdiff((1+K_mmW):K,ue_idxs_affected);
+                        ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),ue_idxs_affected);
                         % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
                         user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);                               
                         user_sc_alloc(ue_idx) = 1;

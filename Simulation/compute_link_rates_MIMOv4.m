@@ -135,7 +135,7 @@ if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
                 end
             end
             if (term > 0)
-                eta_eq(m,:,n) = (1/term)*(D(m,:).*(user_sc_alloc==n));
+                eta_eq(m,:,n) = (1/term)*(D(m,:)'.*(user_sc_alloc==n));
             end
         end
     end
@@ -159,7 +159,7 @@ else
                 end
             end
             if (term > 0)
-                eta_eq(m,:,n) = (1/term)*(D(m,:).*(user_sc_alloc==n));
+                eta_eq(m,:,n) = (1/term)*(D(m,:)'.*(user_sc_alloc==n));
                 eta_eq(m,1:K_mmW,n) = p_fac*eta_eq(m,1:K_mmW,n);
             end
         end
