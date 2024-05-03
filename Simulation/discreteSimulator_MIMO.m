@@ -323,7 +323,7 @@ while nextEventTime < params.simTime
                         % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                         
 %                         rate_dl_before_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                        rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        rate_dl_before_handoff_old = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         if (sub6ConnectionState == zeros(params.numUE,1))
 %                             p_fac = params.p_fac;
 %                             params.p_fac = 0;
@@ -332,12 +332,14 @@ while nextEventTime < params.simTime
 %                         if (sub6ConnectionState == zeros(params.numUE,1))
 %                             params.p_fac = p_fac;
 %                         end
-                        sub6ConnectionState(ue_idx) = 1;
 %                         D_old = params.D;
 %                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
-                        % lb = quantile(rate_dl_before_handoff((1+numUE):end)./params.Band,params.lb_thres);
-                        lb = quantile(rate_dl_before_handoff(ue_idxs_affected)./Band,params.lb_thres);
+                        D = params.D;
+                        params.D = D(:,[1; ue_idxs_affected]);
+                        rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl(:,ue_idxs_affected-numUE,:,:), channel_est_dl(:,ue_idxs_affected-numUE,:,:),channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                        params.D = D;
+                        lb = quantile(rate_dl_before_handoff((1+numUE):end)./params.Band,params.lb_thres);
                         bw_alloc = Band - r_min_sub6/lb;
                         params.scs_sub6(1) = bw_alloc;
                         params.scs_sub6(2) = Band - bw_alloc;
@@ -348,10 +350,11 @@ while nextEventTime < params.simTime
                         user_sc_alloc(ue_idx,1) = 1;
                         user_sc_alloc(ue_idx,2) = 0;
                         user_sc_alloc(ues_not_affected,1) = 1;
-                        user_sc_alloc(ues_not_affected,2) = 1;
+                        user_sc_alloc(ues_not_affected,2) = 0;
                         user_sc_alloc(ue_idxs_affected,1) = 0;
                         user_sc_alloc(ue_idxs_affected,2) = 1;
                         params.user_sc_alloc = user_sc_alloc;
+                        sub6ConnectionState(ue_idx) = 1;
 %                         rate_dl = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
 %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                         % rate_dl_after_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
