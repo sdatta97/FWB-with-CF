@@ -182,7 +182,7 @@ for n_idx = 1:num_sc_sub6
         for q = 1:K_mmW
             for m = 1:M
                 % D_mmW_mmW(k,q,:,:,n_idx) = reshape(D_mmW_mmW(k,q,:,:,n_idx),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
-                D_mmW_mmW(k,q,:,:) = reshape(D_mmW_mmW(k,q,:,:,n_idx),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(dl_mmse_precoder_mmW(m,q,:,:,n_idx),[Ntx,N_UE_mmW]);
+                D_mmW_mmW(k,q,:,:,n_idx) = reshape(D_mmW_mmW(k,q,:,:,n_idx),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(dl_mmse_precoder_mmW(m,q,:,:,n_idx),[Ntx,N_UE_mmW]);
             end
         end
         for q = 1:K-K_mmW
