@@ -205,8 +205,8 @@ for aID = 1:99
             params.R_ue_mmW = R_ue_mmW;
             params.R_ue_sub6 = R_ue_sub6;
             [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params); 
-            % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+            % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,1,0);                                              
+            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,1,0);                                              
             for idxlbthres = 1:length(lb_thresh)
                 lb_thres = lb_thresh(idxlbthres);
                 %% Recording the Results
@@ -217,7 +217,7 @@ for aID = 1:99
                 if not(isfolder(impactFolder))
                     mkdir(impactFolder)
                 end
-                result_string = ['/rate_stats_',num2str(numUE),...
+                result_string = ['/rate_stats_',num2str(K_mmW),...
                     'UE_',num2str(lambda_BS(idxBSDensity)),...
                     'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
                     'lambdaUE_',num2str(aID),'mmse'];    
