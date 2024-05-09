@@ -101,7 +101,7 @@ for aID = 1:99
     % num_BS_arr = [2,5,10,20]; %densityBS
     % numUE_sub6_arr = 2:2:10;
     % numUE_sub6_arr = 10;
-    lambda_UE_sub6 = 1000; % [30:20:90, 100]; %:100:2000;
+    lambda_UE_sub6 = [250:250:1000, 1500, 2000]; % [30:20:90, 100]; %:100:2000;
     % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
     params.loss_pc_thresh = 10;
     params.Lmax=4;
@@ -220,7 +220,8 @@ for aID = 1:99
                 result_string = ['/rate_stats_',num2str(K_mmW),...
                     'UE_',num2str(lambda_BS(idxBSDensity)),...
                     'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
-                    'lambdaUE_',num2str(aID),'mmse'];    
+                    'lambdaUE_',num2str(lb_thres),...
+                    'lb_thresh_',num2str(aID),'mmse'];    
                 %Since we are mostly interested in blockage probability, we want to
                 %transfer the data quickly to our local machine from server. We will save
                 %the results as a txt file.
