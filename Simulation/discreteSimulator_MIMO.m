@@ -336,9 +336,12 @@ while nextEventTime < params.simTime
 %                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                         [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
                         D = params.D;
-                        params.D = D(:,[1; ue_idxs_affected]);
+                        BETA = params.BETA;
+                        params.D = D(:,[(1:numUE)'; ue_idxs_affected]);
+                        params.BETA = BETA(:,[(1:numUE)'; ue_idxs_affected]);
                         rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl(:,ue_idxs_affected-numUE,:,:), channel_est_dl(:,ue_idxs_affected-numUE,:,:),channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                         params.D = D;
+                        params.BETA = BETA;
                         lb = quantile(rate_dl_before_handoff((1+numUE):end)./params.Band,params.lb_thres);
                         bw_alloc = Band - r_min_sub6/lb;
                         params.scs_sub6(1) = bw_alloc;
@@ -557,10 +560,10 @@ while nextEventTime < params.simTime
                 end
             end
         end
-    end
+    % end
 
-    %Secondary Connection Establishment Procedures
-    for ue_idx = 1:numUE
+        %Secondary Connection Establishment Procedures
+    % for ue_idx = 1:numUE
         if UE.secondaryConnectionState(ue_idx) == 0
             UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
         elseif UE.secondaryConnectionState(ue_idx) == 2

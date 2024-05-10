@@ -131,7 +131,7 @@ end
 
 %% initialization of c
 eta_eq = zeros(M,K,num_sc_sub6);
-if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
+if (K_mmW == 0) || all(sub6ConnectionState == 0)
     for m = 1:M
         for n = 1:num_sc_sub6
             term = 0;
@@ -168,7 +168,7 @@ else
             end
             if (term > 0)
                 eta_eq(m,:,n) = (1/term)*(D(m,:)'.*(user_sc_alloc(:,n)==1));
-                eta_eq(m,1:K_mmW,n) = p_fac*(eta_eq(m,1:K_mmW,n).*(sub6ConnectionState==1));
+                eta_eq(m,1:K_mmW,n) = p_fac*(eta_eq(m,1:K_mmW,n)*(sub6ConnectionState==1));
             end
         end
     end

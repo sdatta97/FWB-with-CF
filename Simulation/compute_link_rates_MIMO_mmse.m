@@ -98,7 +98,7 @@ for m = 1:M
 end
 eta_eq = zeros(M,K);
 N_AP = params.num_antennas_per_gNB;
-if ((K_mmW == 0) || (sub6ConnectionState == zeros(K_mmW,1)))
+if (K_mmW == 0) || all(sub6ConnectionState == 0)
     for m = 1:M
         term = 0;
         for k = 1+K_mmW:K

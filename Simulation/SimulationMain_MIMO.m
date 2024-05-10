@@ -79,8 +79,8 @@ width_area_sub6 = 2*params.coverageRange_sub6;
 height_transmitter_sub6 = 5;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
 %%UE location
-params.numUE = 1;
-params.RUE = 0;  %params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+params.numUE = 2;
+params.RUE = params.coverageRange * sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
 params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
 params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
 
@@ -102,7 +102,7 @@ lambda_BS = 25; %:25:200;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 2000; %[250:250:1000, 1500, 2000]; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 25; %2000; %[250:250:1000, 1500, 2000]; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
