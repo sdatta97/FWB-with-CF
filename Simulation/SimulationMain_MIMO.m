@@ -495,7 +495,7 @@ for idxBSDensity = 1:length(lambda_BS)
             %                             out_prob_analysis_wo_cf = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
             %                             out_dur_analysis = outage_duration_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
             %                             out_dur_analysis_wo_cf = outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);                        
-                                        min_rate_req = params.r_min(ue_idx);
+                                        min_rate_req = params.r_min;
                                         p_fac = params.p_fac;
                                         formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                                         fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
