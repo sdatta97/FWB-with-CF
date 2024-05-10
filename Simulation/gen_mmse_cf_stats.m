@@ -206,7 +206,7 @@ for aID = 1:99
             params.R_ue_sub6 = R_ue_sub6;
             [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params); 
             % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,1,0);                                              
-            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,1,0);                                              
+             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,1,0);                                              
             for idxlbthres = 1:length(lb_thresh)
                 lb_thres = lb_thresh(idxlbthres);
                 %% Recording the Results
