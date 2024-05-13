@@ -69,18 +69,18 @@ params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 % the coverageRange amount of distance from the UE.
 params.deployRange = 10;
 params.coverageRange = 100;
-% length_area = 2*params.coverageRange;   
-% width_area = 2*params.coverageRange;
-length_area = 2*(params.deployRange + params.coverageRange);   
-width_area = 2*(params.deployRange + params.coverageRange);
+length_area = 2*params.coverageRange;   
+width_area = 2*params.coverageRange;
+% length_area = 2*(params.deployRange + params.coverageRange);   
+% width_area = 2*(params.deployRange + params.coverageRange);
 height_transmitter = 5;
 params.areaDimensions = [width_area, length_area, height_transmitter];
 
 params.coverageRange_sub6 = 430;
-% length_area_sub6 = 2*params.coverageRange_sub6;   
-% width_area_sub6 = 2*params.coverageRange_sub6;
-length_area_sub6 = 2*(params.deployRange + params.coverageRange_sub6);   
-width_area_sub6 = 2*(params.deployRange + params.coverageRange_sub6);
+length_area_sub6 = 2*params.coverageRange_sub6;   
+width_area_sub6 = 2*params.coverageRange_sub6;
+% length_area_sub6 = 2*(params.deployRange + params.coverageRange_sub6);   
+% width_area_sub6 = 2*(params.deployRange + params.coverageRange_sub6);
 height_transmitter_sub6 = 4; % 5;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
 %%UE location
