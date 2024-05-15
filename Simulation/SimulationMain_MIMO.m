@@ -135,7 +135,7 @@ for idxBSDensity = 1:length(lambda_BS)
     angleGNB =  2*pi*rand(numBS,numUE);
     locationsBS = zeros(numBS*numUE,2);
     for k = 1:numUE
-        locationsBS(numBS*(k-1)+1,:) = params.UE_locations(k,:) + [RgNB(:,k).*cos(angleGNB(:,k)), RgNB(:,k).*sin(angleGNB(:,k))];
+        locationsBS(numBS*(k-1)+1:numBS*k,:) = params.UE_locations(k,:) + [RgNB(:,k).*cos(angleGNB(:,k)), RgNB(:,k).*sin(angleGNB(:,k))];
     end
     params.RgNB = RgNB;
     params.angleGNB = angleGNB;
