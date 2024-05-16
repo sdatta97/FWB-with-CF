@@ -178,7 +178,7 @@ end
 nextEventTimes = getNextEvents(link,params.simTime);
 % link_mat = cell2mat(link);
 % nextEventTimes = getNextEvents(mat2cell(link_mat(1:numUE,1:params.numGNB),[1,1]),params.simTime);
-nextEventTime = min(nextEventTimes(1:numUE,1:params.numGNB));
+nextEventTime = min(nextEventTimes,[],"all"); %min(nextEventTimes(1:numUE,1:params.numGNB));
 %need to check Ue event times as well
 UEEventTimes = [UE.primaryNextEventTime;UE.secondaryNextEventTime];
 if min(UEEventTimes) > currentTime
@@ -378,7 +378,8 @@ while nextEventTime < params.simTime
 %                         lb = quantile(rate_dl_after_handoff(ue_idxs_affected),params.lb_thres);
                         % lb = quantile(rate_dl_after_handoff((1+numUE):end),params.lb_thres);
                         % lb = quantile(rate_dl_after_handoff(ues_not_affected),params.lb_thres);
-                        if (rate_dl_after_handoff_mmW_only(ue_idx) >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
+                        if (rate_dl_after_handoff_mmW_only(sub6ConnectionState==1) >= r_min)
+                        % if (rate_dl_after_handoff_mmW_only(ue_idx) >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
                         % if (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];

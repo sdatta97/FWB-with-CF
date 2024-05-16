@@ -1,7 +1,7 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = 'C:\Users\dsoum\Desktop\data\outageData\outageResultsvaryinglbthres_mmse_fdm_new_v2';
+projectdir = 'C:\Users\dsoum\FWB-with-CF\Simulation\resultData\StatsResults';
 % projectdir = '/Users/sdatta/FWB-with-CF/Simulation/resultData/impactResults';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
@@ -24,15 +24,20 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
 % end
-changingVars = cell(1,length(colNames)-4);
-for i=1:(length(colNames)-4)
-    changingVars{i} = colNames{i};
-end
+% changingVars = cell(1,length(colNames)-4);
+% for i=1:(length(colNames)-4)
+%     changingVars{i} = colNames{i};
+% end
 % changingVars = cell(1,length(colNames)-5);
 % for i=1:(length(colNames)-5)
 %     changingVars{i} = colNames{i};
 % end
+changingVars = cell(1,length(colNames)-2);
+for i=1:(length(colNames)-2)
+    changingVars{i} = colNames{i};
+end
+
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
 
-writetable(summaryTable,'./outage_mmse_updated_vary_lb_thresh_ue_density_2000_v2.txt')
-writetable(summaryTable,'./outage_mmse_updated_vary_lb_thresh_ue_density_2000_v2.csv')
+writetable(summaryTable,'./stats_mmse_updated_vary_lb_thresh_ue_density.txt')
+writetable(summaryTable,'./stats_mmse_updated_vary_lb_thresh_ue_density.csv')
