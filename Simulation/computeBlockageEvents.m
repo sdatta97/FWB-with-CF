@@ -53,15 +53,14 @@ else
         % all_mobility{indB} = Generate_Mobility(mobility_input{indB});
     % end
     for indB=1:length(numBlockers)
-        mobility_input{indB} = struct('V_POSITION_X_INTERVAL',[-width_area/2 width_area/2],...%(m)
-            'V_POSITION_Y_INTERVAL',[-length_area/2 length_area/2],...%(m)
+        mobility_input{indB} = struct('V_POSITION_R_INTERVAL',[0 width_area/2],...%(m)
+            'V_POSITION_THETA_INTERVAL',[-180 180],...%(degrees),
             'V_SPEED_INTERVAL',[V V],...%(m/s)
             'V_PAUSE_INTERVAL',[0 0],...%pause time (s)
-            'V_WALK_INTERVAL',[10.00 10.00],...%walk time (s)
+            'V_WALK_INTERVAL',[10 10],...%walk time (s)
             'V_DIRECTION_INTERVAL',[-180 180],...%(degrees)
             'SIMULATION_TIME',simTime,...%(s)
             'NB_NODES',numBlockers(indB));
-
         % Generate_Mobility function is Copyright (c) 2011, Mathieu Boutin
         all_mobility{indB} = Generate_Uniform_Mobility(mobility_input{indB},params.coverageRange);
     end

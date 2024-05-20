@@ -40,8 +40,10 @@ function s_mobility = Generate_Uniform_Mobility(s_input,R)
         s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_IS_MOVING = [];
         s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_DURATION = [];
 
-        previousX = unifrnd(s_input.V_POSITION_X_INTERVAL(1),s_input.V_POSITION_X_INTERVAL(2));
-        previousY = unifrnd(s_input.V_POSITION_Y_INTERVAL(1),s_input.V_POSITION_Y_INTERVAL(2));
+        r = unifrnd(s_input.V_POSITION_R_INTERVAL(1),s_input.V_POSITION_R_INTERVAL(2));
+        theta = unifrnd(s_input.V_POSITION_THETA_INTERVAL(1),s_input.V_POSITION_THETA_INTERVAL(2));
+        previousX = r*cos(theta);
+        previousY = r*sin(theta);
         previousDuration = 0;
         previousTime = 0;
         Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDuration,previousTime,s_input,R);
@@ -160,29 +162,49 @@ function Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDurat
             x_dest = x_tmp + distance_tmp*cosd(direction_tmp);
             y_dest = y_tmp + distance_tmp*sind(direction_tmp);
             flag_mobility_was_outside = false;
-            if (x_dest > s_input.V_POSITION_X_INTERVAL(2))
+            % if (x_dest > s_input.V_POSITION_X_INTERVAL(2))
+            %     flag_mobility_was_outside = true;
+            %     new_direction = 180 - direction_tmp;
+            %     x_dest = s_input.V_POSITION_X_INTERVAL(2);
+            %     y_dest = y_tmp + diff([x_tmp x_dest])*tand(direction_tmp);  
+            % end
+            % if (x_dest < s_input.V_POSITION_X_INTERVAL(1))
+            %     flag_mobility_was_outside = true;
+            %     new_direction = 180 - direction_tmp;
+            %     x_dest = s_input.V_POSITION_X_INTERVAL(1);
+            %     y_dest = y_tmp + diff([x_tmp x_dest])*tand(direction_tmp);
+            % end
+            % if (y_dest > s_input.V_POSITION_Y_INTERVAL(2))
+            %     flag_mobility_was_outside = true;
+            %     new_direction = -direction_tmp;
+            %     y_dest = s_input.V_POSITION_Y_INTERVAL(2);
+            %     x_dest = x_tmp + diff([y_tmp y_dest])/tand(direction_tmp); 
+            % end
+            % if (y_dest < s_input.V_POSITION_Y_INTERVAL(1))
+            %     flag_mobility_was_outside = true;
+            %     new_direction = -direction_tmp;
+            %     y_dest = s_input.V_POSITION_Y_INTERVAL(1);
+            %     x_dest = x_tmp + diff([y_tmp y_dest])/tand(direction_tmp);
+            % end
+            r_dest = sqrt(x_dest^2+y_dest^2);
+            r_tmp = sqrt(x_tmp^2+y_tmp^2);
+            if (r_dest > s_input.V_POSITION_R_INTERVAL(2))
                 flag_mobility_was_outside = true;
-                new_direction = 180 - direction_tmp;
-                x_dest = s_input.V_POSITION_X_INTERVAL(2);
-                y_dest = y_tmp + diff([x_tmp x_dest])*tand(direction_tmp);  
-            end
-            if (x_dest < s_input.V_POSITION_X_INTERVAL(1))
-                flag_mobility_was_outside = true;
-                new_direction = 180 - direction_tmp;
-                x_dest = s_input.V_POSITION_X_INTERVAL(1);
-                y_dest = y_tmp + diff([x_tmp x_dest])*tand(direction_tmp);
-            end
-            if (y_dest > s_input.V_POSITION_Y_INTERVAL(2))
-                flag_mobility_was_outside = true;
-                new_direction = -direction_tmp;
-                y_dest = s_input.V_POSITION_Y_INTERVAL(2);
-                x_dest = x_tmp + diff([y_tmp y_dest])/tand(direction_tmp); 
-            end
-            if (y_dest < s_input.V_POSITION_Y_INTERVAL(1))
-                flag_mobility_was_outside = true;
-                new_direction = -direction_tmp;
-                y_dest = s_input.V_POSITION_Y_INTERVAL(1);
-                x_dest = x_tmp + diff([y_tmp y_dest])/tand(direction_tmp);
+                syms d
+                eqn = d^2+d*(2*(x_tmp*cosd(direction_tmp)+y_tmp*sind(direction_tmp)))+(x_tmp^2+y_tmp^2-R^2) == 0;
+                d_new = solve(eqn,d,"Real",true);
+                x_dest = x_tmp + d_new*cosd(direction_tmp);
+                y_dest = y_tmp + d_new*tand(direction_tmp);   
+                d_dest = atand(y_dest/x_dest);
+                if (y_dest > 0 && x_dest > 0) %first quadrant
+                    new_direction = - (180 - d_dest);
+                elseif (y_dest > 0 && x_dest < 0) %second quadrant
+                    new_direction = d_dest;
+                elseif (y_dest < 0 && x_dest < 0) %third quadrant
+                    new_direction = d_dest;
+                else
+                    new_direction = 180+d_dest;
+                end
             end
             current_distance = abs(diff([x_tmp x_dest]) + 1i*diff([y_tmp y_dest]));
             current_duration = Out_adjustDuration_random_waypoint(time_tmp,current_distance/speed,s_input);
@@ -210,7 +232,7 @@ end
 
 function duration = Out_adjustDuration_random_waypoint(time,duration,s_input)
 
-    if ((time+duration) >= s_input.SIMULATION_TIME)
+    if (ceil(time+duration) >= s_input.SIMULATION_TIME)
         duration = s_input.SIMULATION_TIME - time;
     end
 end

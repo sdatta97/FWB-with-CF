@@ -214,7 +214,8 @@ for idxBSDensity = 1:length(lambda_BS)
                     
                     %% Blocker Properties and Simulation Duration
                     params.lambdaBlockers = 0.01; %How many blockers around
-                    params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+                    % params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+                    params.numBlockers = floor(pi*(params.coverageRange)^2*params.lambdaBlockers);
             %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
                     params.V = 1; %velocity of blocker m/s
                     % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.
