@@ -50,9 +50,9 @@ else
             'NB_NODES',numBlockers(indB));
 
         % Generate_Mobility function is Copyright (c) 2011, Mathieu Boutin
-        all_mobility{indB} = Generate_Mobility(mobility_input{indB});
+        % all_mobility{indB} = Generate_Mobility(mobility_input{indB});
+        all_mobility{indB} = Generate_Uniform_Mobility(mobility_input{indB});
     end
-
 end
 
 %% Computing Physical interaction btw Blockers and Base Stations
