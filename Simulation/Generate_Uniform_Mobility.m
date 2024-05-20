@@ -1,4 +1,4 @@
-function s_mobility = Generate_Uniform_Mobility(s_input)
+function s_mobility = Generate_Uniform_Mobility(s_input,R)
 % Copyright (c) 2011, Mathieu Boutin
 % All rights reserved.
 % 
@@ -44,7 +44,7 @@ function s_mobility = Generate_Uniform_Mobility(s_input)
         previousY = unifrnd(s_input.V_POSITION_Y_INTERVAL(1),s_input.V_POSITION_Y_INTERVAL(2));
         previousDuration = 0;
         previousTime = 0;
-        Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDuration,previousTime,s_input);
+        Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDuration,previousTime,s_input,R);
 
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%Promenade     
@@ -54,7 +54,7 @@ function s_mobility = Generate_Uniform_Mobility(s_input)
                 previousY = s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_POSITION_Y(end);
                 previousDuration = s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_DURATION(end);
                 previousTime = s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_TIME(end);
-                Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDuration,previousTime,s_input);
+                Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDuration,previousTime,s_input,R);
             else
                 %%%%%%%%Node is taking a pause:
                 previousDirection = s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_DIRECTION(end);
@@ -129,7 +129,7 @@ function s_mobility = Generate_Uniform_Mobility(s_input)
     clear nodeIndex_tmp;
 end
 
-function Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDuration,previousTime,s_input)
+function Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDuration,previousTime,s_input,R)
 
     global s_mobility_tmp;
     global nodeIndex_tmp;
@@ -139,7 +139,11 @@ function Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDurat
     time_tmp = previousTime + previousDuration;
     duration_tmp = Out_adjustDuration_random_waypoint(time_tmp,unifrnd(s_input.V_WALK_INTERVAL(1),s_input.V_WALK_INTERVAL(2)),s_input);
     direction_tmp = unifrnd(s_input.V_DIRECTION_INTERVAL(1),s_input.V_DIRECTION_INTERVAL(2));
-    speed = unifrnd(s_input.V_SPEED_INTERVAL(1),s_input.V_SPEED_INTERVAL(2));
+    % speed = unifrnd(s_input.V_SPEED_INTERVAL(1),s_input.V_SPEED_INTERVAL(2));
+    kval = unifrnd(s_input.V_SPEED_INTERVAL(1),s_input.V_SPEED_INTERVAL(2))/0.7031;
+    rval = sqrt(x_tmp^2 + y_tmp^2)/R;
+    fsval = (3*(1-rval^2)*(189-44*rval^2-18*rval^4))/(257*pi);
+    speed = kval*fsval;
     distance_tmp = speed*duration_tmp;
     if (distance_tmp == 0)
         s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_TIME(end+1,1) = time_tmp;

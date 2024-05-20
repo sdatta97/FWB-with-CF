@@ -562,10 +562,10 @@ while nextEventTime < params.simTime
                 end
             end
         end
-    % end
+    end
 
         %Secondary Connection Establishment Procedures
-    % for ue_idx = 1:numUE
+    for ue_idx = 1:numUE
         if UE.secondaryConnectionState(ue_idx) == 0
             UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
         elseif UE.secondaryConnectionState(ue_idx) == 2
