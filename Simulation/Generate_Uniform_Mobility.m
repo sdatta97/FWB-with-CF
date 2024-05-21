@@ -40,7 +40,7 @@ function s_mobility = Generate_Uniform_Mobility(s_input,R)
         s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_IS_MOVING = [];
         s_mobility_tmp.VS_NODE(nodeIndex_tmp).V_DURATION = [];
 
-        r = unifrnd(s_input.V_POSITION_R_INTERVAL(1),s_input.V_POSITION_R_INTERVAL(2));
+        r = sqrt(unifrnd(s_input.V_POSITION_R_INTERVAL(1)^2,s_input.V_POSITION_R_INTERVAL(2)^2));
         theta = unifrnd(s_input.V_POSITION_THETA_INTERVAL(1),s_input.V_POSITION_THETA_INTERVAL(2));
         previousX = r*cos(theta);
         previousY = r*sin(theta);
@@ -191,7 +191,7 @@ function Out_setRestrictedWalk_random_waypoint(previousX,previousY,previousDurat
             if (r_dest > s_input.V_POSITION_R_INTERVAL(2))
                 flag_mobility_was_outside = true;
                 syms d
-                eqn = d^2+d*(2*(x_tmp*cosd(direction_tmp)+y_tmp*sind(direction_tmp)))+(x_tmp^2+y_tmp^2-R^2) == 0;
+                eqn = d^2+d*(2*(x_tmp*cosd(direction_tmp)+y_tmp*sind(direction_tmp)))+(r_tmp^2-R^2) == 0;
                 d_new = solve(eqn,d,"Real",true);
                 x_dest = x_tmp + d_new*cosd(direction_tmp);
                 y_dest = y_tmp + d_new*tand(direction_tmp);   
