@@ -67,7 +67,7 @@ params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.deployRange = 20:20:100;
+params.deployRange = 10:10:100;
 params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
@@ -471,7 +471,8 @@ for idxdeployRange = 1:length(params.deployRange)
                         result_string = strcat('/results_',num2str(numUE),...
                             'UE_',num2str(lambda_BS(idxBSDensity)),...
                             'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
-                            'lambdaUE_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin), "Pow_fac", num2str(params.p_fac), "lb_thres", num2str(100*params.lb_thres));
+                            'lambdaUE_',num2str(deployRange),...
+                            'deployRange_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin), "Pow_fac", num2str(params.p_fac), "lb_thres", num2str(100*params.lb_thres));
                         results_save_string = strcat(eventFolder,result_string,'.mat');
                         save(results_save_string,'simOutputs','protocolParams','dataDescription')
                 
