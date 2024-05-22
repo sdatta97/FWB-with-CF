@@ -301,45 +301,6 @@ for idxdeployRange = 1:length(params.deployRange)
                 %         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
         %                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
                         [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
-        %                 stream = RandStream('mlfg6331_64');  % Random number stream
-        %                 options = statset('UseParallel',1,'UseSubstreams',1,'Streams',stream);
-        %                 [cluster_idxs, cluster_centroids, sum_cluster_distances, cluster_distances] = kmeans([real(UEpositions), imag(UEpositions)],num_sc_sub6, 'Options',options,'MaxIter',10000,'Display','final','Replicates',10);
-        %                 idx = 0;
-        %                 n_pc = 0; %num_sc_sub6;
-        %                 eq_n = 1;
-        %                 split_clust = 1.3;
-        %                 init_iter = 1;
-        %                 realign = 1;
-        %                 drawfig = 1;
-        %                 dot_size = [10,40];
-        %                 [cluster_centroids, cluster_idxs, n_c] = centroid_fct([real(UEpositions), imag(UEpositions)],idx,n_pc,eq_n,split_clust,init_iter,realign,drawfig,dot_size);
-        %                 user_cluster_map = zeros(K,num_sc_sub6);
-        %                 for k = 1:K
-        %                     user_cluster_map(k,cluster_idxs(k)) = 1;
-        %                 end
-        %                 user_sc_alloc = zeros(K,num_sc_sub6);
-        %                 for n = 1:num_sc_sub6
-        %                     n_allotted = 0;
-        %                     while (n_allotted < floor(K/n_c))
-        %                         for c_idx = 1:n_c
-        %     %                         k = find(user_cluster_map(:,c_idx),1);
-        %                             k_idxs = find(user_cluster_map(:,c_idx));
-        %     %                         if(sum(user_sc_alloc (k,:)) == 0)
-        %     %                             user_sc_alloc (k,n) = 1;
-        %     %                             user_cluster_map(k,c_idx) = 0;
-        %     %                         end
-        %                             while (user_sc_alloc(k,n) > 0)
-        %                                 k = k_idxs(randi([1,numel(k_idxs)]));
-        %                             end
-        %                             user_sc_alloc (k,n) = 1;
-        %                             n_allotted = n_allotted + 1;
-        %                             if (n_allotted == floor(K/n_c))
-        %                                 break;
-        %                             end
-        %                         end
-        %                     end
-        %                 end
-        %                 params.user_sc_alloc = user_sc_alloc;
                         num_sc_sub6 = params.num_sc_sub6;
                         params.BETA = db2pow(gainOverNoisedB);   
                         params.D = D;

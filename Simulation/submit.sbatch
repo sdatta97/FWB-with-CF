@@ -17,4 +17,4 @@ module load matlab/2023a
 
 echo "$SLURM_ARRAY_TASK_ID"
 
-matlab -batch "addpath('/scratch/sd3927/FWB-with-CF/Simulation/quadriga_src'),SimulationMain_MIMO, exit"
+matlab -batch "SimulationMain_MIMO, exit"
