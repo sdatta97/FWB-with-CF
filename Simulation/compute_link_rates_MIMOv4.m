@@ -117,7 +117,7 @@ end
 for m = 1:M
     for n = 1:num_sc_sub6
         for k = 1:K_mmW
-            if ismember(m,Serv{k}) && (user_sc_alloc(k,n) == 1)
+            if ismember(m,Serv{k}) && (user_sc_alloc(k,n) == 1) && (sub6ConnectionState(k)==1)
                 dl_mmse_precoder_mmW(m,k,:,:,n) = reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])./sqrt(scaling_LP_mmse(m,k,n));
             end
         end
