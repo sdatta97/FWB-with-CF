@@ -377,7 +377,7 @@ while nextEventTime < params.simTime
                         lb = quantile(rate_dl_after_handoff(ues_not_affected),params.lb_thres);
                         % if (rate_dl_after_handoff_mmW_only(sub6ConnectionState==1) >= r_min)
                         % if (rate_dl_after_handoff_mmW_only(ue_idx) >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
-                        if ((rate_dl_after_handoff(nonzeros((1:numUE)'.*sub6ConnectionState)) >= r_min) && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
+                        if (all(rate_dl_after_handoff(nonzeros((1:numUE)'.*sub6ConnectionState)) >= r_min) && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
 %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
                             UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
