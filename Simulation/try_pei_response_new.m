@@ -190,6 +190,8 @@ for aID = 1:99
                             rmin_sub6 = 35e6;
                             params.r_min_sub6 = rmin_sub6*ones(params.numUE_sub6,1);  %stores min rate requirement for all sub-6 users
                             params.rate_reduce_threshold = 5e7;
+                            params.p_fac = p_fac_arr(idx_p);
+                            params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);  
                             %Length of the coherence block
                             params.tau_c = 200;
                             
