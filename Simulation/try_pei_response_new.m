@@ -184,6 +184,7 @@ for aID = 1:99
                     for idx_p = 1:length(p_fac_arr)
                         for idxlbthres = 1:length(lb_thresh)
                             lb_thres = lb_thresh(idxlbthres);
+                            params.lb_thres = lb_thres;
                             rmin = rmin_arr(idxrmin);
                             params.r_min = rmin*ones(params.numUE,1);  %stores min rate requirement for all mmWave users
                             rmin_sub6 = 35e6;
