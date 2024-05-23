@@ -324,13 +324,11 @@ for aID = 1:99
                                 'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
                                 'lambdaUE_',num2str(deployRange),...
                                 'deployRange_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin), "Pow_fac", num2str(params.p_fac), "lb_thres", num2str(100*params.lb_thres));
-                            results_save_string = strcat(eventFolder,result_string,'.mat');
-                            save(results_save_string,'simOutputs','protocolParams','dataDescription')
                     
                             %Since we are mostly interested in blockage probability, we want to
                             %transfer the data quickly to our local machine from server. We will save
                             %the results as a txt file.
-                            recording_text_file_string = strcat(outageFolder,result_string,'.csv');
+                            recording_text_file_string = strcat(impactFolder,result_string,'.csv');
                             fileID = fopen(recording_text_file_string,'w');
                             output_categories = ['UE idx,','lambdaBS,','lambdaUE,','numBlockers,',...
                                 'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,', 'mean_rate_before_handoff,','mean_rate_after_handoff\n'];
@@ -340,7 +338,7 @@ for aID = 1:99
                             p_fac = params.p_fac;
                             formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f\n';
                             fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
-                                deployRange,min_rate_req, p_fac, lb_thres, mean(rate_dl_before_handoff),mean(rate_dl_after_handoff((1+K_mmW):end)));
+                                deployRange,rmin, p_fac, lb_thres, mean(rate_dl_before_handoff),mean(rate_dl_after_handoff((1+K_mmW):end)));
                             fclose(fileID);
                         end
                     end
