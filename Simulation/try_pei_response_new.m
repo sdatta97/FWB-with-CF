@@ -54,7 +54,7 @@ for aID = 1:99
     % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
     
     %Power factor division
-    p_fac_arr = 1; %10^2; %10:10:100; %10.^(0:1:5);
+    p_fac_arr = 10; %10^2; %10:10:100; %10.^(0:1:5);
     % params.p_fac = 10;
       %Total uplink transmit power per UE (mW)
     params.p = 100;
@@ -64,10 +64,6 @@ for aID = 1:99
     %Total downlink transmit power per AP (mW)
     params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200
     % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
-    
-    %Power factor division
-    % p_fac_arr = 10; %10.^(0:1:4);
-    % params.p_fac = 10;
     
     %Prepare to save simulation results
     
@@ -250,7 +246,7 @@ for aID = 1:99
                 Band = params.Band; %Communication bandwidth
                 tau_c = params.tau_c;      % coherence block length                            
                 num_sc_sub6 = params.num_sc_sub6;
-                params.user_sc_alloc = ones(K,num_sc_sub6);                                
+                params.user_sc_alloc = zeros(K,num_sc_sub6);                                
                 params.BETA = db2pow(gainOverNoisedB);   
                 params.D = D;
                 params.R_gNB = R_gNB;
@@ -270,32 +266,24 @@ for aID = 1:99
                             params.p_fac = p_fac_arr(idx_p);
                             params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);  
                             [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params); 
-                            % for p_idx = 1:length(p_fac_arr)
-                            %     params.p_fac = p_fac_arr(p_idx);
-                            %     params.p_fac_rearrange = 0.1*p_fac_arr(p_idx); 
                             numUE = params.numUE;
-                            sub6ConnectionState = ones(numUE,1);
                             for ue_idx = 1:numUE 
                                 [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
                                 params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
                             end
-                            % D = params.D;
-                            % BETA = params.BETA;
-                            % params.D = D(:,[(1:numUE)'; ue_idxs_affected]);
-                            % params.BETA = BETA(:,[(1:numUE)'; ue_idxs_affected]);
-                            % rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl(:,ue_idxs_affected-numUE,:,:), channel_est_dl(:,ue_idxs_affected-numUE,:,:),channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                            % params.D = D;
-                            % params.BETA = BETA;
+                            sub6ConnectionState = zeros(numUE,1);
+                            sub6ConnectionState(1) = 1;
                             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
-                            lb = quantile(rate_dl_before_handoff(union(ue_idxs_affected,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
+                            lb = quantile(rate_dl_before_handoff(union(params.ue_rearranged,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
                             params.scs_sub6(1) = bw_alloc;
                             params.scs_sub6(2) = Band - bw_alloc;
                             % params.ue_rearranged = ue_idxs_affected;
                             ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
                             % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
-                            user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);                               
+                            user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);
+                            ue_idx = 2;
                             user_sc_alloc(ue_idx,1) = 1;
                             user_sc_alloc(ue_idx,2) = 0;
                             user_sc_alloc(ues_not_affected,1) = 1;
@@ -304,8 +292,15 @@ for aID = 1:99
                             user_sc_alloc(ue_idxs_affected,2) = 1;
                             params.user_sc_alloc = user_sc_alloc;
                             sub6ConnectionState(ue_idx) = 1;
-        %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                            rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
+                            ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
+                            D = params.D;
+                            BETA = params.BETA;
+                            params.D = D(:,ues_sharing);
+                            params.BETA = BETA(:,ues_sharing);                                                        
+%                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl(:,ues_not_affected-numUE,:,:), channel_est_dl(:,ues_not_affected-numUE,:,:),channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
+                            params.D = D;
+                            params.BETA = BETA;
                             numUE = params.numUE;
                             numUE_sub6 = params.numUE_sub6;
                             numBS = size(params.locationsBS,1);
