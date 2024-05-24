@@ -183,6 +183,80 @@ for aID = 1:99
                   %                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
                             % [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,aID);
+                
+                 %Length of the coherence block
+                params.tau_c = 200;
+                
+                %Compute number of pilots per coherence block
+                params.tau_p = params.numUE+params.numUE_sub6;
+                
+                %Compute the prelog factor assuming only downlink data transmission
+        %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
+                params.preLogFactor = 1;
+        
+                %Number of setups with random UE locations
+                params.nbrOfSetups = 100;
+                        
+                      
+                %Number of channel realizations per setup
+                params.nbrOfRealizations = 100;
+                
+                %% PHY layer params
+                params.scs_mmw = 2e9;     %not using this parameter now
+                params.scs_sub6 = [0.5*(params.Band), 0.5*(params.Band)];   %sub-6 GHz bandwidth 100 MHz
+                params.num_sc_mmw = 1;    %not using this parameter now
+                params.num_sc_sub6 = 2;   %sub-6 GHz considered as one full band
+                
+                %% UE angular coverage range (full 360 coverage for now)
+                lookAngleCell{1} = [0,360];
+                
+                %% Blocker Properties and Simulation Duration
+                params.lambdaBlockers = 0.01; %How many blockers around
+                params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+        %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
+                params.V = 1; %velocity of blocker m/s
+                % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.
+                % params.hb = (175 + TruncatedGaussian(5, [-15,15], [1 params.numBlockers])) / 100;
+                params.hb = 1.8*ones(1,params.numBlockers); %height blocker
+                params.mu = 2; %Expected bloc dur =1/mu sec
+                
+                N = params.num_antennas_per_gNB;  % antennas per AP
+                L = params.numGNB_sub6;
+                K_mmW = params.numUE;
+                K = params.numUE + params.numUE_sub6;  % --Ground UEs
+                numUE_sub6 = params.numUE_sub6;
+                snr_db = params.snr_db;
+                LOOP = length(params.snr_db);
+                asd_length = length(params.ASD_VALUE);
+                hi_length = length(params.Kt_Kr_vsUE);
+                ASD_VALUE = params.ASD_VALUE;
+                ASD_CORR = params.ASD_CORR;
+                Kt_Kr_vsUE = params.Kt_Kr_vsUE;
+                K_Factor = params.K_Factor;
+                RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
+                Perf_CSI = params.Perf_CSI;
+                cov_area = params.cov_area;
+                %%
+                TAU_P_K_by_two = params.TAU_P_K_by_two;  
+                CH_estimation = params.CH_estimation;  
+                %%
+                LB = params.LB;  %Lower bound
+                UB = params.UB;  %Upper bound
+                no_of_rea = params.no_of_rea;     % no.of channel realizations
+                %%
+                pilot_pow = params.pilot_pow; 
+                noiseFigure = params.noiseFigure;
+                sigma_sf = params.sigma_sf;
+                Band = params.Band; %Communication bandwidth
+                tau_c = params.tau_c;      % coherence block length                            
+                num_sc_sub6 = params.num_sc_sub6;
+                params.user_sc_alloc = ones(K,num_sc_sub6);                                
+                params.BETA = db2pow(gainOverNoisedB);   
+                params.D = D;
+                params.R_gNB = R_gNB;
+                params.R_ue_mmW = R_ue_mmW;
+                params.R_ue_sub6 = R_ue_sub6;
+                
                 for idxrmin = 1:length(rmin_arr)
                     for idx_p = 1:length(p_fac_arr)
                         for idxlbthres = 1:length(lb_thresh)
@@ -195,101 +269,25 @@ for aID = 1:99
                             params.rate_reduce_threshold = 5e7;
                             params.p_fac = p_fac_arr(idx_p);
                             params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);  
-                            %Length of the coherence block
-                            params.tau_c = 200;
-                            
-                            %Compute number of pilots per coherence block
-                            params.tau_p = params.numUE+params.numUE_sub6;
-                            
-                            %Compute the prelog factor assuming only downlink data transmission
-                    %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
-                            params.preLogFactor = 1;
-                    
-                            %Number of setups with random UE locations
-                            params.nbrOfSetups = 100;
-                                    
-                                  
-                            %Number of channel realizations per setup
-                            params.nbrOfRealizations = 100;
-                            
-                            %% PHY layer params
-                            params.scs_mmw = 2e9;     %not using this parameter now
-                            params.scs_sub6 = [0.5*(params.Band), 0.5*(params.Band)];   %sub-6 GHz bandwidth 100 MHz
-                            params.num_sc_mmw = 1;    %not using this parameter now
-                            params.num_sc_sub6 = 2;   %sub-6 GHz considered as one full band
-                            
-                            %% UE angular coverage range (full 360 coverage for now)
-                            lookAngleCell{1} = [0,360];
-                            
-                            %% Blocker Properties and Simulation Duration
-                            params.lambdaBlockers = 0.01; %How many blockers around
-                            params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
-                    %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
-                            params.V = 1; %velocity of blocker m/s
-                            % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.
-                            % params.hb = (175 + TruncatedGaussian(5, [-15,15], [1 params.numBlockers])) / 100;
-                            params.hb = 1.8*ones(1,params.numBlockers); %height blocker
-                            params.mu = 2; %Expected bloc dur =1/mu sec
-                            
-                            N = params.num_antennas_per_gNB;  % antennas per AP
-                            L = params.numGNB_sub6;
-                            K_mmW = params.numUE;
-                            K = params.numUE + params.numUE_sub6;  % --Ground UEs
-                            numUE_sub6 = params.numUE_sub6;
-                            snr_db = params.snr_db;
-                            LOOP = length(params.snr_db);
-                            asd_length = length(params.ASD_VALUE);
-                            hi_length = length(params.Kt_Kr_vsUE);
-                            ASD_VALUE = params.ASD_VALUE;
-                            ASD_CORR = params.ASD_CORR;
-                            Kt_Kr_vsUE = params.Kt_Kr_vsUE;
-                            K_Factor = params.K_Factor;
-                            RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
-                            Perf_CSI = params.Perf_CSI;
-                            cov_area = params.cov_area;
-                            %%
-                            TAU_P_K_by_two = params.TAU_P_K_by_two;  
-                            CH_estimation = params.CH_estimation;  
-                            %%
-                            LB = params.LB;  %Lower bound
-                            UB = params.UB;  %Upper bound
-                            no_of_rea = params.no_of_rea;     % no.of channel realizations
-                            %%
-                            pilot_pow = params.pilot_pow; 
-                            noiseFigure = params.noiseFigure;
-                            sigma_sf = params.sigma_sf;
-                            Band = params.Band; %Communication bandwidth
-                            tau_c = params.tau_c;      % coherence block length                            
-                            num_sc_sub6 = params.num_sc_sub6;
-                            params.user_sc_alloc = ones(K,num_sc_sub6);                                
-                            params.BETA = db2pow(gainOverNoisedB);   
-                            params.D = D;
-                            params.R_gNB = R_gNB;
-                            params.R_ue_mmW = R_ue_mmW;
-                            params.R_ue_sub6 = R_ue_sub6;
                             numUE = params.numUE;
                             sub6ConnectionState = zeros(numUE,1);
-                %                 ap_idxs = find(D(:,1));
-                %                 ue_idxs = 1;
-                %                 for a = 1:length(ap_idxs)
-                %                     ap_idx = ap_idxs(a);
-                %                     ue_idxs = union(ue_idxs,find(D(ap_idx,:)));
-                %                 end
                             [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params); 
                             % for p_idx = 1:length(p_fac_arr)
                             %     params.p_fac = p_fac_arr(p_idx);
                             %     params.p_fac_rearrange = 0.1*p_fac_arr(p_idx); 
                             ue_idx = 1;
                             [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
-                            D = params.D;
-                            BETA = params.BETA;
-                            params.D = D(:,[(1:numUE)'; ue_idxs_affected]);
-                            params.BETA = BETA(:,[(1:numUE)'; ue_idxs_affected]);
-                            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl(:,ue_idxs_affected-numUE,:,:), channel_est_dl(:,ue_idxs_affected-numUE,:,:),channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                            params.D = D;
-                            params.BETA = BETA;
+                            % D = params.D;
+                            % BETA = params.BETA;
+                            % params.D = D(:,[(1:numUE)'; ue_idxs_affected]);
+                            % params.BETA = BETA(:,[(1:numUE)'; ue_idxs_affected]);
+                            % rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl(:,ue_idxs_affected-numUE,:,:), channel_est_dl(:,ue_idxs_affected-numUE,:,:),channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            % params.D = D;
+                            % params.BETA = BETA;
+                            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                             sub6ConnectionState(ue_idx) = 1;
-                            lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
+                            % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
+                            lb = quantile(rate_dl_before_handoff(union(ue_idxs_affected,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
                             params.scs_sub6(1) = bw_alloc;
                             params.scs_sub6(2) = Band - bw_alloc;
