@@ -346,8 +346,8 @@ while nextEventTime < params.simTime
                         % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
                         user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);     
                         sub6ConnectionState(ue_idx) = 1;
-                        user_sc_alloc(sub6ConnectionState,1) = 1;
-                        user_sc_alloc(sub6ConnectionState,2) = 0;
+                        user_sc_alloc(find(sub6ConnectionState),1) = 1;
+                        user_sc_alloc(find(sub6ConnectionState),2) = 0;
                         user_sc_alloc(ues_not_affected,1) = 1;
                         user_sc_alloc(ues_not_affected,2) = 1;
                         user_sc_alloc(params.ue_rearranged,1) = 0;
