@@ -272,10 +272,9 @@ for aID = 1:99
                                 params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
                             end
                             sub6ConnectionState = zeros(numUE,1);
-                            sub6ConnectionState(1) = 1;
                             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
-                            lb = quantile(rate_dl_before_handoff(union(params.ue_rearranged,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
+                            lb = quantile(rate_dl_before_handoff(params.ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
                             params.scs_sub6(1) = bw_alloc;
                             params.scs_sub6(2) = Band - bw_alloc;
@@ -284,6 +283,7 @@ for aID = 1:99
                             % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
                             user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);
                             ue_idx = 2;
+                            sub6ConnectionState(1) = 1;
                             sub6ConnectionState(ue_idx) = 1;
                             user_sc_alloc(((1:numUE).*sub6ConnectionState),1) = 1;
                             user_sc_alloc(((1:numUE).*sub6ConnectionState),2) = 0;
@@ -326,14 +326,14 @@ for aID = 1:99
                             recording_text_file_string = strcat(impactFolder,result_string,'.csv');
                             fileID = fopen(recording_text_file_string,'w');
                             output_categories = ['UE idx,','lambdaBS,','lambdaUE,','numBlockers,',...
-                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,', 'lb_rate_before_handoff,','scs_1','scs_2','mmW_rate_1','mmW_rate_2','users_not_bb\n'];
+                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,', 'lb_rate_before_handoff,','scs_1,','scs_2,','mmW_rate_1,','mmW_rate_2,','users_not_bb\n'];
                     
                             fprintf(fileID,output_categories);
                         
                             p_fac = params.p_fac;
-                            formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f\n';
+                            formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
-                                deployRange,rmin, p_fac, lb_thres,lb,params.scs_sub6(1),params.scs_sub6(2),l_after_handoff);
+                                deployRange,rmin, p_fac, lb_thres,lb,params.scs_sub6(1),params.scs_sub6(2),rate_dl_after_handoff(1),rate_dl_after_handoff(2),l_after_handoff);
                             fclose(fileID);
                         end
                     end
