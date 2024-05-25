@@ -325,14 +325,14 @@ for aID = 1:99
                             %the results as a txt file.
                             recording_text_file_string = strcat(impactFolder,result_string,'.csv');
                             fileID = fopen(recording_text_file_string,'w');
-                            output_categories = ['UE idx,','lambdaBS,','lambdaUE,','numBlockers,',...
+                            output_categories = ['lambdaBS,','lambdaUE,','numBlockers,',...
                                 'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,', 'lb_rate_before_handoff,','scs_1,','scs_2,','mmW_rate_1,','mmW_rate_2,','users_not_bb\n'];
                     
                             fprintf(fileID,output_categories);
                         
                             p_fac = params.p_fac;
-                            formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
-                            fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
+                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+                            fprintf(fileID,formatSpec,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
                                 deployRange,rmin, p_fac, lb_thres,lb,params.scs_sub6(1),params.scs_sub6(2),rate_dl_after_handoff(1),rate_dl_after_handoff(2),l_after_handoff);
                             fclose(fileID);
                         end
