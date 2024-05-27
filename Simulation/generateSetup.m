@@ -121,26 +121,11 @@ masterAPs = zeros(K,1); %the indices of master AP of each UE k
 for n = 1:nbrOfSetups
     
     %Random AP locations with uniform distribution
-    % APpositions = (rand(L,1) + 1i*rand(L,1)) * squareLength;
-    % RgNB = coverageRange * sqrt(rand(L_mmW,1)); %location of gNBs (distance from origin)
-    % angleGNB = 2*pi*rand(L_mmW,1);%location of gNBs (angle from x-axis)
-    % locationsBS = RgNB.*cos(angleGNB) + 1i*(RgNB.*sin(angleGNB));
-    % 
-    % RgNB_sub6 = coverageRange + (coverageRange_sub6 - coverageRange) * sqrt(rand(L-L_mmW,1)); %location of gNBs (distance from origin)
-    % angleGNB_sub6 = 2*pi*rand(L-L_mmW,1);%location of gNBs (angle from x-axis)
-    % locationsBS_sub6 = RgNB_sub6.*cos(angleGNB_sub6) + 1i*(RgNB_sub6.*sin(angleGNB_sub6));  
     locationsBS = params.locationsBS;
     locationsBS_sub6 = params.locationsBS_sub6;
     APpositions = [locationsBS; locationsBS_sub6];
     APpositions = APpositions(:,1) + 1i*APpositions(:,2);
-    %Prepare to compute UE locations
-    % UEpositions = zeros(K,1);
-    % RUE = 0; %location of UEs (distance from origin)
-    % angleUE = 2*pi*rand(K_mmW,1);%location of UEs (angle from x-axis)
-    % UE_locations = RUE.*cos(angleUE) + 1i*(RUE.*sin(angleUE));
-    % RUE_sub6 = coverageRange_sub6*sqrt(rand(K-K_mmW,1)); %location of UEs (distance from origin)
-    % angleUE_sub6 = 2*pi*rand(K-K_mmW,1);%location of UEs (angle from x-axis)
-    % UE_locations_sub6 = RUE_sub6.*cos(angleUE_sub6) + 1i*(RUE_sub6.*sin(angleUE_sub6));      
+    %Prepare to compute UE locations  
     UE_locations = params.UE_locations;
     UE_locations_sub6 = params.UE_locations_sub6;
     UEpositions = [UE_locations; UE_locations_sub6];
@@ -319,14 +304,10 @@ for n = 1:nbrOfSetups
     %(5.47) by considering only the APs from the set M_k for UE k, i.e.,
     %where D(:,k,n) is one.
     for k=1:K
-        
         tempmat = -inf*ones(L,1);
         tempmat(D(:,k,n)==1,1) = gainOverNoisedB(D(:,k,n)==1,k,n);
         [~,servingAP] = max(tempmat);
-        D_small(servingAP,k,n) = 1;
-        
-    end
-    
-    
+        D_small(servingAP,k,n) = 1;        
+    end    
 end
 
