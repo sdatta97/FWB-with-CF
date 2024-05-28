@@ -54,7 +54,7 @@ params.p = 100;
 % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
 
 %Power factor division
-p_fac_arr = 10.^(1:1:2);
+p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
 
 %Prepare to save simulation results
@@ -109,7 +109,7 @@ for idxdeployRange = 1:length(params.deployRange)
     % num_BS_arr = [2,5,10,20]; %densityBS
     % numUE_sub6_arr = 2:2:10;
     % numUE_sub6_arr = 10;
-    lambda_UE_sub6 = 1000; %[250:250:1000, 1500, 2000]; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+    lambda_UE_sub6 = 500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
     params.loss_pc_thresh = 10;
     params.Lmax = 4;
     % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
