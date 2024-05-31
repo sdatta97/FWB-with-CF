@@ -1,7 +1,7 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = 'C:\Users\dsoum\Desktop\data\outageData\outageResultsvaryingpowfactor_multiUE';
+projectdir = 'C:\Users\dsoum\Desktop\data\outageData\outageResultspowfactor10_varyUEdensity_multiUE';
 % projectdir = 'C:\Users\dsoum\FWB-with-CF\Simulation\resultData\impactResults';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
@@ -39,5 +39,5 @@ end
 
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
 
-writetable(summaryTable,'./outage_mmse_fdm_updated_vary_pow_factor_multi_UEv2.txt')
-writetable(summaryTable,'./outage_mmse_fdm_updated_vary_pow_factor_multi_UEv2.csv')
+writetable(summaryTable,'./outage_mmse_fdm_updated_vary_ue_density_pow_factor_10_multi_UEv2.txt')
+writetable(summaryTable,'./outage_mmse_fdm_updated_vary_ue_density_pow_factor_10_multi_UEv2.csv')
