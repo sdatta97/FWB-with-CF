@@ -56,6 +56,7 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
+numUE_arr = 4:2:10;
 
 %Prepare to save simulation results
 
@@ -67,7 +68,7 @@ params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.deployRange = 20; %20:20:100;
+params.deployRange = 100; %20:20:100;
 params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
@@ -83,10 +84,10 @@ width_area_sub6 = 2*params.coverageRange_sub6;
 % width_area_sub6 = 2*(params.deployRange + params.coverageRange_sub6);
 height_transmitter_sub6 = 4; % 5;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
-for idxdeployRange = 1:length(params.deployRange)
+for idxnumUE = 1:length(numUE_arr)
+    params.numUE = numUE_arr(idxnumUE);
     %%UE location
-    params.numUE = 2;
-    deployRange = params.deployRange(idxdeployRange);
+    deployRange = params.deployRange; %(idxdeployRange);
     params.RUE =  deployRange*rand(params.numUE,1);%params.coverageRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
     params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
     params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
@@ -109,7 +110,7 @@ for idxdeployRange = 1:length(params.deployRange)
     % num_BS_arr = [2,5,10,20]; %densityBS
     % numUE_sub6_arr = 2:2:10;
     % numUE_sub6_arr = 10;
-    lambda_UE_sub6 = 500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+    lambda_UE_sub6 = 1000; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
     params.loss_pc_thresh = 10;
     params.Lmax = 4;
     % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -149,12 +150,14 @@ for idxdeployRange = 1:length(params.deployRange)
         params.numGNB_sub6 = n;
     %     params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
-        params.RgNB_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2 + params.coverageRange_sub6) * sqrt(rand(params.numGNB_sub6 - params.numGNB*params.numUE,1)); %location of gNBs (distance from origin)
+        % params.RgNB_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2 + params.coverageRange_sub6) * sqrt(rand(params.numGNB_sub6 - params.numGNB*params.numUE,1)); %location of gNBs (distance from origin)
+        params.RgNB_sub6 = (max(sqrt(sum(params.UE_locations.^2,2))) + params.coverageRange_sub6) * sqrt(rand(params.numGNB_sub6 - params.numGNB*params.numUE,1)); %location of gNBs (distance from origin)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB*params.numUE,1);%location of gNBs (angle from x-axis)
         % params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.locationsBS_sub6 = mean(params.UE_locations,1) + [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        for idxUEDensity = 1:length(lambda_UE_sub6)
+        % params.locationsBS_sub6 = mean(params.UE_locations,1) + [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
+        params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
+       for idxUEDensity = 1:length(lambda_UE_sub6)
             params.ue_rearranged = [];        
             %%UE locations
             % params.numUE_sub6 = 10;
@@ -171,9 +174,11 @@ for idxdeployRange = 1:length(params.deployRange)
             end
             params.numUE_sub6 = n;
             % params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-            params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+            % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+            params.RUE_sub6 = (max(sqrt(sum(params.UE_locations.^2,2)))+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
             params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
-            params.UE_locations_sub6 =  mean(params.UE_locations,1) + [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+            % params.UE_locations_sub6 =  mean(params.UE_locations,1) + [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+            params.UE_locations_sub6 =  [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
             
              %Length of the coherence block
 %                 params.tau_c = 200;
