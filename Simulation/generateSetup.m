@@ -136,7 +136,7 @@ for n = 1:nbrOfSetups
     wrapVertical = wrapHorizontal';
     wrapLocations = wrapHorizontal(:)' + 1i*wrapVertical(:)';
     APpositionsWrapped = repmat(APpositions,[1 length(wrapLocations)]) + repmat(wrapLocations,[L 1]);
-    
+
     %Prepare to store shadowing correlation matrix
     shadowCorrMatrix = sigma_sf^2*ones(K,K);
     shadowAPrealizations = zeros(K,L);    

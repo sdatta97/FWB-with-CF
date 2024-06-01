@@ -11,7 +11,7 @@ if (isempty(aID))
 end
 if(isempty(aID))
     warning('aID is empty. Replacing it with 0010.')
-    aID = '0003';
+    aID = '0011';
 end
 %RNG seed.
 rng(str2double(aID),'twister');
@@ -144,7 +144,7 @@ for idxnumUE = 1:length(numUE_arr)
         params.angleGNB = angleGNB;
         params.locationsBS = locationsBS;
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        while (n<=params.numGNB) %(n==0)
+        while (n<=(numBS*numUE)) %(n==0)
             n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         end
         params.numGNB_sub6 = n;
