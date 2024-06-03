@@ -50,22 +50,8 @@ else
             'NB_NODES',numBlockers(indB));
 
         % Generate_Mobility function is Copyright (c) 2011, Mathieu Boutin
-        % all_mobility{indB} = Generate_Mobility(mobility_input{indB});
-        all_mobility{indB} = Generate_Mobilityv2(mobility_input{indB});
+        all_mobility{indB} = Generate_Mobility(mobility_input{indB});
     end
-    % for indB=1:length(numBlockers)
-    %     mobility_input{indB} = struct('V_POSITION_R_INTERVAL',[0 width_area/2],...%(m)
-    %         'V_POSITION_THETA_INTERVAL',[-180 180],...%(degrees),
-    %         'V_SPEED_INTERVAL',[V V],...%(m/s)
-    %         'V_PAUSE_INTERVAL',[0 0],...%pause time (s)
-    %         'V_WALK_INTERVAL',[10 10],...%walk time (s)
-    %         'V_DIRECTION_INTERVAL',[-180 180],...%(degrees)
-    %         'SIMULATION_TIME',simTime,...%(s)
-    %         'NB_NODES',numBlockers(indB));
-    %     % Generate_Mobility function is Copyright (c) 2011, Mathieu Boutin
-    %     all_mobility{indB} = Generate_Uniform_Mobility(mobility_input{indB},params.coverageRange);
-    %     % test_Animate(all_mobility{indB},mobility_input{indB},1);
-    % end
 end
 
 %% Computing Physical interaction btw Blockers and Base Stations
