@@ -1,0 +1,2 @@
+lambdaBS,lambdaUE,numBlockers,deployRange,minRatereq,powerFac,lower_bound_thresh,GroupCount,mean_mmW_rate_1,std_mmW_rate_1,mean_mmW_rate_2,std_mmW_rate_2,mean_users_not_bb,std_users_not_bb,mean_mmW_rate_1_small,std_mmW_rate_1_small,mean_mmW_rate_2_small,std_mmW_rate_2_small,mean_users_not_bb_small,std_users_not_bb_small
+25,250,400,100,400000000,10,0.1,62,4902995248.66591,1265096057.58458,4635657987.73801,1495357453.7261,7.34566801626064,1.20645343145869,372054984.253181,875256454.059686,307307366.231702,763172320.823208,13.3350445470292,8.04265815847294
