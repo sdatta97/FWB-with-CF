@@ -300,8 +300,37 @@ for aID = 1:99
 %                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                             rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
                             l_after_handoff = 100*sum(find(rate_dl_after_handoff((1+K_mmW):end)<35e6)>0)/K;
-                            % params.D = D;
-                            % params.BETA = BETA;
+                            params.D = D_small;
+                            sub6ConnectionState = zeros(numUE,1);
+                            rate_dl_before_handoff_small = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
+                            lb = quantile(rate_dl_before_handoff_small(params.ue_rearranged)./params.Band,params.lb_thres);
+                            bw_alloc = Band - rmin_sub6/lb;
+                            params.scs_sub6(1) = bw_alloc;
+                            params.scs_sub6(2) = Band - bw_alloc;
+                            % params.ue_rearranged = ue_idxs_affected;
+                            ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
+                            % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
+                            user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);
+                            ue_idx = 2;
+                            sub6ConnectionState(1) = 1;
+                            sub6ConnectionState(ue_idx) = 1;
+                            user_sc_alloc(find(sub6ConnectionState),1) = 1;
+                            user_sc_alloc(find(sub6ConnectionState),2) = 0;
+                            user_sc_alloc(ues_not_affected,1) = 1;
+                            user_sc_alloc(ues_not_affected,2) = 1;
+                            user_sc_alloc(params.ue_rearranged,1) = 0;
+                            user_sc_alloc(params.ue_rearranged,2) = 1;
+                            params.user_sc_alloc = user_sc_alloc;
+                            ues_sharing = union(find(sub6ConnectionState),ues_not_affected);
+                            % D = params.D;
+                            % BETA = params.BETA;
+                            % params.D = D(:,ues_sharing);
+                            % params.BETA = BETA(:,ues_sharing);                                                        
+%                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            rate_dl_after_handoff_small = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
+                            l_after_handoff_small = 100*sum(find(rate_dl_after_handoff_small((1+K_mmW):end)<35e6)>0)/K;
+                           
                             numUE = params.numUE;
                             numUE_sub6 = params.numUE_sub6;
                             numBS = size(params.locationsBS,1);
@@ -314,7 +343,7 @@ for aID = 1:99
                             if not(isfolder(impactFolder))
                                 mkdir(impactFolder)
                             end
-                            result_string = strcat('/handoff_impact_',num2str(numUE),...
+                            result_string = strcat('/handoff_impact_incl_small_',num2str(numUE),...
                                 'UE_',num2str(lambda_BS(idxBSDensity)),...
                                 'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
                                 'lambdaUE_',num2str(deployRange),...
@@ -326,14 +355,14 @@ for aID = 1:99
                             recording_text_file_string = strcat(impactFolder,result_string,'.csv');
                             fileID = fopen(recording_text_file_string,'w');
                             output_categories = ['lambdaBS,','lambdaUE,','numBlockers,',...
-                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,', 'lb_rate_before_handoff,','scs_1,','scs_2,','mmW_rate_1,','mmW_rate_2,','users_not_bb\n'];
+                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,','mmW_rate_1,','mmW_rate_2,','users_not_bb\n'];
                     
                             fprintf(fileID,output_categories);
                         
                             p_fac = params.p_fac;
                             formatSpec = '%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             fprintf(fileID,formatSpec,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
-                                deployRange,rmin, p_fac, lb_thres,lb,params.scs_sub6(1),params.scs_sub6(2),rate_dl_after_handoff(1),rate_dl_after_handoff(2),l_after_handoff);
+                                deployRange,rmin, p_fac, lb_thres,rate_dl_after_handoff(1),rate_dl_after_handoff(2),l_after_handoff,rate_dl_after_handoff_small(1),rate_dl_after_handoff_small(2),l_after_handoff_small);
                             fclose(fileID);
                         end
                     end
