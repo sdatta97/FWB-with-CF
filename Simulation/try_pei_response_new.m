@@ -276,8 +276,9 @@ for aID = 1:99
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             lb = quantile(rate_dl_before_handoff(params.ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
-                            if bw_alloc < 0
+                            if (bw_alloc < 0) || isnan(bw_alloc)
                                 bw_alloc = 0;
+                                params.p_fac = 1;
                                 params.ue_rearranged = [];    
                             end
                             params.scs_sub6(1) = bw_alloc;
@@ -304,8 +305,9 @@ for aID = 1:99
 %                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                             rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
                             l_after_handoff = 100*sum(find(rate_dl_after_handoff((1+K_mmW):end)<35e6)>0)/K;
-                            
+
                             params.D = D_small;
+                            params.p_fac = p_fac_arr(idx_p);
                             params.ue_rearranged = [];    
                             for ue_idx = 1:numUE 
                                 [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
@@ -316,8 +318,9 @@ for aID = 1:99
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             lb = quantile(rate_dl_before_handoff_small(params.ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
-                            if bw_alloc < 0
+                            if (bw_alloc < 0) || isnan(bw_alloc)
                                 bw_alloc = 0;
+                                params.p_fac = 1;
                                 params.ue_rearranged = [];    
                             end
                             params.scs_sub6(1) = bw_alloc;
