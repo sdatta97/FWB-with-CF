@@ -1,4 +1,4 @@
-function rate_dl = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState)
+function rate_dl = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState)
 M = size(channel_dl,1);
 K_mmW = size(sub6ConnectionState,1);
 K = K_mmW + size(channel_dl,2);

@@ -272,7 +272,7 @@ for aID = 1:99
                                 params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
                             end
                             sub6ConnectionState = zeros(numUE,1);
-                            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             lb = quantile(rate_dl_before_handoff(params.ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
@@ -303,8 +303,8 @@ for aID = 1:99
                             % BETA = params.BETA;
                             % params.D = D(:,ues_sharing);
                             % params.BETA = BETA(:,ues_sharing);                                                        
-%                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                            rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
+%                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
+                            rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                                         
                             l_after_handoff = 100*sum(find(rate_dl_after_handoff((1+K_mmW):end)<35e6)>0)/K;
 
                             params.user_sc_alloc = zeros(K,num_sc_sub6); 
@@ -316,7 +316,7 @@ for aID = 1:99
                                 params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
                             end
                             sub6ConnectionState = zeros(numUE,1);
-                            rate_dl_before_handoff_small = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            rate_dl_before_handoff_small = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             lb = quantile(rate_dl_before_handoff_small(params.ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
@@ -347,8 +347,8 @@ for aID = 1:99
                             % BETA = params.BETA;
                             % params.D = D(:,ues_sharing);
                             % params.BETA = BETA(:,ues_sharing);                                                        
-%                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                            rate_dl_after_handoff_small = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
+%                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
+                            rate_dl_after_handoff_small = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                                         
                             l_after_handoff_small = 100*sum(find(rate_dl_after_handoff_small((1+K_mmW):end)<35e6)>0)/K;
                            
                             numUE = params.numUE;
