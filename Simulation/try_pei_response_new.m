@@ -54,7 +54,7 @@ for aID = 1:99
     % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
     
     %Power factor division
-    p_fac_arr = 10.^(0:1:2);
+    p_fac_arr = 10; %10.^(0:1:2);
     % params.p_fac = 10;
       %Total uplink transmit power per UE (mW)
     params.p = 100;
@@ -75,7 +75,7 @@ for aID = 1:99
     % We are considering an outdoor scenario where the UE is located at the
     % center and gNBs are distributed around the UE. We only need to consider
     % the coverageRange amount of distance from the UE.
-    params.deployRange = 20:20:100;
+    params.deployRange = 100; %20:20:100;
     %% Define simulation setup
     
     %Angular standard deviation in the local scattering model (in radians)
@@ -98,7 +98,7 @@ for aID = 1:99
     params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
     for idxdeployRange = 1:length(params.deployRange)
         %%UE location
-        params.numUE = 2;
+        params.numUE = 10;
         deployRange = params.deployRange(idxdeployRange);
         params.RUE =  deployRange*rand(params.numUE,1);%params.coverageRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
         params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
@@ -152,7 +152,7 @@ for aID = 1:99
             params.angleGNB = angleGNB;
             params.locationsBS = locationsBS;
             n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-            while (n<=params.numGNB) %(n==0)
+            while (n<=(numBS*numUE)) %(n==0)
                 n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
             end
             params.numGNB_sub6 = n;
@@ -285,14 +285,14 @@ for aID = 1:99
                             ue_idx = 2;
                             sub6ConnectionState(1) = 1;
                             sub6ConnectionState(ue_idx) = 1;
-                            user_sc_alloc(((1:numUE).*sub6ConnectionState),1) = 1;
-                            user_sc_alloc(((1:numUE).*sub6ConnectionState),2) = 0;
+                            user_sc_alloc(find(sub6ConnectionState),1) = 1;
+                            user_sc_alloc(find(sub6ConnectionState),2) = 0;
                             user_sc_alloc(ues_not_affected,1) = 1;
                             user_sc_alloc(ues_not_affected,2) = 1;
                             user_sc_alloc(params.ue_rearranged,1) = 0;
                             user_sc_alloc(params.ue_rearranged,2) = 1;
                             params.user_sc_alloc = user_sc_alloc;
-                            ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
+                            ues_sharing = union(find(sub6ConnectionState),ues_not_affected);
                             % D = params.D;
                             % BETA = params.BETA;
                             % params.D = D(:,ues_sharing);
