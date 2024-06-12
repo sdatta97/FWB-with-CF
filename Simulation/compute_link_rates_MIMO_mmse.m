@@ -89,12 +89,12 @@ end
 for m = 1:M
     for k = 1:K_mmW
         if ismember(m,Serv{k}) && (sub6ConnectionState(k)==1)
-            dl_mmse_precoder_mmW(m,k,:,:) = dl_mmse_precoder_mmW(m,k,:,:)./sqrt(scaling_LP_mmse(m,k));
+            dl_mmse_precoder_mmW(m,k,:,:) = reshape(dl_mmse_precoder_mmW(m,k,:,:),[Ntx,N_UE_mmW])./sqrt(scaling_LP_mmse(m,k));
         end
     end
     for k = 1:K-K_mmW
         if ismember(m,Serv{k+K_mmW})
-            dl_mmse_precoder(m,k,:,:) = dl_mmse_precoder(m,k,:,:)./sqrt(scaling_LP_mmse(m,k+K_mmW));
+            dl_mmse_precoder(m,k,:,:) = reshape(dl_mmse_precoder(m,k,:,:),[Ntx,N_UE_sub6])./sqrt(scaling_LP_mmse(m,k+K_mmW));
         end
     end
 end
