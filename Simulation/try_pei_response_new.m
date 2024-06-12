@@ -358,6 +358,8 @@ for aID = 1:99
                             numUE_sub6 = params.numUE_sub6;
                             numBS = size(params.locationsBS,1);
                             numBlockers = params.numBlockers;
+                            params.p_fac = p_fac_arr(idx_p);
+                            p_fac = params.p_fac;
                             %% Recording the Results
                     
                             %Taking care of folder directory creation etc
@@ -381,8 +383,7 @@ for aID = 1:99
                                 'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,','mmW_rate_1,','mmW_rate_2,','users_not_bb,','mmW_rate_1_small,','mmW_rate_2_small,','users_not_bb_small\n'];
                     
                             fprintf(fileID,output_categories);
-                            params.p_fac = p_fac_arr(idx_p);
-                            p_fac = params.p_fac;
+                            
                             formatSpec = '%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             fprintf(fileID,formatSpec,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
                                 deployRange,rmin, p_fac, lb_thres,rate_dl_after_handoff(1),rate_dl_after_handoff(2),l_after_handoff,rate_dl_after_handoff_small(1),rate_dl_after_handoff_small(2),l_after_handoff_small);
