@@ -118,7 +118,7 @@ for aID = 1:99
         % num_BS_arr = [2,5,10,20]; %densityBS
         % numUE_sub6_arr = 2:2:10;
         % numUE_sub6_arr = 10;
-        lambda_UE_sub6 = 1000; % [30:20:90, 100]; %:100:2000;
+        lambda_UE_sub6 = 250; % [30:20:90, 100]; %:100:2000;
         % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
         params.loss_pc_thresh = 10;
         params.Lmax=4;
@@ -165,7 +165,6 @@ for aID = 1:99
             params.locationsBS_sub6 = mean(params.UE_locations,1) + [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
             %     params.Lmax=n;
             for idxUEDensity = 1:length(lambda_UE_sub6)
-                params.ue_rearranged = [];    
                 %%UE locations
                 n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
                 while (n==0)
@@ -267,6 +266,7 @@ for aID = 1:99
                             params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);  
                             [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params); 
                             numUE = params.numUE;
+                            params.ue_rearranged = [];    
                             for ue_idx = 1:numUE 
                                 [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
                                 params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
@@ -276,6 +276,10 @@ for aID = 1:99
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             lb = quantile(rate_dl_before_handoff(params.ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
+                            if bw_alloc < 0
+                                bw_alloc = 0;
+                                params.ue_rearranged = [];    
+                            end
                             params.scs_sub6(1) = bw_alloc;
                             params.scs_sub6(2) = Band - bw_alloc;
                             % params.ue_rearranged = ue_idxs_affected;
@@ -300,12 +304,22 @@ for aID = 1:99
 %                           rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                             rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                                         
                             l_after_handoff = 100*sum(find(rate_dl_after_handoff((1+K_mmW):end)<35e6)>0)/K;
+                            
                             params.D = D_small;
+                            params.ue_rearranged = [];    
+                            for ue_idx = 1:numUE 
+                                [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                                params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
+                            end
                             sub6ConnectionState = zeros(numUE,1);
                             rate_dl_before_handoff_small = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
                             % lb = quantile(rate_dl_before_handoff(union((1+numUE):end,nonzeros((1:numUE)'.*sub6ConnectionState)))./params.Band,params.lb_thres);
                             lb = quantile(rate_dl_before_handoff_small(params.ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - rmin_sub6/lb;
+                            if bw_alloc < 0
+                                bw_alloc = 0;
+                                params.ue_rearranged = [];    
+                            end
                             params.scs_sub6(1) = bw_alloc;
                             params.scs_sub6(2) = Band - bw_alloc;
                             % params.ue_rearranged = ue_idxs_affected;
