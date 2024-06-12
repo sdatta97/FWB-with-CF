@@ -378,7 +378,7 @@ for aID = 1:99
                             recording_text_file_string = strcat(impactFolder,result_string,'.csv');
                             fileID = fopen(recording_text_file_string,'w');
                             output_categories = ['lambdaBS,','lambdaUE,','numBlockers,',...
-                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,','mmW_rate_1,','mmW_rate_2,','users_not_bb\n'];
+                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,','mmW_rate_1,','mmW_rate_2,','users_not_bb,','mmW_rate_1_small,','mmW_rate_2_small,','users_not_bb_small\n'];
                     
                             fprintf(fileID,output_categories);
                             params.p_fac = p_fac_arr(idx_p);
