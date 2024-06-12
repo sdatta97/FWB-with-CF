@@ -139,7 +139,8 @@ if (K_mmW == 0) || all(sub6ConnectionState == 0)
                 if ismember(m,Serv{k}) && (user_sc_alloc(k,n) == 1)
                         %term = (N_AP*N_UE_sub6*num_sc_sub6*beta_uc(m,:)*user_sc_alloc(:,n));
                         % term = num_sc_sub6*N_AP*(N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                      
-                        term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
+                        % term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
+                        term = term + num_sc_sub6*trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
                 end
             end
             if (term > 0)
@@ -157,12 +158,14 @@ else
                     if (k<=K_mmW) && (sub6ConnectionState(k) == 1) 
     %                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
                         % term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                                              
-                        term = term + p_fac*trace(reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])*reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])');
+                        % term = term + p_fac*trace(reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])*reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])');
+                        term = term + num_sc_sub6*p_fac*trace(reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])*reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])');
                     elseif (k>K_mmW)
 %                     eta_eq(m,k) = 1./(N_AP*(N_UE_mmW*p_fac*beta_uc(m,1:K_mmW)+N_UE_sub6*sum(beta_uc(m,2:K))));
 %                         term = (N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*beta_uc(m,(1+K_mmW):K)*user_sc_alloc((1+K_mmW):K,n)));
                         % term = num_sc_sub6*N_AP*(N_UE_mmW*num_sc_sub6*p_fac*((beta_uc(m,1:K_mmW).*sub6ConnectionState)*user_sc_alloc(1:K_mmW,n))+N_UE_sub6*(p_fac_rearrange*beta_uc(m,ue_rearranged)*user_sc_alloc(ue_rearranged,n)+beta_uc(m,ues_not_rearranged)*user_sc_alloc(ues_not_rearranged,n)));                        
-                        term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
+                        % term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
+                        term = term + num_sc_sub6*trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
                     end
                 end
             end
