@@ -37,7 +37,7 @@ end
 %     changingVars{i} = colNames{i};
 % end
 
-summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std'});
+summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std','median'});
 
 writetable(summaryTable,'./impact_incl_small_multi_UEv2.txt')
 writetable(summaryTable,'./impact_incl_small_multi_UEv2.csv')
