@@ -381,7 +381,7 @@ for aID = 1:99
                                 'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,','mmW_rate_1,','mmW_rate_2,','users_not_bb\n'];
                     
                             fprintf(fileID,output_categories);
-                        
+                            params.p_fac = p_fac_arr(idx_p);
                             p_fac = params.p_fac;
                             formatSpec = '%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
                             fprintf(fileID,formatSpec,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
