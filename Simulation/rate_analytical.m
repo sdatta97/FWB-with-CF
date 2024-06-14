@@ -37,11 +37,11 @@ D = params.D;
 BETA = params.BETA;
 beta_uc = zeros(size(BETA));
 
-%Prepare array to store the number of APs serving a specficic UE
+%Prepare array to store the number of APs serving a specific UE
 La = zeros(K,1);
-%Prepare cell to store the AP indices serving a specficic UE
+%Prepare cell to store the AP indices serving a specific UE
 Serv = cell(K,1);
-%Prepare cell to store the AP indices not serving a specficic UE
+%Prepare cell to store the AP indices not serving a specific UE
 NoServ = cell(K,1);
 %Construc the above array and cells
 for k = 1:K
