@@ -25,39 +25,6 @@ for k = 1:K
     NoServ{k} = NoservingAPs;   
 end
 
-%% initialization of c
-eta_eq = zeros(M,K);
-if (K_mmW == 0) || all(sub6ConnectionState == 0)
-    for m = 1:M
-        term = 0;
-        for k = 1+K_mmW:K
-            if ismember(m,Serv{k}) 
-                term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
-            end
-        end
-        if (term > 0)
-            eta_eq(m,:) = (1/term)*D(m,:)';
-        end
-    end
-else
-    % ues_not_rearranged = setdiff((1+K_mmW):K,ue_rearranged);
-    for m = 1:M
-        term = 0;
-        for k = 1:K
-            if ismember(m,Serv{k})
-                if (k<=K_mmW) && (sub6ConnectionState(k) == 1) 
-                    term = term + p_fac*trace(reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])*reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW])');
-                elseif (k>K_mmW)
-                    term = term + trace(reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])*reshape(dl_mmse_precoder(m,k-K_mmW,:,:,n),[N_AP,N_UE_sub6])');
-                end
-            end
-        end
-        if (term > 0)
-            eta_eq(m,:) = (1/term)*D(m,:)';
-            eta_eq(m,1:K_mmW) = p_fac*(eta_eq(m,1:K_mmW).*(sub6ConnectionState==1)');
-        end
-    end
-end
 rate_dl = zeros(K,1);
 DS_mmW = zeros(K_mmW,N_UE_mmW);
 MSI_mmW = zeros(K_mmW,N_UE_mmW);
