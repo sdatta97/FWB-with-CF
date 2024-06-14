@@ -334,7 +334,7 @@ for idxnumUE = 1:length(numUE_arr)
         %                                     % plos(k) = prod(plos2(:,k),1);
         %                                     plos(k) = prod(plos2(idx_max(:,k),k),1);
         %                                 end
-        % %                                 rate_dl = rate_analyticalv4(params, plos2, plos, R_GUE, h_LOS_GUE, PLOS_GUE);
+                                        rate_dl = rate_analytical(params);
         %                                 for k = 1:params.numUE
         %                                    % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
         %                                    [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
