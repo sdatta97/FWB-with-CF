@@ -10,33 +10,8 @@ p_d = params.rho_tot; % 1*K;
 p_fac = params.p_fac;
 p_fac_rearrange = params.p_fac_rearrange;
 D = params.D;
-% ue_rearranged = params.ue_rearranged;
-% perm_vec  = repmat(randperm(tau_p),1,2);
-% phi_index = perm_vec(1:K);
-% for k = 1:K
-%     PHI(:,k) = PHI1(:,phi_index(k));
-% end
-% gamma_num = zeros(M,K);
-% gamma_den = zeros(M,K);
-% Gamma = zeros(M,K);
-% for m = 1:M
-%     for k = 1:K
-%         gamma_num(m,k) = tau_p*p_p*(BETA(m,k)^2);
-%         gamma_den_temp = zeros(1,K);
-%         for j = 1:K
-%             gamma_den_temp(j) = BETA(m,j)*(abs(PHI(:,j)'*PHI(:,k))^2);
-%         end
-% 
-%         gamma_den(m,k) = tau_p*p_p*sum(gamma_den_temp)+1;
-% 
-%         Gamma(m,k) = gamma_num(m,k)/gamma_den(m,k);
-%     end
-% end
-BETA = params.BETA;
-beta_uc = zeros(size(BETA));
+R_gNB = params.R_gNB;
 
-%Prepare array to store the number of APs serving a specific UE
-La = zeros(K,1);
 %Prepare cell to store the AP indices serving a specific UE
 Serv = cell(K,1);
 %Prepare cell to store the AP indices not serving a specific UE
@@ -47,10 +22,7 @@ for k = 1:K
     NoservingAPs = find(D(:,k)==0);
     
     Serv{k} = servingAPs;
-    NoServ{k} = NoservingAPs;
-    
-    La(k) = length(servingAPs);
-    beta_uc(:,k) = BETA(:,k).*D(:,k);
+    NoServ{k} = NoservingAPs;   
 end
 
 %% initialization of c

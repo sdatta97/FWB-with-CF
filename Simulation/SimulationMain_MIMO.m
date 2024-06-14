@@ -101,8 +101,8 @@ for idxnumUE = 1:length(numUE_arr)
     % params.num_antennas_per_gNB = 8;
     %Number of antennas per UE
     % N_UE_mmW_arr = 2.^(0:1:5);
-    params.N_UE_mmW = 8;
-    params.N_UE_sub6 = 4;
+    params.N_UE_mmW = 1; %8;
+    params.N_UE_sub6 = 1; %4;
     rmin_arr = 4*10^8;
     % params.r_min = rmin*rand(params.numUE,1);
     % lambda_BS = 50:50:200;%densityBS
