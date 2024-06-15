@@ -19,15 +19,15 @@ d_DECORR       = 0.1; %KM;   %100; %M  %shadow fading correlation
 decorr         = d_DECORR;
 %% Noise model
 Noise_var     = Band * boltz_const * Noise_temp * Noise_fig;
-%Noise_var_dBm = 10*log10(Noise_var) + 30;
-Noise_var_dBm = -93.9-30; %dBm % Noise_fig =7;
+Noise_var_dBm = 10*log10(Noise_var) + 30;
+% Noise_var_dBm = -93.9-30; %dBm % Noise_fig =7;
 %Noise_var_dBm = -94;
 %% Simulation area model
-% AP_locations = (rand(AP,1)*D) + 1i*(rand(AP,1)*D);% randomly generating AP locations within DxD square area.
-% UE_locations = (rand(UE,1)*D) + 1i*(rand(UE,1)*D);% randomly generating AP locations within DxD square area.  % UAVs, GUEs
-AP_locations =cell2mat(struct2cell( load('ap_loc1')));  %ap_loc1   ap_loc3
+AP_locations = (rand(AP,1)*D) + 1i*(rand(AP,1)*D);% randomly generating AP locations within DxD square area.
+UE_locations = (rand(UE,1)*D) + 1i*(rand(UE,1)*D);% randomly generating AP locations within DxD square area.  % UAVs, GUEs
+% AP_locations =cell2mat(struct2cell( load('ap_loc1')));  %ap_loc1   ap_loc3
 AP_locations =AP_locations(1:AP,1);
-UE_locations = cell2mat(struct2cell( load('ue_loc2')));  %ue_loc2   ue_loc3
+% UE_locations = cell2mat(struct2cell( load('ue_loc2')));  %ue_loc2   ue_loc3
 UE_locations = UE_locations(1:UE,1);
 wrap_X = repmat([-D 0 D],[3 1]); % wrapping matrix used to wrap AP locations in X direction
 wrap_Y = wrap_X';% wrapping matrix used to wrap AP locations in Y direction
