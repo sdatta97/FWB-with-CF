@@ -43,7 +43,7 @@ while err > tol
        T_inv = T_inv + (1/(M*N_AP))*conj(Theta(:,:,k))/(1 + e_init(k));              
    end  
    for k = 1:K
-      e_new(k) = (1/(M*N_AP))*trace(conj(Theta(:,:,k))*pinv(T_inv1)); 
+      e_new(k) = (1/(M*N_AP))*trace(conj(Theta(:,:,k))*pinv(T_inv)); 
     end
     err  = norm(e_new - e_init)/norm(e_new);
     e_init = e_new;    
