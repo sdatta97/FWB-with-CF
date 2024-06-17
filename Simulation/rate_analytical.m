@@ -26,7 +26,7 @@ for k = 1:K
 end
 for k = 1:K
     for m = 1:M
-        R_g((m-1)*N_AP+1:m*N_AP,(m-1)*N_AP+1:m*N_AP,k) = R_gNB(:,:,m,k);
+        R_g((m-1)*N_AP+1:m*N_AP,(m-1)*N_AP+1:m*N_AP,k) = R_gNB(1:N_AP,1:N_AP,m,k);
     end
 end
 for k = 1:K
@@ -51,10 +51,10 @@ end
 T_inv_m = zeros(N_AP,N_AP,M);
 T_inv_block=zeros(N_AP*M,N_AP*M);
 for m=1:M
-   T_inv_m(:,:,m) = T_inv(((m-1)*N_AP+1):m*N,((m-1)*N_AP+1):m*N_AP);
+   T_inv_m(:,:,m) = T_inv(((m-1)*N_AP+1):m*N_AP,((m-1)*N_AP+1):m*N_AP);
 end
 for m=1:M
-   T_inv_block(((m-1)*N+1):m*N,((m-1)*N+1):m*N) = T_inv_m(:,:,m);
+   T_inv_block(((m-1)*N_AP+1):m*N_AP,((m-1)*N_AP+1):m*N_AP) = T_inv_m(:,:,m);
 end
 
 J = zeros(K,K);
@@ -64,19 +64,19 @@ for k = 1:K
     Theta_k = p_d*R_g(:,:,k);
     Theta(:,:,k)=Theta_k;
 end       
-for m = 1:K
-    for n = 1:K
-      J(m,n)  = (1/(N_AP*M))*trace(conj(Theta(:,:,m))*pinv(T_inv)*conj(Theta(:,:,n))*pinv(T_inv))/((N_AP*M)*(1+e_new(n))^2);
-      V(m,n)  = (1/(N_AP*M))*trace(conj(Theta(:,:,m))*pinv(T_inv)*conj(Theta(:,:,n))*pinv(T_inv));
+for k = 1:K
+    for q = 1:K
+      J(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*pinv(T_inv)*conj(Theta(:,:,q))*pinv(T_inv))/((N_AP*M)*(1+e_new(q))^2);
+      V(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*pinv(T_inv)*conj(Theta(:,:,q))*pinv(T_inv));
     end
-    g(m)   = (1/(N_AP*M))*trace(conj(Theta(:,:,m))*pinv(T_inv)*pinv(T_inv)) ;             
+    g(k)   = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*pinv(T_inv)*pinv(T_inv)) ;             
 end
 f_prime  = pinv(eye(K)-J)*(g);
 e_prime  = pinv(eye(K)-J)*(V);
 for k = 1:K
     T_prime(:,:,k) = pinv(T_inv)*conj(Theta(:,:,k))*pinv(T_inv);
     for q = 1:K
-        T_prime(:,:,k) = T_prime(:,:,k) + pinv(T_inv)*((1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e(q))^2 + (1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e(q))^2)*pinv(T_inv);
+        T_prime(:,:,k) = T_prime(:,:,k) + pinv(T_inv)*((1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2 + (1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2)*pinv(T_inv);
     end
 end
 zeta = zeros(K,K);
