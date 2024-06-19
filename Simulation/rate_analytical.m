@@ -52,11 +52,7 @@ end
 T = pinv(T_inv);
 J = zeros(K,K);
 V = zeros(K,K);
-g = zeros(K,1);
-for k = 1:K           
-    Theta_k = p_d*R_g(:,:,k);
-    Theta(:,:,k)=Theta_k;
-end       
+g = zeros(K,1);    
 for k = 1:K
     for q = 1:K
       J(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*conj(Theta(:,:,q))*T)/((N_AP*M)*(1+e_new(q))^2);
