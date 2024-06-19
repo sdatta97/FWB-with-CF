@@ -48,15 +48,8 @@ while err > tol
     err  = norm(e_new - e_init)/norm(e_new);
     e_init = e_new;    
 end
-T_inv_m = zeros(N_AP,N_AP,M);
-T_inv_block=zeros(N_AP*M,N_AP*M);
-for m=1:M
-   T_inv_m(:,:,m) = T_inv(((m-1)*N_AP+1):m*N_AP,((m-1)*N_AP+1):m*N_AP);
-end
-for m=1:M
-   T_inv_block(((m-1)*N_AP+1):m*N_AP,((m-1)*N_AP+1):m*N_AP) = T_inv_m(:,:,m);
-end
 
+T = pinv(T_inv);
 J = zeros(K,K);
 V = zeros(K,K);
 g = zeros(K,1);
@@ -66,17 +59,17 @@ for k = 1:K
 end       
 for k = 1:K
     for q = 1:K
-      J(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*pinv(T_inv)*conj(Theta(:,:,q))*pinv(T_inv))/((N_AP*M)*(1+e_new(q))^2);
-      V(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*pinv(T_inv)*conj(Theta(:,:,q))*pinv(T_inv));
+      J(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*conj(Theta(:,:,q))*T)/((N_AP*M)*(1+e_new(q))^2);
+      V(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*conj(Theta(:,:,q))*T);
     end
-    g(k)   = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*pinv(T_inv)*pinv(T_inv)) ;             
+    g(k)   = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*T) ;             
 end
 f_prime  = pinv(eye(K)-J)*(g);
 e_prime  = pinv(eye(K)-J)*(V);
 for k = 1:K
-    T_prime(:,:,k) = pinv(T_inv)*conj(Theta(:,:,k))*pinv(T_inv);
+    T_prime(:,:,k) = T*conj(Theta(:,:,k))*T;
     for q = 1:K
-        T_prime(:,:,k) = T_prime(:,:,k) + pinv(T_inv)*((1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2 + (1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2)*pinv(T_inv);
+        T_prime(:,:,k) = T_prime(:,:,k) + T*((1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2 + (1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2)*T;
     end
 end
 zeta = zeros(K,K);
