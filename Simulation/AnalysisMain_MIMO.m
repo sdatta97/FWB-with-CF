@@ -56,19 +56,18 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
-numUE_arr = 4:2:10;
+percent_fr2_UE_arr = 1:1:5;
 
 %Prepare to save simulation results
 
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.deployRange = 100; %20:20:100;
+params.deployRange = 400; %20:20:100;
 params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
@@ -84,37 +83,42 @@ width_area_sub6 = 2*params.coverageRange_sub6;
 % width_area_sub6 = 2*(params.deployRange + params.coverageRange_sub6);
 height_transmitter_sub6 = 4; % 5;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
-for idxnumUE = 1:length(numUE_arr)
-    params.numUE = numUE_arr(idxnumUE);
+
+params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
+params.ht = height_transmitter; %height transmitter (BS)
+params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
+params.num_antennas_per_gNB = 64;
+params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
+
+% params.num_antennas_per_gNB = 8;
+%Number of antennas per UE
+% N_UE_mmW_arr = 2.^(0:1:5);
+params.N_UE_mmW = 1; %8;
+params.N_UE_sub6 = 1; %4;
+rmin_arr = 4*10^8;
+% params.r_min = rmin*rand(params.numUE,1);
+% lambda_BS = 50:50:200;%densityBS
+lambda_BS = 25; %:25:200;
+% num_BS_arr = [2,5,10,20]; %densityBS
+% numUE_sub6_arr = 2:2:10;
+% numUE_sub6_arr = 10;
+lambda_UE_sub6 = 250; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+params.loss_pc_thresh = 10;
+params.Lmax = 4;
+% for idxnumUEsub6 = 1:length(numUE_sub6_arr)
+lb_thresh = 0.1; %0:0.25:1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
+
+for idxnumUE = 1:length(percent_fr2_UE_arr)
+    n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    while(n==0)
+        n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    end
+    params.numUE = n;
     %%UE location
     deployRange = params.deployRange; %(idxdeployRange);
     params.RUE =  deployRange*rand(params.numUE,1);%params.coverageRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
     params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
     params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-    
-    params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
-    params.ht = height_transmitter; %height transmitter (BS)
-    params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-    params.num_antennas_per_gNB = 64;
-    params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
-    
-    % params.num_antennas_per_gNB = 8;
-    %Number of antennas per UE
-    % N_UE_mmW_arr = 2.^(0:1:5);
-    params.N_UE_mmW = 1; %8;
-    params.N_UE_sub6 = 1; %4;
-    rmin_arr = 4*10^8;
-    % params.r_min = rmin*rand(params.numUE,1);
-    % lambda_BS = 50:50:200;%densityBS
-    lambda_BS = 25; %:25:200;
-    % num_BS_arr = [2,5,10,20]; %densityBS
-    % numUE_sub6_arr = 2:2:10;
-    % numUE_sub6_arr = 10;
-    lambda_UE_sub6 = 1000; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
-    params.loss_pc_thresh = 10;
-    params.Lmax = 4;
-    % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-    lb_thresh = 0.1; %0:0.25:1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
     for idxBSDensity = 1:length(lambda_BS)
         %% gNB locations
         % params.numGNB = 10;
@@ -340,7 +344,11 @@ for idxnumUE = 1:length(numUE_arr)
         %                                        tos = tos3;
         %                                    end
                                            ue_idx = 1;
-                                           p_out = CF_outage_analytical(params,ue_idx,lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity));
+                                           if (rate_dl(1:numUE) > params.r_min)
+                                                p_out = 0;
+                                           else
+                                               p_out = 1;
+                                           end
         %                                    outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
                                            outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*pos3;
                                            outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
