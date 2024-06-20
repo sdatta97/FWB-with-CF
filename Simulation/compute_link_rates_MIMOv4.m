@@ -7,10 +7,9 @@ scs = params.scs_sub6;
 num_sc_sub6 = params.num_sc_sub6;
 K_sc = K/num_sc_sub6;
 TAU_FAC = params.preLogFactor;
-Ntx = size(channel_dl,3);
 N_AP = params.num_antennas_per_gNB;
-N_UE_mmW = size(channel_dl_mmW,4);
-N_UE_sub6 = size(channel_dl,4);
+N_UE_mmW = params.N_UE_mmW;
+N_UE_sub6 = params.N_UE_sub6;
 p_d = params.rho_tot; % 1*K;
 p_fac = params.p_fac;
 p_fac_rearrange = params.p_fac_rearrange;
@@ -59,28 +58,30 @@ for k = 1:K
     beta_uc(:,k) = BETA(:,k).*D(:,k);
 end
 
-dl_mmse_precoder_mmW = zeros([size(channel_est_dl_mmW),num_sc_sub6]);
-dl_mmse_precoder = zeros([size(channel_est_dl),num_sc_sub6]);
+% dl_mmse_precoder_mmW = zeros([size(channel_est_dl_mmW),num_sc_sub6]);
+% dl_mmse_precoder = zeros([size(channel_est_dl),num_sc_sub6]);
+dl_mmse_precoder_mmW = zeros([M,K_mmW,N_AP,N_UE_mmW,num_sc_sub6]);
+dl_mmse_precoder = zeros([M,K-K_mmW,N_AP,N_UE_sub6,num_sc_sub6]);
 scaling_LP_mmse = zeros(M,K,num_sc_sub6);
 for m = 1:M
     for n = 1:num_sc_sub6
         for k = 1:K_mmW
             if (sub6ConnectionState(k) == 1) && (user_sc_alloc(k,n) == 1)
-                % inv_matrix = noiseVariance*eye(Ntx);
-                inv_matrix = eye(Ntx);
+                % inv_matrix = noiseVariance*eye(N_AP);
+                inv_matrix = eye(N_AP);
                 for q = 1:K_mmW
                     if ismember(m,Serv{q}) && (sub6ConnectionState(q) == 1) && (user_sc_alloc(q,n) == 1)
-                        % inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
-                        inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
+                        % inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])';
+                        inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])';
                     end
                 end
                 for q = 1:K-K_mmW
                     if ismember(m,Serv{q+K_mmW}) && (user_sc_alloc(q+K_mmW,n) == 1)
-                        % inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
-                        inv_matrix = inv_matrix + p_d*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
+                        % inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])';
+                        inv_matrix = inv_matrix + p_d*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])';
                     end
                 end
-                dl_mmse_precoder_mmW(m,k,:,:,n) = reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[Ntx,N_UE_mmW]) + p_d*inv_matrix\(reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]));
+                dl_mmse_precoder_mmW(m,k,:,:,n) = reshape(dl_mmse_precoder_mmW(m,k,:,:,n),[N_AP,N_UE_mmW]) + p_d*inv_matrix\(reshape(channel_dl_mmW(m,k,:,:),[N_AP,N_UE_mmW]));
                 if ismember(m,Serv{k})
                     % scaling_LP_mmse(m,servedUEs) = scaling_LP_mmse(m,servedUEs) + norm(dl_mmse_precoder_mmW(m,k,:,:),'fro')^2;
                     scaling_LP_mmse(m,k,n) = scaling_LP_mmse(m,k,n) + norm(dl_mmse_precoder_mmW(m,k,:,:,n),'fro')^2;
@@ -89,21 +90,21 @@ for m = 1:M
         end
         for k = 1:K-K_mmW
             if (user_sc_alloc(k+K_mmW,n) == 1)
-                % inv_matrix = noiseVariance*eye(Ntx);
-                inv_matrix = eye(Ntx);
+                % inv_matrix = noiseVariance*eye(N_AP);
+                inv_matrix = eye(N_AP);
                 for q = 1:K_mmW
                     if ismember(m,Serv{q}) && (sub6ConnectionState(q) == 1) && (user_sc_alloc(q,n) == 1)
-                        % inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
-                        inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[Ntx,N_UE_mmW])';
+                        % inv_matrix = inv_matrix + p_d*noiseVariance*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])';
+                        inv_matrix = inv_matrix + p_d*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])*reshape(channel_dl_mmW(m,q,:,:),[N_AP,N_UE_mmW])';
                     end
                 end
                 for q = 1:K-K_mmW
                     if ismember(m,Serv{q+K_mmW}) && (user_sc_alloc(q+K_mmW,n) == 1)
-                        % inv_matrix = inv_matrix +  p_d*noiseVariance*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
-                        inv_matrix = inv_matrix +  p_d*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[Ntx,N_UE_sub6])';
+                        % inv_matrix = inv_matrix +  p_d*noiseVariance*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])';
+                        inv_matrix = inv_matrix +  p_d*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])*reshape(channel_dl(m,q,:,:),[N_AP,N_UE_sub6])';
                     end
                 end
-                dl_mmse_precoder(m,k,:,:,n) = reshape(dl_mmse_precoder(m,k,:,:,n),[Ntx,N_UE_sub6]) + p_d*inv_matrix\(reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]));
+                dl_mmse_precoder(m,k,:,:,n) = reshape(dl_mmse_precoder(m,k,:,:,n),[N_AP,N_UE_sub6]) + p_d*inv_matrix\(reshape(channel_dl(m,k,:,:),[N_AP,N_UE_sub6]));
                 if ismember(m,Serv{k+K_mmW})
                     % scaling_LP_mmse(m,servedUEs) = scaling_LP_mmse(m,servedUEs) + norm(dl_mmse_precoder(m,k,:,:),'fro')^2;
                     scaling_LP_mmse(m,k+K_mmW,n) = scaling_LP_mmse(m,k+K_mmW,n) + norm(dl_mmse_precoder(m,k,:,:,n),'fro')^2;
@@ -185,16 +186,16 @@ for n_idx = 1:num_sc_sub6
         for q = 1:K_mmW
             for m = 1:M
                 if ismember(m,Serv{q}) && (sub6ConnectionState(q) == 1) && (user_sc_alloc(q,n_idx) == 1)
-                    % D_mmW_mmW(k,q,:,:,n_idx) = reshape(D_mmW_mmW(k,q,:,:,n_idx),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
-                    D_mmW_mmW(k,q,:,:,n_idx) = reshape(D_mmW_mmW(k,q,:,:,n_idx),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(dl_mmse_precoder_mmW(m,q,:,:,n_idx),[Ntx,N_UE_mmW]);
+                    % D_mmW_mmW(k,q,:,:,n_idx) = reshape(D_mmW_mmW(k,q,:,:,n_idx),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[N_AP,N_UE_mmW]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[N_AP,N_UE_mmW]);
+                    D_mmW_mmW(k,q,:,:,n_idx) = reshape(D_mmW_mmW(k,q,:,:,n_idx),[N_UE_mmW,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[N_AP,N_UE_mmW])'*reshape(dl_mmse_precoder_mmW(m,q,:,:,n_idx),[N_AP,N_UE_mmW]);
                 end
             end
         end
         for q = 1:K-K_mmW
             for m = 1:M
                 if ismember(m,Serv{q+K_mmW}) && (user_sc_alloc(q+K_mmW,n_idx) == 1)
-                    % D_mmW_sub6(k,q,:,:,n_idx) = reshape(D_mmW_sub6(k,q,:,:,n_idx),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW]).'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
-                    D_mmW_sub6(k,q,:,:,n_idx) = reshape(D_mmW_sub6(k,q,:,:,n_idx),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[Ntx,N_UE_mmW])'*reshape(dl_mmse_precoder(m,q,:,:,n_idx),[Ntx,N_UE_sub6]);
+                    % D_mmW_sub6(k,q,:,:,n_idx) = reshape(D_mmW_sub6(k,q,:,:,n_idx),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[N_AP,N_UE_mmW]).'*reshape(conj(channel_est_dl(m,q,:,:)),[N_AP,N_UE_sub6]);
+                    D_mmW_sub6(k,q,:,:,n_idx) = reshape(D_mmW_sub6(k,q,:,:,n_idx),[N_UE_mmW,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl_mmW(m,k,:,:),[N_AP,N_UE_mmW])'*reshape(dl_mmse_precoder(m,q,:,:,n_idx),[N_AP,N_UE_sub6]);
                 end
             end
         end
@@ -203,16 +204,16 @@ for n_idx = 1:num_sc_sub6
         for q = 1:K_mmW
             for m = 1:M
                 if ismember(m,Serv{q}) && (sub6ConnectionState(q) == 1) && (user_sc_alloc(q,n_idx) == 1)
-                    % D_sub6_mmW(k,q,:,:,n_idx) = reshape(D_sub6_mmW(k,q,:,:,n_idx),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[Ntx,N_UE_mmW]);
-                    D_sub6_mmW(k,q,:,:,n_idx) = reshape(D_sub6_mmW(k,q,:,:,n_idx),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(dl_mmse_precoder_mmW(m,q,:,:,n_idx),[Ntx,N_UE_mmW]);
+                    % D_sub6_mmW(k,q,:,:,n_idx) = reshape(D_sub6_mmW(k,q,:,:,n_idx),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl(m,k,:,:),[N_AP,N_UE_sub6]).'*reshape(conj(channel_est_dl_mmW(m,q,:,:)),[N_AP,N_UE_mmW]);
+                    D_sub6_mmW(k,q,:,:,n_idx) = reshape(D_sub6_mmW(k,q,:,:,n_idx),[N_UE_sub6,N_UE_mmW]) + sqrt(eta_eq(m,q,n_idx))*reshape(channel_dl(m,k,:,:),[N_AP,N_UE_sub6])'*reshape(dl_mmse_precoder_mmW(m,q,:,:,n_idx),[N_AP,N_UE_mmW]);
                 end
             end
         end
         for q = 1:K-K_mmW
             for m = 1:M
                 if ismember(m,Serv{q+K_mmW}) && (user_sc_alloc(q+K_mmW,n_idx) == 1)
-                    % D_sub6_sub6(k,q,:,:,n_idx) = reshape(D_sub6_sub6(k,q,:,:,n_idx),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6]).'*reshape(conj(channel_est_dl(m,q,:,:)),[Ntx,N_UE_sub6]);
-                    D_sub6_sub6(k,q,:,:,n_idx) = reshape(D_sub6_sub6(k,q,:,:,n_idx),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl(m,k,:,:),[Ntx,N_UE_sub6])'*reshape(dl_mmse_precoder(m,q,:,:,n_idx),[Ntx,N_UE_sub6]);
+                    % D_sub6_sub6(k,q,:,:,n_idx) = reshape(D_sub6_sub6(k,q,:,:,n_idx),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl(m,k,:,:),[N_AP,N_UE_sub6]).'*reshape(conj(channel_est_dl(m,q,:,:)),[N_AP,N_UE_sub6]);
+                    D_sub6_sub6(k,q,:,:,n_idx) = reshape(D_sub6_sub6(k,q,:,:,n_idx),[N_UE_sub6,N_UE_sub6]) + sqrt(eta_eq(m,q+K_mmW,n_idx))*reshape(channel_dl(m,k,:,:),[N_AP,N_UE_sub6])'*reshape(dl_mmse_precoder(m,q,:,:,n_idx),[N_AP,N_UE_sub6]);
                 end
             end
         end
