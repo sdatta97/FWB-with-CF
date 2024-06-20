@@ -56,7 +56,7 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
-numUE_arr = 4:2:10;
+percent_fr2_UE_arr = 1:1:5;
 
 %Prepare to save simulation results
 
@@ -68,7 +68,7 @@ params.simTime = 60*60; %sec Total Simulation time should be more than 100.
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.deployRange = 100; %20:20:100;
+params.deployRange = 400; %20:20:100;
 params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
@@ -84,49 +84,48 @@ width_area_sub6 = 2*params.coverageRange_sub6;
 % width_area_sub6 = 2*(params.deployRange + params.coverageRange_sub6);
 height_transmitter_sub6 = 4; % 5;
 params.areaDimensions_sub6 = [width_area_sub6, length_area_sub6, height_transmitter_sub6];
-for idxnumUE = 1:length(numUE_arr)
-    params.numUE = numUE_arr(idxnumUE);
+
+params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
+params.ht = height_transmitter; %height transmitter (BS)
+params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
+params.num_antennas_per_gNB = 64;
+params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
+
+% params.num_antennas_per_gNB = 8;
+%Number of antennas per UE
+% N_UE_mmW_arr = 2.^(0:1:5);
+params.N_UE_mmW = 1; %8;
+params.N_UE_sub6 = 1; %4;
+rmin_arr = 4*10^8;
+% lambda_BS = 50:50:200;%densityBS
+lambda_BS = 25; %:25:200;
+% num_BS_arr = [2,5,10,20]; %densityBS
+% numUE_sub6_arr = 2:2:10;
+% numUE_sub6_arr = 10;
+lambda_UE_sub6 = 250; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+params.loss_pc_thresh = 10;
+params.Lmax = 4;
+% for idxnumUEsub6 = 1:length(numUE_sub6_arr)
+lb_thresh = 0.1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
+for idxnumUE = 1:length(percent_fr2_UE_arr)
+    n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    while(n==0)
+        n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    end
+    params.numUE = n;
     %%UE location
     deployRange = params.deployRange; %(idxdeployRange);
-    params.RUE =  deployRange*rand(params.numUE,1);%params.coverageRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+    params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
     params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
     params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-    
-    params.hr = 1.4; %height receiver (UE), approximately the height a human holds the phone
-    params.ht = height_transmitter; %height transmitter (BS)
-    params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
-    params.num_antennas_per_gNB = 64;
-    params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
-    
-    % params.num_antennas_per_gNB = 8;
-    %Number of antennas per UE
-    % N_UE_mmW_arr = 2.^(0:1:5);
-    params.N_UE_mmW = 1; %8;
-    params.N_UE_sub6 = 1; %4;
-    rmin_arr = 4*10^8;
-    % params.r_min = rmin*rand(params.numUE,1);
-    % lambda_BS = 50:50:200;%densityBS
-    lambda_BS = 25; %:25:200;
-    % num_BS_arr = [2,5,10,20]; %densityBS
-    % numUE_sub6_arr = 2:2:10;
-    % numUE_sub6_arr = 10;
-    lambda_UE_sub6 = 250; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
-    params.loss_pc_thresh = 10;
-    params.Lmax = 4;
-    % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-    lb_thresh = 0.1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
     for idxBSDensity = 1:length(lambda_BS)
         %% gNB locations
         % params.numGNB = 10;
-    %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
         while (n==0)
-    %         n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
             n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
         end
         params.numGNB = n;
-        % params.numGNB = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-        % params.numGNB = floor(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
         % params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (params.deployRange+params.coverageRange) * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
@@ -172,7 +171,7 @@ for idxnumUE = 1:length(numUE_arr)
             while (n==0)
                 n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
             end
-            params.numUE_sub6 = n;
+            params.numUE_sub6 = n; %n;
             % params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
             % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
             params.RUE_sub6 = (max(sqrt(sum(params.UE_locations.^2,2)))+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
@@ -281,8 +280,6 @@ for idxnumUE = 1:length(numUE_arr)
             % params.user_sc_alloc = randi([1,num_sc_sub6],K,1);
             params.user_sc_alloc = zeros(K,num_sc_sub6);
 %                 tau_c = params.tau_c;      % coherence block length 
-%         [gainOverNoisedB,R,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0);
-%                 [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params.numGNB,params.numGNB_sub6,params.numUE,params.numUE+params.numUE_sub6,params.num_antennas_per_gNB,params.N_UE_mmW,params.N_UE_sub6,params.coverageRange,params.coverageRange_sub6,params.tau_p,1,0,params.ASD_varphi,params.ASD_theta);
             [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositions,UEpositions,distances] = generateSetup(params,1,str2double(aID));
             num_sc_sub6 = params.num_sc_sub6;
             params.BETA = db2pow(gainOverNoisedB);   
@@ -368,8 +365,8 @@ for idxnumUE = 1:length(numUE_arr)
                         numUE_sub6 = params.numUE_sub6;
                         numBS = size(params.locationsBS,1);
                         numBlockers = params.numBlockers;
-                        result_string = strcat('/results_',num2str(numUE),...
-                            'UE_',num2str(lambda_BS(idxBSDensity)),...
+                        result_string = strcat('/results_',num2str(percent_fr2_UE_arr(idxnumUE)),...
+                            'percentfr2UE_',num2str(lambda_BS(idxBSDensity)),...
                             'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
                             'lambdaUE_',num2str(deployRange),...
                             'deployRange_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin), "Pow_fac", num2str(params.p_fac), "lb_thres", num2str(100*params.lb_thres));
