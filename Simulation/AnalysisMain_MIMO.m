@@ -330,7 +330,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                         rate_dl = rate_analytical(params);
                                         for k = 1:params.numUE
                                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                                           [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+                                           [pos3, tos3] = pLoS3(params.locationsBS(numBS*(k-1)+1:numBS*k,:), params.UE_locations(k,:), theta,omega,psi,idx_max);
                                            % plos3 = pLoS3(theta,omega,params.coverageRange);
                                           % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
         %                                    if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
