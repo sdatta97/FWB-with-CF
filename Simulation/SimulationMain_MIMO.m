@@ -56,7 +56,7 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
-percent_fr2_UE_arr = 1:1:5;
+percent_fr2_UE_arr = 5:5:20;
 
 %Prepare to save simulation results
 
@@ -108,11 +108,12 @@ params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 lb_thresh = 0.1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
 for idxnumUE = 1:length(percent_fr2_UE_arr)
-    n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-    while(n==0)
-        n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-    end
-    params.numUE = n;
+    % n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    % while(n==0)
+    %     n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    % end
+    % params.numUE = n;
+    params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);;
     %%UE location
     deployRange = params.deployRange; %(idxdeployRange);
     params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
