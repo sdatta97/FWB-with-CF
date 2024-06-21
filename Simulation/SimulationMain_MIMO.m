@@ -113,7 +113,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     %     n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     % end
     % params.numUE = n;
-    params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);;
+    params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     %%UE location
     deployRange = params.deployRange; %(idxdeployRange);
     params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)

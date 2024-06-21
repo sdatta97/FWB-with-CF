@@ -109,7 +109,7 @@ params.Lmax = 4;
 lb_thresh = 0.1; %0:0.25:1; %[0, 0.05, 0.1, 1]; %[0.05, 0.1]; %[0.1, 0.25, 0.5];
 
 for idxnumUE = 1:length(percent_fr2_UE_arr)
-    n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    n = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     while(n==0)
         n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     end
@@ -344,7 +344,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         %                                        tos = tos3;
         %                                    end
                                            ue_idx = 1;
-                                           if (rate_dl(1:numUE) > params.r_min)
+                                           if all(rate_dl(1:numUE) > params.r_min)
                                                 p_out = 0;
                                            else
                                                p_out = 1;
