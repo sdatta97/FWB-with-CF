@@ -49,7 +49,7 @@ for k = 1:K
     end
 end
 
-rate_dl = zeros(K,num_sc_sub6);
+rate_dl = zeros(K,1);
 MUI = zeros(K,num_sc_sub6);
 
 for n = 1:num_sc_sub6
@@ -60,14 +60,14 @@ for n = 1:num_sc_sub6
     while err > tol 
        T_inv = (1/(M*N_AP))*eye(M*N_AP); 
        for k = 1:K  
-           if (k<=K_mmW) && ((sub6ConnectionState(k)==0)||(user_sc_alloc(k,n)==0))
+           if (user_sc_alloc(k,n)==0) || ((k<=K_mmW) && (sub6ConnectionState(k)==0))
                continue;             
            else
                T_inv = T_inv + (1/(M*N_AP))*conj(Theta(:,:,k,n))/(1 + e_init(k)); 
            end
        end  
        for k = 1:K
-           if (k<=K_mmW) && ((sub6ConnectionState(k)==0)||(user_sc_alloc(k,n)==0))
+           if (user_sc_alloc(k,n)==0) || ((k<=K_mmW) && (sub6ConnectionState(k)==0))
                continue;
            else
                e_new(k) = (1/(M*N_AP))*trace(conj(Theta(:,:,k,n))*pinv(T_inv)); 
@@ -82,11 +82,11 @@ for n = 1:num_sc_sub6
     V = zeros(K,K);
     g = zeros(K,1);    
     for k = 1:K
-        if (k<=K_mmW) &&  ((sub6ConnectionState(k)==0)||(user_sc_alloc(k,n)==0))
+        if (user_sc_alloc(k,n)==0) || ((k<=K_mmW) && (sub6ConnectionState(k)==0))
             continue;
         else
             for q = 1:K
-                if (q<=K_mmW) && ((sub6ConnectionState(q)==0)||(user_sc_alloc(q,n)==0))
+                if (user_sc_alloc(q,n)==0) || ((q<=K_mmW) && (sub6ConnectionState(q)==0))
                     continue;
                 else
                     J(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k,n))*T*conj(Theta(:,:,q,n))*T)/((N_AP*M)*(1+e_new(q))^2);
@@ -99,12 +99,12 @@ for n = 1:num_sc_sub6
     f_prime  = pinv(eye(K)-J)*(g);
     e_prime  = pinv(eye(K)-J)*(V);
     for k = 1:K
-        if (k<=K_mmW) &&  ((sub6ConnectionState(k)==0)||(user_sc_alloc(k,n)==0))
+        if (user_sc_alloc(k,n)==0) || ((k<=K_mmW) && (sub6ConnectionState(k)==0))
             continue;
         else
             T_prime(:,:,k) = T*conj(Theta(:,:,k,n))*T;
             for q = 1:K
-                if (q<=K_mmW) && ((sub6ConnectionState(q)==0)||(user_sc_alloc(q,n)==0))
+                if (user_sc_alloc(q,n)==0) || ((q<=K_mmW) && (sub6ConnectionState(q)==0))
                     continue;
                 else
                     T_prime(:,:,k) = T_prime(:,:,k) + T*((1/(N_AP*M))*conj(Theta(:,:,q,n))*e_prime(q,k)/(1+e_new(q))^2 + (1/(N_AP*M))*conj(Theta(:,:,q,n))*e_prime(q,k)/(1+e_new(q))^2)*T;
@@ -114,11 +114,11 @@ for n = 1:num_sc_sub6
     end
     zeta = zeros(K,K);
     for k=1:K
-        if (k<=K_mmW) && ((sub6ConnectionState(k)==0)||(user_sc_alloc(k,n)==0))
+        if (user_sc_alloc(k,n)==0) || ((k<=K_mmW) && (sub6ConnectionState(k)==0))
             continue;
         else
             for q=1:K
-                if (q<=K_mmW) &&  ((sub6ConnectionState(q)==0)||(user_sc_alloc(q,n)==0))
+                if (user_sc_alloc(q,n)==0) || ((q<=K_mmW) && (sub6ConnectionState(q)==0))
                     continue;
                 else
                     zeta(k,q) = trace(conj(Theta(:,:,k,n))*T_prime(:,:,q))/((1+e_new(k))^2*f_prime(q));
@@ -126,14 +126,25 @@ for n = 1:num_sc_sub6
             end
         end
     end
-    delta = (N_AP*M)*((e_new.^2)./f_prime);
+    delta = zeros(size(e_new));
     for k = 1:K
-        for q = 1:K
-            if (q~=k)
-                MUI(k,n) = MUI(k,n) + (1/(N_AP*M))*zeta(k,q);
+        if (user_sc_alloc(k,n) == 1)
+            if (k<=K_mmW) && (sub6ConnectionState(k) == 0)
+                continue;
+            else
+                delta(k) = (N_AP*M)*(e_new(k))^2/f_prime(k);
+                for q = 1:K
+                    if (q~=k) && (user_sc_alloc(q,n) == 1)
+                        if (q<=K_mmW) && (sub6ConnectionState(q) == 0)
+                            continue;
+                        else
+                            MUI(k,n) = MUI(k,n) + (1/(N_AP*M))*zeta(k,q);
+                        end
+                    end
+                end
             end
+            rate_dl(k) = rate_dl(k) + scs(n)*TAU_FAC*log2(1+delta(k)/(MUI(k,n)+1));   
         end
-        rate_dl(k,n) = TAU_FAC*log2(1+delta(k)/(MUI(k,n)+1));   
     end
 end
 end

@@ -98,11 +98,11 @@ params.N_UE_sub6 = 1; %4;
 rmin_arr = 4*10^8;
 % params.r_min = rmin*rand(params.numUE,1);
 % lambda_BS = 50:50:200;%densityBS
-lambda_BS = 5; %:25:200;
+lambda_BS = 25; %:25:200;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 10; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 250; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -351,7 +351,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                            params.user_sc_alloc = user_sc_alloc;
                                            ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
                                            rate_dl = rate_analyticalv2(params,sub6ConnectionState);
-                                           if (rate_dl(ue_idx) > params.r_min) && (rate_dl((1+params.numUE):end)>params.r_min_sub6)
+                                           if all(rate_dl(ue_idx) >= params.r_min) && all(rate_dl((1+params.numUE):end)>=params.r_min_sub6)
                                                p_out = 0;
                                            else
                                                p_out = 1;
