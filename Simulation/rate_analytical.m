@@ -102,7 +102,7 @@ for k=1:K
         continue;
     else
         for q=1:K
-            if ((k<=K_mmW) && (sub6ConnectionState(k)==0))
+            if ((q<=K_mmW) && (sub6ConnectionState(q)==0))
                 continue;
             else
                 zeta(k,q) = trace(conj(Theta(:,:,k))*T_prime(:,:,q))/((1+e_new(k))^2*f_prime(q));
