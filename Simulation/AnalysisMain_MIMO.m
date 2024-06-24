@@ -56,7 +56,7 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
-percent_fr2_UE_arr = 1:1:5;
+percent_fr2_UE_arr = 5:5:20;
 
 %Prepare to save simulation results
 
@@ -327,34 +327,23 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                             % plos(k) = prod(plos2(:,k),1);
                                             plos(k) = prod(plos2(idx_max(:,k),k),1);
                                         end
-                                        rate_dl = rate_analytical(params);
-                                        for k = 1:params.numUE
+                                        % rate_dl = rate_analytical(params);
+                                        for ue_idx = 1:params.numUE
                                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                                           [pos3, tos3] = pLoS3(params.locationsBS(numBS*(k-1)+1:numBS*k,:), params.UE_locations(k,:), theta,omega,psi,idx_max);
-                                           % plos3 = pLoS3(theta,omega,params.coverageRange);
-                                          % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-        %                                    if (rate_dl(k) >= params.r_min(k) && all(rate_dl(1+params.numUE:params.numUE+params.numUE_sub6) >= params.r_min_sub6(:)))
-        %                                        p1 = 1;
-        %                                        tos = 0;
-        %                                    else
-        %                                        % p1 = 1-plos4;
-        %                                        % p1 = 1-plos(k);
-        %                                        % p1 = 1-plos3;
-        %                                        p1 = 1-pos3;
-        %                                        tos = tos3;
-        %                                    end
-                                           ue_idx = 1;
-                                           if all(rate_dl(1:numUE) > params.r_min)
-                                                p_out = 0;
+                                           % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
+                                           [pos3, tos3] = pLoS3(params.locationsBS(numBS*(ue_idx-1)+1:numBS*ue_idx,:), params.UE_locations(ue_idx,:), theta,omega,psi,idx_max);
+                                           sub6ConnectionState = zeros(params.numUE,1);
+                                           sub6ConnectionState(ue_idx) = 1;
+                                           rate_dl = rate_analytical(params,sub6ConnectionState);
+                                           if (rate_dl(ue_idx) > params.r_min) && (rate_dl((1+params.numUE):end)>params.r_min_sub6)
+                                               p_out = 0;
                                            else
                                                p_out = 1;
                                            end
-        %                                    outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + (1-p1);
-                                           outage_probability_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*pos3;
-                                           outage_probability_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + pos3;
-        %                                    outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + tos;
-                                           outage_duration_analysis(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(k,idxDiscDelay, idxConnDelay) + p_out*tos3;
-                                           outage_duration_analysis_wo_cf(k,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(k,idxDiscDelay, idxConnDelay) + tos3;
+                                           outage_probability_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(ue_idx,idxDiscDelay, idxConnDelay) + p_out*pos3;
+                                           outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxConnDelay) + pos3;
+                                           outage_duration_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis(ue_idx,idxDiscDelay, idxConnDelay) + p_out*tos3;
+                                           outage_duration_analysis_wo_cf(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay) = outage_probability_analysis_wo_cf(ue_idx,idxDiscDelay, idxConnDelay) + tos3;
                                         end
                                     end
                                 end
@@ -398,8 +387,8 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                         numUE_sub6 = params.numUE_sub6;
                         numBS = size(params.locationsBS,1);
                         numBlockers = params.numBlockers;
-                        result_string = strcat('/results_',num2str(numUE),...
-                            'UE_',num2str(lambda_BS(idxBSDensity)),...
+                        result_string = strcat('/results_',num2str(percent_fr2_UE_arr(idxnumUE)),...
+                            'percentfr2UE_',num2str(lambda_BS(idxBSDensity)),...
                             'lambdaBS_',num2str(lambda_UE_sub6(idxUEDensity)),...
                             'lambdaUE_',num2str(deployRange),...
                             'deployRange_',num2str(numBlockers), 'Blockers_randomHeight_', num2str(aID),'Min_rate', num2str(rmin), "Pow_fac", num2str(params.p_fac), "lb_thres", num2str(100*params.lb_thres));

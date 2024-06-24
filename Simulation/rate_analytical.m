@@ -1,4 +1,4 @@
-function rate_dl = rate_analytical(params)
+function rate_dl = rate_analytical(params,sub6ConnectionState)
 M = params.numGNB_sub6;
 K_mmW = params.numUE;
 K = params.numUE + params.numUE_sub6;
@@ -30,7 +30,11 @@ for k = 1:K
     end
 end
 for k = 1:K
-    Theta(:,:,k) = p_d*(R_g(:,:,k));
+    if (k<=K_mmW)
+        Theta(:,:,k) = p_d*p_fac*(R_g(:,:,k));
+    else
+        Theta(:,:,k) = p_d*(R_g(:,:,k));
+    end
 end
 tol = 1e-1;
 err = 1;
@@ -39,11 +43,19 @@ e_new = zeros(K,1);
 
 while err > tol 
    T_inv = (1/(M*N_AP))*eye(M*N_AP); 
-   for k = 1:K         
-       T_inv = T_inv + (1/(M*N_AP))*conj(Theta(:,:,k))/(1 + e_init(k));              
+   for k = 1:K  
+       if ((k<=K_mmW) && (sub6ConnectionState(k)==0))
+           continue;             
+       else
+           T_inv = T_inv + (1/(M*N_AP))*conj(Theta(:,:,k))/(1 + e_init(k)); 
+       end
    end  
    for k = 1:K
-      e_new(k) = (1/(M*N_AP))*trace(conj(Theta(:,:,k))*pinv(T_inv)); 
+       if ((k<=K_mmW) && (sub6ConnectionState(k)==0))
+           continue;
+       else
+           e_new(k) = (1/(M*N_AP))*trace(conj(Theta(:,:,k))*pinv(T_inv)); 
+       end
     end
     err  = norm(e_new - e_init)/norm(e_new);
     e_init = e_new;    
@@ -54,24 +66,48 @@ J = zeros(K,K);
 V = zeros(K,K);
 g = zeros(K,1);    
 for k = 1:K
-    for q = 1:K
-      J(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*conj(Theta(:,:,q))*T)/((N_AP*M)*(1+e_new(q))^2);
-      V(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*conj(Theta(:,:,q))*T);
+    if ((k<=K_mmW) && (sub6ConnectionState(k)==0))
+        continue;
+    else
+        for q = 1:K
+            if ((q<=K_mmW) && (sub6ConnectionState(q)==0))
+                continue;
+            else
+                J(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*conj(Theta(:,:,q))*T)/((N_AP*M)*(1+e_new(q))^2);
+                V(k,q)  = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*conj(Theta(:,:,q))*T);
+            end
+        end
+        g(k)   = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*T) ;
     end
-    g(k)   = (1/(N_AP*M))*trace(conj(Theta(:,:,k))*T*T) ;             
 end
 f_prime  = pinv(eye(K)-J)*(g);
 e_prime  = pinv(eye(K)-J)*(V);
 for k = 1:K
-    T_prime(:,:,k) = T*conj(Theta(:,:,k))*T;
-    for q = 1:K
-        T_prime(:,:,k) = T_prime(:,:,k) + T*((1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2 + (1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2)*T;
+    if ((k<=K_mmW) && (sub6ConnectionState(k)==0))
+        continue;
+    else
+        T_prime(:,:,k) = T*conj(Theta(:,:,k))*T;
+        for q = 1:K
+            if ((q<=K_mmW) && (sub6ConnectionState(q)==0))
+                continue;
+            else
+                T_prime(:,:,k) = T_prime(:,:,k) + T*((1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2 + (1/(N_AP*M))*conj(Theta(:,:,q))*e_prime(q,k)/(1+e_new(q))^2)*T;
+            end
+        end
     end
 end
 zeta = zeros(K,K);
-for i=1:K
-    for j=1:K
-        zeta(i,j) = trace(conj(Theta(:,:,i))*T_prime(:,:,j))/((1+e_new(i))^2*f_prime(j));
+for k=1:K
+    if ((k<=K_mmW) && (sub6ConnectionState(k)==0))
+        continue;
+    else
+        for q=1:K
+            if ((k<=K_mmW) && (sub6ConnectionState(k)==0))
+                continue;
+            else
+                zeta(k,q) = trace(conj(Theta(:,:,k))*T_prime(:,:,q))/((1+e_new(k))^2*f_prime(q));
+            end
+        end
     end
 end
 delta = (N_AP*M)*((e_new.^2)./f_prime);
