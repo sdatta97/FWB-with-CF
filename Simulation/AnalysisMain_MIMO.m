@@ -333,11 +333,11 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                            % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                                            [pos3, tos3] = pLoS3(params.locationsBS(numBS*(ue_idx-1)+1:numBS*ue_idx,:), params.UE_locations(ue_idx,:), theta,omega,psi,idx_max);
                                            sub6ConnectionState = zeros(params.numUE,1);
-                                           rate_dl_before_handoff = rate_analytical(params,sub6ConnectionState);
+                                           rate_dl_before_handoff = real(rate_analytical(params,sub6ConnectionState));
                                            [~, params.ue_rearranged] = AP_reassign(params,ue_idx);
                                            ues_not_affected = setdiff((1+params.numUE):(params.numUE+params.numUE_sub6),params.ue_rearranged);
                                            lb = quantile(rate_dl_before_handoff(params.ue_rearranged),params.lb_thres);
-                                           bw_alloc = params.Band - params.r_min_sub6/lb;
+                                           bw_alloc = Band - params.r_min_sub6/lb;
                                            params.scs_sub6(1) = bw_alloc;
                                            params.scs_sub6(2) = Band - bw_alloc;
                                            sub6ConnectionState(ue_idx) = 1;
@@ -350,7 +350,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                            user_sc_alloc(params.ue_rearranged,2) = 1;
                                            params.user_sc_alloc = user_sc_alloc;
                                            ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
-                                           rate_dl = rate_analyticalv2(params,sub6ConnectionState);
+                                           rate_dl = real(rate_analyticalv2(params,sub6ConnectionState));
                                            if all(rate_dl(ue_idx) >= params.r_min) && all(rate_dl((1+params.numUE):end)>=params.r_min_sub6)
                                                p_out = 0;
                                            else
