@@ -102,7 +102,7 @@ lambda_BS = 25; %:25:200;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 250; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 100; %500:500:2000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -350,8 +350,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                            user_sc_alloc(params.ue_rearranged,2) = 1;
                                            params.user_sc_alloc = user_sc_alloc;
                                            ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
-                                           rate_dl = real(rate_analyticalv2(params,sub6ConnectionState));
-                                           if all(rate_dl(ue_idx) >= params.r_min) && all(rate_dl((1+params.numUE):end)>=params.r_min_sub6)
+                                           rate_dl_after_handoff = real(rate_analyticalv2(params,sub6ConnectionState));
+                                           lb = quantile(rate_dl_after_handoff(ues_not_affected),params.lb_thres);
+                                           if all(rate_dl_after_handoff(ue_idx) >= params.r_min) && (lb >= params.r_min_sub6)
                                                p_out = 0;
                                            else
                                                p_out = 1;
@@ -367,9 +368,6 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                         end                
                         %% Create Discrete Time Event Simulation input
                         simInputs.params = params;
-                        simInputs.dataBS_mobile = dataBS_mobile;
-                        % simInputs.phy_channel_mmw = phy_channel_mmw;
-                        % simInputs.phy_channel_sub6 = phy_channel_sub6;
                         simInputs.protocolParams = protocolParams;
                         simOutputs = cell(length(protocolParams.discovery_time),...
                                           length(protocolParams.FailureDetectionTime),...
@@ -421,17 +419,13 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                             for idxFailureDetectionDelay = 1:length(protocolParams.FailureDetectionTime)
                                 for idxConnDelay = 1:length(protocolParams.connection_time)
                                     for idxSignalingAfterRachDelay = 1:length(protocolParams.signalingAfterRachTime)
-                                        thisOutputs = simOutputs{idxDiscDelay,idxFailureDetectionDelay,idxConnDelay,idxSignalingAfterRachDelay};                    
-                                        numBS                   = size(thisOutputs.params.locationsBS,1);                
-                                        numBlockers             = thisOutputs.params.numBlockers;
-                                        discDelay               = thisOutputs.discovery_delay;
-                                        failureDetectionDelay   = thisOutputs.failureDetectionDelay;
-                                        connDelay               = thisOutputs.connection_setup_delay;
-                                        signalingAfterRachDelay = thisOutputs.signalingAfterRachDelay;
-                                        frameHopCount           = thisOutputs.frameHopCount;
-                                        frameDeliveryDelay      = thisOutputs.frameDeliveryDelay;
-                                        outage_durations_wo_cf = thisOutputs.outage_durations_wo_cf;
-                                        outage_durations_wi_cf = thisOutputs.outage_durations_wi_cf;
+                                        discDelay               = protocolParams.discovery_time(idxDiscDelay);
+                                        failureDetectionDelay   = protocolParams.FailureDetectionTime(idxFailureDetectionDelay);
+                                        connDelay               = protocolParams.connection_time(idxConnDelay);
+                                        signalingAfterRachDelay = protocolParams.signalingAfterRachTime(idxSignalingAfterRachDelay);
+                                        frameHopCount           = protocolParams.frameHopCount;
+                                        frameDeliveryDelay      = protocolParams.frameDeliveryDelay;
+
                 
                                         for ue_idx = 1:params.numUE   %storing outage probability and duration for each user
                                             out_prob_analysis = outage_probability_analysis(ue_idx,idxDiscDelay, idxFailureDetectionDelay, idxConnDelay, idxSignalingAfterRachDelay);
