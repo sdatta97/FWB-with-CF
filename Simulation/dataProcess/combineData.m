@@ -3,7 +3,7 @@
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
 % projectdir = 'C:\Users\dsoum\Desktop\data\outageData\outageResults_varynumUE_ue_density_1000_multiUE';
 projectdir = '/Users/sdatta/Desktop/data/analysisResults';
-dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
+dinfo = dir(fullfile(projectdir, '*10percent*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
 tables = cell(nfiles,1);
@@ -39,5 +39,5 @@ end
 
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std','median'});
 
-writetable(summaryTable,'./outage_single_antenna_multi_UEv2_anal.txt')
-writetable(summaryTable,'./outage_single_antenna_multi_UEv2_anal.csv')
+writetable(summaryTable,'./outage_single_antenna_multi_UEv2_anal_10_pc.txt')
+writetable(summaryTable,'./outage_single_antenna_multi_UEv2_anal_10_pc.csv')
