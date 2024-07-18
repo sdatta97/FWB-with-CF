@@ -109,8 +109,8 @@ for aID = 64:99
         params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS) 
         %Number of antennas per UE
         % N_UE_mmW_arr = 2.^(0:1:5);
-        params.N_UE_mmW = 8;
-        params.N_UE_sub6 = 4;
+        params.N_UE_mmW = 1;
+        params.N_UE_sub6 = 1;
         rmin_arr = 4*10^8;
         % params.r_min = rmin*rand(params.numUE,1);
         % lambda_BS = 50:50:200;%densityBS
