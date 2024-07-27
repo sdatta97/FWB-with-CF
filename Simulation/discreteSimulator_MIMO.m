@@ -4,6 +4,7 @@ function simOutputs = discreteSimulator_MIMO(simInputs) %trying Pei's idea
 params = simInputs.params;
 protocolParams = simInputs.protocolParams;
 dataBS_mobile = simInputs.dataBS_mobile; %{(ue_idx-1)*params.numGNB+1:ue_idx*params.numGNB,1};
+numBS_mobile = simInputs.numBS_mobile;
 r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
 rate_reduce_threshold = params.rate_reduce_threshold;
@@ -38,18 +39,16 @@ RACH_eff = protocolParams.frameHopCount * protocolParams.frameDeliveryDelay + ..
 
 
 %% Aply discovery
-[discoveredTimes, bsBlockageTimes] = computeDiscoveredTimes(dataBS_mobile,params,discovery_delay,failureDetectionDelay);
+% [discoveredTimes, bsBlockageTimes] = computeDiscoveredTimes(dataBS_mobile,params,discovery_delay,failureDetectionDelay);
+[discoveredTimes, bsBlockageTimes] = computeDiscoveredTimes(dataBS_mobile,numBS_mobile,params,discovery_delay,failureDetectionDelay);
 %% Simulation Initialization
 disp('=====================================');
 disp('Starting Simulation:')
 tic
 % numBS = size(dataBS_mobile,1);
 numBS = params.numGNB;
-% numBS_mmW = params.numGNB;
-% numBS = params.numGNB_sub6;
 numUE = params.numUE;
 numUE_sub6 = params.numUE_sub6;
-% fprintf('numBS mmW: %d. \n',numBS_mmW)
 fprintf('numBS: %d. \n',numBS)
 fprintf('DiscD: %.3f, FailDet: %.3f, ConnD: %.3f, SingAfterRach: %.3f\n',...
 discovery_delay,failureDetectionDelay,connection_setup_delay,signalingAfterRachDelay);
@@ -77,7 +76,7 @@ link = cell(numUE,numBS);
 
 for ue_idx = 1:numUE
 % for ue_idx = 1:(numUE+numUE_sub6)
-    for idxBS = 1:numBS        
+    for idxBS = 1:numBS_mobile(ue_idx) %1:numBS        
         link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
         link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
         link{ue_idx,idxBS}.nonBlockedTimes = bsBlockageTimes{(ue_idx-1)*numBS + idxBS};

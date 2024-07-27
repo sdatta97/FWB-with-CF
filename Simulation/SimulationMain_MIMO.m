@@ -242,14 +242,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
             % params.UE_locations_sub6 =  mean(params.UE_locations,1) + [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
             params.UE_locations_sub6 =  [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
-           
-            N = params.num_antennas_per_gNB;  % antennas per AP
-            L = params.numGNB_sub6;
+            
             K = params.numUE + params.numUE_sub6;  % --Ground UEs
             snr_db = params.snr_db;
-            LOOP = length(params.snr_db);
-            asd_length = length(params.ASD_VALUE);
-            hi_length = length(params.Kt_Kr_vsUE);
             ASD_VALUE = params.ASD_VALUE;
             ASD_CORR = params.ASD_CORR;
             Kt_Kr_vsUE = params.Kt_Kr_vsUE;
@@ -290,6 +285,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                         %% Create Discrete Time Event Simulation input
                         simInputs.params = params;
                         simInputs.dataBS_mobile = dataBS_mobile;
+                        simInputs.numBS_mobile = numBS_mobile;
                         simInputs.protocolParams = protocolParams;
                         simOutputs = cell(length(protocolParams.discovery_time),...
                                           length(protocolParams.FailureDetectionTime),...

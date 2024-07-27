@@ -51,8 +51,7 @@ function [gainOverNoisedB,R_gNB,R_ue_mmW,R_ue_sub6,pilotIndex,D,D_small,APpositi
 %License: This code is licensed under the GPLv2 license. If you in any way
 %use this code for research that results in publications, please cite our
 %monograph as described above.
-L_mmW = params.numGNB;
-L = params.numGNB_sub6;
+L = params.numGNB;
 K_mmW = params.numUE;
 K = params.numUE+params.numUE_sub6;
 Lmax = params.Lmax;
@@ -122,9 +121,7 @@ for n = 1:nbrOfSetups
     
     %Random AP locations with uniform distribution
     locationsBS = params.locationsBS;
-    locationsBS_sub6 = params.locationsBS_sub6;
-    APpositions = [locationsBS; locationsBS_sub6];
-    APpositions = APpositions(:,1) + 1i*APpositions(:,2);
+    APpositions = locationsBS(:,1) + 1i*locationsBS(:,2);
     %Prepare to compute UE locations  
     UE_locations = params.UE_locations;
     UE_locations_sub6 = params.UE_locations_sub6;
