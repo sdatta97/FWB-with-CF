@@ -14,7 +14,7 @@ length_area  = params.areaDimensions(2);
 % width_area  = params.areaDimensions_sub6(1);
 % length_area  = params.areaDimensions_sub6(2);
 numUE = params.numUE;
-numUE_sub6 = params.numUE_sub6;
+% numUE_sub6 = params.numUE_sub6;
 if (ue_idx<=numUE)
     UE_location = params.UE_locations(ue_idx,:);
 else
