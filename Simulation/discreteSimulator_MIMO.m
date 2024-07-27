@@ -168,13 +168,15 @@ UE.sub6NextEventTime = -100*ones(numUE,1);
 % Try RACH if BS available
 for ue_idx = 1:numUE
     if UE.primaryConnectionState(ue_idx) == 0
-        UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+        % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+        UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
     end
 end
 % Try secondary RACH if BS available
 for ue_idx = 1:numUE
     if UE.secondaryConnectionState(ue_idx) == 0
-        UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+        % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+        UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
     end
 end
 %% Simulation next step
@@ -526,7 +528,8 @@ while nextEventTime < params.simTime
     %Let's start with primary
     for ue_idx = 1:numUE
         if UE.primaryConnectionState(ue_idx) == 0
-            UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+            % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+            UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
         elseif UE.primaryConnectionState(ue_idx) == 2
             if UE.primaryNextEventTime(ue_idx) == currentTime
                 idxBS = UE.primaryTargetIdx(ue_idx);
@@ -555,7 +558,8 @@ while nextEventTime < params.simTime
                     UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
                     UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
                     UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryRachFailed-NotConnected-go2-Idle-State-Can-Try-another-BS'}];
-                    UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                    % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                    UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
                 end
             end
         end
@@ -564,7 +568,8 @@ while nextEventTime < params.simTime
         %Secondary Connection Establishment Procedures
     for ue_idx = 1:numUE
         if UE.secondaryConnectionState(ue_idx) == 0
-            UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+            % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+            UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
         elseif UE.secondaryConnectionState(ue_idx) == 2
             if UE.secondaryNextEventTime(ue_idx) == currentTime
                 idxBS = UE.secondaryTargetIdx(ue_idx);
@@ -587,7 +592,8 @@ while nextEventTime < params.simTime
                     UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
                     UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
                     UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': secondaryRachFailed-NotConnected-go2-Idle-State-Can-Try-another-BS'}];
-                    UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                    % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                    UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
                 end
             end
         end

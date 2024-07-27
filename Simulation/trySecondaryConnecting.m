@@ -1,5 +1,6 @@
 % function UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes)
-function UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx)
+% function UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx)
+function UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile)
 %TRYCONNECTING If a UE is not connected we try all the BS to find
 %a target bs to establish connection
 
@@ -35,10 +36,11 @@ for i = 1:numBS
     % idxBS = bsPriorities(i);
     idxBS = bsPriorities(ue_idx,i);
     % if (ismember(idxBS, UE.primaryBSIdx)) || (ismember(idxBS, UE.primaryTargetIdx))
-    if (ismember(idxBS, UE.primaryBSIdx(ue_idx))) || (ismember(idxBS, UE.primaryTargetIdx(ue_idx)))
+    if ismember(idxBS, UE.primaryBSIdx(ue_idx)) || ismember(idxBS, UE.primaryTargetIdx(ue_idx)) || (idxBS > numBS_mobile(ue_idx))
         continue
         %We skip this BS since its either connected with the UE as primary
         %or is establishing connection with the UE as a primary.
+        %or is not connected.
     end
     % if UE.primaryConnectionState ~= 1
     %     UE.secondaryNextEventTime = UE.primaryNextEventTime + 1e-8;
