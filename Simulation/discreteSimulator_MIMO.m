@@ -182,6 +182,7 @@ end
 %% Simulation next step
 % nextEventTimes = getNextEvents(link,params.simTime);
 nextEventTimes = getNextEvents(link,params.simTime,numBS_mobile);
+nextEventTimes = nextEventTimes(nextEventTimes>0);
 % link_mat = cell2mat(link);
 % nextEventTimes = getNextEvents(mat2cell(link_mat(1:numUE,1:params.numGNB),[1,1]),params.simTime);
 nextEventTime = min(nextEventTimes,[],"all"); %min(nextEventTimes(1:numUE,1:params.numGNB));
@@ -605,8 +606,10 @@ while nextEventTime < params.simTime
 %     nextEventTimes = getNextEvents(mat2cell(link_mat(1:numUE,1:params.numGNB),[1,1]),params.simTime);
     nextEventTime = params.simTime;
     for ue_idx = 1:numUE
-        if (min(nextEventTimes(ue_idx,1:params.numGNB)) < nextEventTime)
-            nextEventTime = min(nextEventTimes(ue_idx,1:params.numGNB));
+        % if (min(nextEventTimes(ue_idx,1:params.numGNB)) < nextEventTime)
+        if (min(nextEventTimes(ue_idx,1:numBS_mobile(ue_idx))) < nextEventTime)
+            % nextEventTime = min(nextEventTimes(ue_idx,1:params.numGNB));
+            nextEventTime = min(nextEventTimes(ue_idx,1:numBS_mobile(ue_idx)));
         end
     end
     %need to check Ue event times as well
