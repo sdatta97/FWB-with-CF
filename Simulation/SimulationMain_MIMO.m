@@ -68,7 +68,7 @@ params.simTime = 60*60; %sec Total Simulation time should be more than 100.
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
-params.deployRange = 100; %20:20:100;
+params.deployRange = 300; %20:20:100;
 params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
@@ -114,7 +114,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     % end
     % params.numUE = n;
     % params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-    params.numUE = 10;
+    params.numUE = 20;
     %%UE location
     deployRange = params.deployRange; %(idxdeployRange);
     params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
