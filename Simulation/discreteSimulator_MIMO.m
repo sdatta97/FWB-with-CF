@@ -77,10 +77,14 @@ link = cell(numUE,numBS);
 for ue_idx = 1:numUE
 % for ue_idx = 1:(numUE+numUE_sub6)
     for idxBS = 1:numBS_mobile(ue_idx) %1:numBS        
-        link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
-        link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
-        link{ue_idx,idxBS}.nonBlockedTimes = bsBlockageTimes{(ue_idx-1)*numBS + idxBS};
-        link{ue_idx,idxBS}.blockageStatus = blockageStatus(bsBlockageTimes,idxBS,currentTime, ue_idx, numBS);    % if link is discovered the next event time will be next blockage
+        % link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{(ue_idx-1)*numBS + idxBS};
+        link{ue_idx,idxBS}.discoveredTimes = discoveredTimes{sum(numBS_mobile(1:(ue_idx-1)))+idxBS};
+        % link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS);
+        link{ue_idx,idxBS}.discovery_state = discoveryStatus(discoveredTimes,idxBS,currentTime, ue_idx, numBS_mobile);
+        % link{ue_idx,idxBS}.nonBlockedTimes = bsBlockageTimes{(ue_idx-1)*numBS + idxBS};
+        link{ue_idx,idxBS}.nonBlockedTimes = bsBlockageTimes{sum(numBS_mobile(1:(ue_idx-1))) + idxBS};
+        % link{ue_idx,idxBS}.blockageStatus = blockageStatus(bsBlockageTimes,idxBS,currentTime, ue_idx, numBS);    % if link is discovered the next event time will be next blockage
+        link{ue_idx,idxBS}.blockageStatus = blockageStatus(bsBlockageTimes,idxBS,currentTime, ue_idx, numBS_mobile);    % if link is discovered the next event time will be next blockage
         % arrival. If it is not discovered, next event time will be discovery
         % completion time.
         if link{ue_idx,idxBS}.discovery_state %link is discovered
