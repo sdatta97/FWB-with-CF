@@ -1,4 +1,4 @@
-function dataBS = computeBlockageEvents(params,ue_idx)
+function [dataBS, nBS] = computeBlockageEvents(params,ue_idx)
 %COMPUTEBLOCKAGEEVENTS Computes blockage arrival and blockage departure
 %times for every BS. Physical characteristics of the system independent of
 %the protocol.
@@ -24,7 +24,9 @@ hr = params.hr;
 ht = params.ht;
 % locationsBS = [params.locationsBS; params.locationsBS_sub6];
 % locationsBS = params.locationsBS_sub6;
-locationsBS = params.locationsBS(params.numGNB*(ue_idx-1)+1:params.numGNB*ue_idx,:);
+% locationsBS = params.locationsBS(params.numGNB*(ue_idx-1)+1:params.numGNB*ue_idx,:);
+distancesBS = sqrt(sum((params.locationsBS - repmat(UE_location,[params.numGNB,1])).^2,2));
+locationsBS = params.locationsBS(find(distancesBS < params.coverageRange),:);
 V=params.V;
 hb = params.hb;
 simTime = params.simTime;

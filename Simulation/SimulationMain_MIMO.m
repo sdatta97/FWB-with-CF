@@ -123,46 +123,22 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     for idxBSDensity = 1:length(lambda_BS)
         %% gNB locations
         % params.numGNB = 10;
-        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+        % n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);
+        % while (n==0)
+        %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+        % end
+        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
         while (n==0)
-            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
+            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         end
         params.numGNB = n;
         % params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+        params.RgNB = params.coverageRange_sub6 * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (params.deployRange+params.coverageRange) * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
-        % params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
-        % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
-        numBS = params.numGNB;
-        numUE = params.numUE;
-        RgNB = params.coverageRange*sqrt(rand(numBS,numUE));
-        angleGNB =  2*pi*rand(numBS,numUE);
-        % RgNB = params.coverageRange*sqrt(rand(numBS,1));
-        % angleGNB =  2*pi*rand(numBS,1);
-        locationsBS = zeros(numBS*numUE,2);
-        for k = 1:numUE
-            locationsBS(numBS*(k-1)+1:numBS*k,:) = params.UE_locations(k,:) + [RgNB(:,k).*cos(angleGNB(:,k)), RgNB(:,k).*sin(angleGNB(:,k))];
-            % locationsBS(numBS*(k-1)+1:numBS*k,:) = [RgNB.*cos(angleGNB), RgNB.*sin(angleGNB(:,k))];
-        end
-        params.RgNB = RgNB;
-        params.angleGNB = angleGNB;
-        params.locationsBS = locationsBS;
-        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        while (n<=(numBS*numUE)) %(n==0)
-            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
-        end
-
-        params.numGNB_sub6 = n;
-    %     params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
-        % params.RgNB_sub6 = params.coverageRange_sub6 * sqrt(rand(params.numGNB_sub6 - params.numGNB,1)); %location of gNBs (distance from origin)
-        % params.RgNB_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2 + params.coverageRange_sub6) * sqrt(rand(params.numGNB_sub6 - params.numGNB*params.numUE,1)); %location of gNBs (distance from origin)
-        params.RgNB_sub6 = (max(sqrt(sum(params.UE_locations.^2,2))) + params.coverageRange_sub6) * sqrt(rand(params.numGNB_sub6 - params.numGNB*params.numUE,1)); %location of gNBs (distance from origin)
-        % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
-        params.angleGNB_sub6 = 2*pi*rand(params.numGNB_sub6 - params.numGNB*params.numUE,1);%location of gNBs (angle from x-axis)
-        % params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        % params.locationsBS_sub6 = mean(params.UE_locations,1) + [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        params.locationsBS_sub6 = [params.RgNB_sub6.*cos(params.angleGNB_sub6), params.RgNB_sub6.*sin(params.angleGNB_sub6)];  
-        %Length of the coherence block
+        params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
+        params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+                %Length of the coherence block
 %                 params.tau_c = 200;
             
             %Compute number of pilots per coherence block
@@ -237,12 +213,16 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         % K_list = [1,2,3,4];                      % Degree of Connectivity
         % protocolParams.omega_list = 1./protocolParams.connection_time;
         % self_blockage = 5/6;
-
+        
         %% Mobile blockage events
         tic
+        numBS_mobile = [];
         dataBS_mobile = [];
         for i = 1:(params.numUE)
-            dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
+            % dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
+            [dataBS, nBS] = computeBlockageEvents(params,i);
+            dataBS_mobile = [dataBS_mobile; dataBS];
+            numBS_mobile = [numBS_mobile; nBS];
         end
 
         fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
@@ -251,19 +231,11 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         for idxUEDensity = 1:length(lambda_UE_sub6)
             params.ue_rearranged = [];        
             %%UE locations
-            % params.numUE_sub6 = 10;
-            % params.numUE_sub6 = numUE_sub6_arr(idxnumUEsub6);
-            % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange/1000)^2);
-            % params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange/1000)^2);
-            % params.RUE_sub6 = params.coverageRange * sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-            % params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
-            % params.UE_locations_sub6 = [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];        
-    %         params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
             n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
             while (n==0)
                 n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
             end
-            params.numUE_sub6 = n; %n;
+            params.numUE_sub6 = n;
             % params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
             % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
             params.RUE_sub6 = (max(sqrt(sum(params.UE_locations.^2,2)))+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
