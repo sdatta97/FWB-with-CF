@@ -178,7 +178,8 @@ for ue_idx = 1:numUE
     end
 end
 %% Simulation next step
-nextEventTimes = getNextEvents(link,params.simTime);
+% nextEventTimes = getNextEvents(link,params.simTime);
+nextEventTimes = getNextEvents(link,params.simTime,numBS_mobile);
 % link_mat = cell2mat(link);
 % nextEventTimes = getNextEvents(mat2cell(link_mat(1:numUE,1:params.numGNB),[1,1]),params.simTime);
 nextEventTime = min(nextEventTimes,[],"all"); %min(nextEventTimes(1:numUE,1:params.numGNB));
@@ -194,7 +195,8 @@ while nextEventTime < params.simTime
         disp('Error infinite loop use ctrl c')
     end
     %Physical + Discovery Updates of all links,
-    link = updatePhysicalDiscovery(currentTime,link,discoveredTimes,bsBlockageTimes);
+    % link = updatePhysicalDiscovery(currentTime,link,discoveredTimes,bsBlockageTimes);
+    link = updatePhysicalDiscovery(currentTime,link,discoveredTimes,bsBlockageTimes,numBS_mobile);
 
     %Protocol updates
     for ue_idx = 1:numUE
@@ -591,7 +593,8 @@ while nextEventTime < params.simTime
         end
     end
     
-    nextEventTimes = getNextEvents(link,params.simTime);
+    % nextEventTimes = getNextEvents(link,params.simTime);
+    nextEventTimes = getNextEvents(link,params.simTime,numBS_mobile);
 %     link_mat = cell2mat(link);
 %     nextEventTimes = getNextEvents(mat2cell(link_mat(1:numUE,1:params.numGNB),[1,1]),params.simTime);
     nextEventTime = params.simTime;
