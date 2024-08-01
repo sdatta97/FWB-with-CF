@@ -27,6 +27,12 @@ ht = params.ht;
 % locationsBS = params.locationsBS(params.numGNB*(ue_idx-1)+1:params.numGNB*ue_idx,:);
 distancesBS = sqrt(sum((params.locationsBS - repmat(UE_location,[params.numGNB,1])).^2,2));
 locationsBS = params.locationsBS(find(distancesBS < params.coverageRange),:);
+nBS = size(locationsBS,1);
+if (nBS == 0)
+    dataBS = [];
+    return;
+end
+
 V=params.V;
 hb = params.hb;
 simTime = params.simTime;
@@ -58,8 +64,6 @@ end
 
 %% Computing Physical interaction btw Blockers and Base Stations
 % Dependent Variables
-
-nBS = size(locationsBS,1);
 % Lets create nBS by 4 matrix representing line segments for UE-BS blockage
 % area:
 %   Each row is of the form [x1 y1 x2 y2] where (x1,y1) is the start point and

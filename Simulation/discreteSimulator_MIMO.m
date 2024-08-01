@@ -167,16 +167,20 @@ UE.sub6NextEventTime = -100*ones(numUE,1);
 
 % Try RACH if BS available
 for ue_idx = 1:numUE
-    if UE.primaryConnectionState(ue_idx) == 0
-        % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
-        UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+    if (numBS_mobile(ue_idx) > 0)
+        if UE.primaryConnectionState(ue_idx) == 0
+            % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+            UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+        end
     end
 end
 % Try secondary RACH if BS available
 for ue_idx = 1:numUE
-    if UE.secondaryConnectionState(ue_idx) == 0
-        % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
-        UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+    if (numBS_mobile(ue_idx) > 0)
+        if UE.secondaryConnectionState(ue_idx) == 0
+            % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+            UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+        end
     end
 end
 %% Simulation next step
@@ -203,229 +207,315 @@ while nextEventTime < params.simTime
 
     %Protocol updates
     for ue_idx = 1:numUE
-        if UE.secondaryConnectionState(ue_idx) == 1
-            if UE.secondaryNextEventTime(ue_idx) == currentTime
-                UE.secondaryConnectionState(ue_idx) = 3;
-                UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                UE.secondaryNextEventTime(ue_idx) = currentTime + UE.failureDetectionDelay;
-                UE.secondaryConnectionEnds = [UE.secondaryConnectionEnds, currentTime];
-                UE.secondaryConnectionEndIndices = [UE.secondaryConnectionEndIndices, ue_idx];
-                UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
-                UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                UE.secondaryEventDescriptions = [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': secondaryGotBlocked-NotDetectedYet-MeasurementsGoingOn'}];
-            end
-        elseif UE.secondaryConnectionState(ue_idx) == 3
-            % a blockage occured but we still didnt detected it yet. We are
-            % in measurement state but at this point our measurements are
-            % done, if current time is our nextevent time
-            if UE.secondaryNextEventTime(ue_idx) == currentTime
-                idxSecondaryBS = UE.secondaryBSIdx(ue_idx);
-                isBSRecovered = link{ue_idx,idxSecondaryBS}.blockageStatus;
-                if isBSRecovered
-                    UE.secondaryConnectionState(ue_idx) = 1;
+        if (numBS_mobile(ue_idx) > 0)
+            if UE.secondaryConnectionState(ue_idx) == 1
+                if UE.secondaryNextEventTime(ue_idx) == currentTime
+                    UE.secondaryConnectionState(ue_idx) = 3;
                     UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                    UE.secondaryConnectionStarts = [UE.secondaryConnectionStarts, currentTime];
-                    UE.secondaryConnectionStartIndices = [UE.secondaryConnectionStartIndices, ue_idx];
-                    UE.secondaryBSIdx(ue_idx) = idxSecondaryBS;
-                    UE.secondaryBSHistory = [UE.secondaryBSHistory, UE.secondaryBSIdx];
-                    next_blockage = link{ue_idx,idxSecondaryBS}.discoveredTimes(3,find(link{ue_idx,idxSecondaryBS}.discoveredTimes(3,:)> currentTime,1));
-                    UE.secondaryNextEventTime(ue_idx) = next_blockage;
+                    UE.secondaryNextEventTime(ue_idx) = currentTime + UE.failureDetectionDelay;
+                    UE.secondaryConnectionEnds = [UE.secondaryConnectionEnds, currentTime];
+                    UE.secondaryConnectionEndIndices = [UE.secondaryConnectionEndIndices, ue_idx];
                     UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
                     UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                    UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone-Recovered-b4-BFDT-expired-No-Failure-ReconnectedWithoutDelays'}];
-                else
-                    %BS didnt recover now we declare beam faiure and go to
-                    %beam recovery procedure.
-                    % Now that we measured the problem, and declared beam
-                    % failure we go to recovery states with our own BS. 
-                    % Now LA will wait until it determines if any of the
-                    % beams from the currentBS is suitable for connection
-                    % re-establishment. 
-                    UE.secondaryConnectionState(ue_idx) = 4;
-                    UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                    UE.secondaryNextEventTime(ue_idx) = currentTime + UE.beamFailureRecoveryTimer;
-                    % In order to give this BS a priority in the future
-                        lastConnectedBS = UE.secondaryBSHistory(ue_idx,end);
-                        bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
-                        [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
-                        % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
-                   % now event recording
-                    UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
-                    UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                    UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone-Declared-Beam-Failure-going2-BeamRecovery'}];
+                    UE.secondaryEventDescriptions = [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': secondaryGotBlocked-NotDetectedYet-MeasurementsGoingOn'}];
                 end
-            end
-        elseif UE.secondaryConnectionState(ue_idx) == 4
-            if UE.secondaryNextEventTime(ue_idx) == currentTime
-                %Check if BS recovered
-                idxSecondaryBS = UE.secondaryBSIdx(ue_idx);
-                isBSRecovered = link{ue_idx,idxSecondaryBS}.blockageStatus;
-                if isBSRecovered
-                    if link{ue_idx,idxSecondaryBS}.blockageStatus %&& link{idxSecondaryBS}.discovery_state
-                        UE.secondaryConnectionState(ue_idx) = 2;
+            elseif UE.secondaryConnectionState(ue_idx) == 3
+                % a blockage occured but we still didnt detected it yet. We are
+                % in measurement state but at this point our measurements are
+                % done, if current time is our nextevent time
+                if UE.secondaryNextEventTime(ue_idx) == currentTime
+                    idxSecondaryBS = UE.secondaryBSIdx(ue_idx);
+                    isBSRecovered = link{ue_idx,idxSecondaryBS}.blockageStatus;
+                    if isBSRecovered
+                        UE.secondaryConnectionState(ue_idx) = 1;
                         UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                        UE.secondaryTargetIdx(ue_idx) = idxSecondaryBS;
+                        UE.secondaryConnectionStarts = [UE.secondaryConnectionStarts, currentTime];
+                        UE.secondaryConnectionStartIndices = [UE.secondaryConnectionStartIndices, ue_idx];
+                        UE.secondaryBSIdx(ue_idx) = idxSecondaryBS;
+                        UE.secondaryBSHistory = [UE.secondaryBSHistory, UE.secondaryBSIdx];
+                        next_blockage = link{ue_idx,idxSecondaryBS}.discoveredTimes(3,find(link{ue_idx,idxSecondaryBS}.discoveredTimes(3,:)> currentTime,1));
+                        UE.secondaryNextEventTime(ue_idx) = next_blockage;
+                        UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
+                        UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
+                        UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone-Recovered-b4-BFDT-expired-No-Failure-ReconnectedWithoutDelays'}];
+                    else
+                        %BS didnt recover now we declare beam faiure and go to
+                        %beam recovery procedure.
+                        % Now that we measured the problem, and declared beam
+                        % failure we go to recovery states with our own BS. 
+                        % Now LA will wait until it determines if any of the
+                        % beams from the currentBS is suitable for connection
+                        % re-establishment. 
+                        UE.secondaryConnectionState(ue_idx) = 4;
+                        UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
+                        UE.secondaryNextEventTime(ue_idx) = currentTime + UE.beamFailureRecoveryTimer;
+                        % In order to give this BS a priority in the future
+                            lastConnectedBS = UE.secondaryBSHistory(ue_idx,end);
+                            bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
+                            [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
+                            % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
+                       % now event recording
+                        UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
+                        UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
+                        UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone-Declared-Beam-Failure-going2-BeamRecovery'}];
+                    end
+                end
+            elseif UE.secondaryConnectionState(ue_idx) == 4
+                if UE.secondaryNextEventTime(ue_idx) == currentTime
+                    %Check if BS recovered
+                    idxSecondaryBS = UE.secondaryBSIdx(ue_idx);
+                    isBSRecovered = link{ue_idx,idxSecondaryBS}.blockageStatus;
+                    if isBSRecovered
+                        if link{ue_idx,idxSecondaryBS}.blockageStatus %&& link{idxSecondaryBS}.discovery_state
+                            UE.secondaryConnectionState(ue_idx) = 2;
+                            UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
+                            UE.secondaryTargetIdx(ue_idx) = idxSecondaryBS;
+                            UE.secondaryBSIdx(ue_idx) = 0;
+                            UE.secondaryNextEventTime(ue_idx) = currentTime + UE.RACH_eff;
+                            link{ue_idx,idxSecondaryBS}.nextEventTime = currentTime + UE.RACH_eff;
+                            % now event recording
+                            UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
+                            UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
+                            UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': Recovered-b4-RLF-expired-(Re)Connecting-to-BS'}];
+                        else
+                            disp('Arrived this line something might be wrong. DEBUG')
+                        end
+                    else
+                        %Declare RLF to go idle state
+                        UE.secondaryConnectionState(ue_idx) = 0;
+                        UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
                         UE.secondaryBSIdx(ue_idx) = 0;
-                        UE.secondaryNextEventTime(ue_idx) = currentTime + UE.RACH_eff;
-                        link{ue_idx,idxSecondaryBS}.nextEventTime = currentTime + UE.RACH_eff;
                         % now event recording
                         UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
                         UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                        UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': Recovered-b4-RLF-expired-(Re)Connecting-to-BS'}];
-                    else
-                        disp('Arrived this line something might be wrong. DEBUG')
+                        UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': Declared-RLF-Going2-NonConnectedState-CanConnect-any-available-BS'}];
                     end
-                else
-                    %Declare RLF to go idle state
-                    UE.secondaryConnectionState(ue_idx) = 0;
-                    UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                    UE.secondaryBSIdx(ue_idx) = 0;
-                    % now event recording
-                    UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
-                    UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                    UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': Declared-RLF-Going2-NonConnectedState-CanConnect-any-available-BS'}];
                 end
             end
         end
     end
     for ue_idx = 1:numUE
-        if UE.primaryConnectionState(ue_idx) == 1
-            if UE.primaryNextEventTime(ue_idx) == currentTime
-                UE.primaryConnectionState(ue_idx) = 3;
-                UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                UE.primaryNextEventTime(ue_idx) = currentTime + UE.failureDetectionDelay;
-                UE.primaryConnectionEnds = [UE.primaryConnectionEnds, currentTime];
-                UE.primaryConnectionEndIndices = [UE.primaryConnectionEndIndices, ue_idx];
-                UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
-                UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                UE.primaryEventDescriptions = [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryGotBlocked-NotDetectedYet-MeasurementsGoingOn-DataplaneInterruption'}];
-            end
-        elseif UE.primaryConnectionState(ue_idx) == 3
-            if UE.primaryNextEventTime(ue_idx) == currentTime
-                idxPrimaryBS = UE.primaryBSIdx(ue_idx);
-                isBSRecovered = link{ue_idx,idxPrimaryBS}.blockageStatus;
-                if isBSRecovered
-                    UE.primaryConnectionState(ue_idx) = 1;
+        if (numBS_mobile > 0)
+            if UE.primaryConnectionState(ue_idx) == 1
+                if UE.primaryNextEventTime(ue_idx) == currentTime
+                    UE.primaryConnectionState(ue_idx) = 3;
                     UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                    UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
-                    UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
-                    if UE.sub6ConnectionState(ue_idx) == 1
-                        UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
-                        UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
-                        UE.sub6ConnectionState(ue_idx) = 0;
-                        UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
-                    end
-                    UE.primaryBSIdx(ue_idx) = idxPrimaryBS;
-                    UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
-                    next_blockage = link{ue_idx,idxPrimaryBS}.discoveredTimes(3,find(link{ue_idx,idxPrimaryBS}.discoveredTimes(3,:)> currentTime,1));
-                    UE.primaryNextEventTime(ue_idx) = next_blockage;
+                    UE.primaryNextEventTime(ue_idx) = currentTime + UE.failureDetectionDelay;
+                    UE.primaryConnectionEnds = [UE.primaryConnectionEnds, currentTime];
+                    UE.primaryConnectionEndIndices = [UE.primaryConnectionEndIndices, ue_idx];
                     UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
                     UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                    UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone-Recovered-b4-BFDT-expired-No-Failure-ReconnectedWithoutDelays'}];
-                else
-                    if UE.sub6ConnectionState(ue_idx) == 1
-                        disp("Some problem")
-                    else                        
-                        sub6ConnectionState = UE.sub6ConnectionState;
-                        [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-                        % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-%                         rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                         
-%                         rate_dl_before_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                        % rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                        % rate_dl_before_handoff_old = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-%                         if (sub6ConnectionState == zeros(params.numUE,1))
-%                             p_fac = params.p_fac;
-%                             params.p_fac = 0;
-%                         end
-%                         rate_dl_before_handoff = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);    
-%                         if (sub6ConnectionState == zeros(params.numUE,1))
-%                             params.p_fac = p_fac;
-%                         end
-%                         D_old = params.D;
-%                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
-                        [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
-                        params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
-                        ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
-                        rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));                                              
-                        lb = quantile(rate_dl_before_handoff(params.ue_rearranged)./params.Band,params.lb_thres);
-                        bw_alloc = Band - r_min_sub6/lb;
-                        params.scs_sub6(1) = bw_alloc;
-                        params.scs_sub6(2) = Band - bw_alloc;
-                        % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
-                        user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);     
-                        sub6ConnectionState(ue_idx) = 1;
-                        user_sc_alloc(find(sub6ConnectionState),1) = 1;
-                        user_sc_alloc(find(sub6ConnectionState),2) = 0;
-                        user_sc_alloc(ues_not_affected,1) = 1;
-                        user_sc_alloc(ues_not_affected,2) = 1;
-                        user_sc_alloc(params.ue_rearranged,1) = 0;
-                        user_sc_alloc(params.ue_rearranged,2) = 1;
-                        params.user_sc_alloc = user_sc_alloc;
-                        ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
-%                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
-                        rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
-                        % Band = params.Band;
-                        % params.Band = bw_alloc;
-                        % rate_dl_after_handoff_mmW_only = compute_link_rates_MIMO_mmW_only(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);  
-                        % params.Band = Band;
-                        % rate_dl_after_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                                 
-%                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
-%                         if rate_dl(ue_idx) >= r_min(ue_idx)
-%                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs(2:end)) - rate_dl(ue_idxs(2:end))) <= rate_reduce_threshold)
-%                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl(ue_idxs_affected)) <= rate_reduce_threshold)
-                        % rate_dip_affected = mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl_after_handoff(ue_idxs_affected));
-%                         lb = mean(rate_dl_after_handoff(ue_idxs_affected)) - std(rate_dl_after_handoff(ue_idxs_affected));
-%                         lb = quantile(rate_dl_after_handoff(ue_idxs_affected),params.lb_thres);
-                        % lb = quantile(rate_dl_after_handoff((1+numUE):end),params.lb_thres);
-                        lb = quantile(rate_dl_after_handoff(ues_not_affected),params.lb_thres);
-                        % if (rate_dl_after_handoff_mmW_only(sub6ConnectionState==1) >= r_min)
-                        % if (rate_dl_after_handoff_mmW_only(ue_idx) >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
-                        if (all(rate_dl_after_handoff(find((1:numUE)'.*sub6ConnectionState)) >= r_min) && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
-%                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
-                            UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
-                            UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
-                            UE.sub6ConnectionState(ue_idx) = 1;
-                            UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
-%                         else
-%                             params.D = D_old;
-                        end
-                    end
-                    %BS didnt recover now we declare beam faiure and go to
-                    % either MCG recovery route or go to Beam Failure route
-                    % If we have secondary BS in connected mode
-                    if UE.secondaryConnectionState(ue_idx) == 1
-                        UE.primaryConnectionState(ue_idx) = 5;
+                    UE.primaryEventDescriptions = [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryGotBlocked-NotDetectedYet-MeasurementsGoingOn-DataplaneInterruption'}];
+                end
+            elseif UE.primaryConnectionState(ue_idx) == 3
+                if UE.primaryNextEventTime(ue_idx) == currentTime
+                    idxPrimaryBS = UE.primaryBSIdx(ue_idx);
+                    isBSRecovered = link{ue_idx,idxPrimaryBS}.blockageStatus;
+                    if isBSRecovered
+                        UE.primaryConnectionState(ue_idx) = 1;
                         UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                        UE.primaryNextEventTime(ue_idx) = currentTime + UE.RACH_eff;
-                        UE.tmpMCGBSIdx(ue_idx) = UE.secondaryBSIdx(ue_idx);
-                        % In order to give this BS a priority in the future
-                        lastConnectedBS = UE.primaryBSHistory(ue_idx,end);
-                        bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
-                        [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
-                        % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
+                        UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
+                        UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
+                        if UE.sub6ConnectionState(ue_idx) == 1
+                            UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
+                            UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
+                            UE.sub6ConnectionState(ue_idx) = 0;
+                            UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+                        end
+                        UE.primaryBSIdx(ue_idx) = idxPrimaryBS;
+                        UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
+                        next_blockage = link{ue_idx,idxPrimaryBS}.discoveredTimes(3,find(link{ue_idx,idxPrimaryBS}.discoveredTimes(3,:)> currentTime,1));
+                        UE.primaryNextEventTime(ue_idx) = next_blockage;
+                        UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
+                        UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
+                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone-Recovered-b4-BFDT-expired-No-Failure-ReconnectedWithoutDelays'}];
+                    else
+                        if UE.sub6ConnectionState(ue_idx) == 1
+                            disp("Some problem")
+                        else                        
+                            sub6ConnectionState = UE.sub6ConnectionState;
+                            [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+                            % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+    %                         rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                         
+    %                         rate_dl_before_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            % rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+                            % rate_dl_before_handoff_old = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
+    %                         if (sub6ConnectionState == zeros(params.numUE,1))
+    %                             p_fac = params.p_fac;
+    %                             params.p_fac = 0;
+    %                         end
+    %                         rate_dl_before_handoff = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);    
+    %                         if (sub6ConnectionState == zeros(params.numUE,1))
+    %                             params.p_fac = p_fac;
+    %                         end
+    %                         D_old = params.D;
+    %                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                            [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                            params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
+                            ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
+                            rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));                                              
+                            lb = quantile(rate_dl_before_handoff(params.ue_rearranged)./params.Band,params.lb_thres);
+                            bw_alloc = Band - r_min_sub6/lb;
+                            params.scs_sub6(1) = bw_alloc;
+                            params.scs_sub6(2) = Band - bw_alloc;
+                            % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
+                            user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);     
+                            sub6ConnectionState(ue_idx) = 1;
+                            user_sc_alloc(find(sub6ConnectionState),1) = 1;
+                            user_sc_alloc(find(sub6ConnectionState),2) = 0;
+                            user_sc_alloc(ues_not_affected,1) = 1;
+                            user_sc_alloc(ues_not_affected,2) = 1;
+                            user_sc_alloc(params.ue_rearranged,1) = 0;
+                            user_sc_alloc(params.ue_rearranged,2) = 1;
+                            params.user_sc_alloc = user_sc_alloc;
+                            ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
+    %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
+                            rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
+                            % Band = params.Band;
+                            % params.Band = bw_alloc;
+                            % rate_dl_after_handoff_mmW_only = compute_link_rates_MIMO_mmW_only(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);  
+                            % params.Band = Band;
+                            % rate_dl_after_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                                 
+    %                         if ((rate_dl(ue_idx) >= r_min(ue_idx)) && all(rate_dl(1+numUE:numUE+numUE_sub6) >= r_min_sub6))
+    %                         if rate_dl(ue_idx) >= r_min(ue_idx)
+    %                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs(2:end)) - rate_dl(ue_idxs(2:end))) <= rate_reduce_threshold)
+    %                         if rate_dl(ue_idx) >= r_min(ue_idx) && (mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl(ue_idxs_affected)) <= rate_reduce_threshold)
+                            % rate_dip_affected = mean(rate_dl_before_handoff(ue_idxs_affected) - rate_dl_after_handoff(ue_idxs_affected));
+    %                         lb = mean(rate_dl_after_handoff(ue_idxs_affected)) - std(rate_dl_after_handoff(ue_idxs_affected));
+    %                         lb = quantile(rate_dl_after_handoff(ue_idxs_affected),params.lb_thres);
+                            % lb = quantile(rate_dl_after_handoff((1+numUE):end),params.lb_thres);
+                            lb = quantile(rate_dl_after_handoff(ues_not_affected),params.lb_thres);
+                            % if (rate_dl_after_handoff_mmW_only(sub6ConnectionState==1) >= r_min)
+                            % if (rate_dl_after_handoff_mmW_only(ue_idx) >= r_min) % || (rate_dl_after_handoff(ue_idx) >= r_min && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
+                            if (all(rate_dl_after_handoff(find((1:numUE)'.*sub6ConnectionState)) >= r_min) && (lb >= r_min_sub6)) %&& (rate_dip_affected <= rate_reduce_threshold) 
+    %                             UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
+                                UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
+                                UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
+                                UE.sub6ConnectionState(ue_idx) = 1;
+                                UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+    %                         else
+    %                             params.D = D_old;
+                            end
+                        end
+                        %BS didnt recover now we declare beam faiure and go to
+                        % either MCG recovery route or go to Beam Failure route
+                        % If we have secondary BS in connected mode
+                        if UE.secondaryConnectionState(ue_idx) == 1
+                            UE.primaryConnectionState(ue_idx) = 5;
+                            UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+                            UE.primaryNextEventTime(ue_idx) = currentTime + UE.RACH_eff;
+                            UE.tmpMCGBSIdx(ue_idx) = UE.secondaryBSIdx(ue_idx);
+                            % In order to give this BS a priority in the future
+                            lastConnectedBS = UE.primaryBSHistory(ue_idx,end);
+                            bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
+                            [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
+                            % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
+                            % now event recording
+                            UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
+                            UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
+                            UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone,SecondaryBS-Available-Initate-MCG-Fail-Recovery'}];
+                        elseif UE.secondaryConnectionState(ue_idx) == 2
+                            % Cancel the RACH of secondary as now we need RACH for
+                            % primary. Secondary RACH already failed without
+                            % assitance from primary.
+                            UE.secondaryConnectionState(ue_idx) = 0;
+                            UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
+                            
+                            UE.primaryConnectionState(ue_idx) = 2;
+                            UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+                            
+                            UE.primaryTargetIdx(ue_idx) = UE.secondaryTargetIdx(ue_idx);
+                            UE.secondaryTargetIdx(ue_idx) = 0;
+                            UE.primaryBSIdx(ue_idx) = 0;
+                            UE.primaryNextEventTime(ue_idx) = (UE.RACH_eff + currentTime);
+                            UE.secondaryNextEventTime(ue_idx) = UE.primaryNextEventTime(ue_idx) + 1e-8;
+                            UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
+                            UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
+                            UE.primaryEventDescriptions = [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementsDone,SecondaryRACH-Aborted,now-the-sameBS used as primary RACH.'}];
+                        else
+                            UE.primaryConnectionState(ue_idx) = 4;
+                            UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+                            UE.primaryNextEventTime(ue_idx) = currentTime + UE.beamFailureRecoveryTimer;
+                            % In order to give this BS a priority in the future
+                            lastConnectedBS = UE.primaryBSHistory(ue_idx,end);
+                            bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
+                            [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
+                            % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
+                            % now event recording
+                            UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
+                            UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
+                            UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone,-No-Secondary-BS-Available-4-MCG-Failure-Recovery,-Declared-Beam-Failure-going2-BeamRecovery'}];
+                        end
+                    end            
+                end
+            elseif UE.primaryConnectionState(ue_idx) == 4
+                if UE.primaryNextEventTime(ue_idx) == currentTime
+                    idxPrimaryBS = UE.primaryBSIdx(ue_idx);
+                    % if isempty( idxPrimaryBS )
+                    if idxPrimaryBS==0
+                        isBSRecovered = false;
+                    else
+                        isBSRecovered = link{ue_idx,idxPrimaryBS}.blockageStatus;
+                    end
+                    if isBSRecovered
+                        if link{ue_idx,idxPrimaryBS}.blockageStatus %&& link{idxPrimaryBS}.discovery_state
+                            UE.primaryConnectionState(ue_idx) = 2;
+                            UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+                            UE.primaryTargetIdx(ue_idx) = idxPrimaryBS;
+                            UE.primaryNextEventTime(ue_idx) = currentTime + UE.RACH_eff;
+                            link{ue_idx,idxPrimaryBS}.nextEventTime = currentTime + UE.RACH_eff;
+                            % now event recording
+                            UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
+                            UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
+                            UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': Recovered-b4-RLF-expired-(Re)Connecting-to-BS'}];
+                        else
+                            disp('Arrived this line something might be wrong. DEBUG')
+                        end
+                    else
+                        %Declare RLF to go idle state
+                        UE.primaryConnectionState(ue_idx) = 0;
+                        UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+                        UE.primaryBSIdx(ue_idx) = 0;
                         % now event recording
                         UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
                         UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone,SecondaryBS-Available-Initate-MCG-Fail-Recovery'}];
-                    elseif UE.secondaryConnectionState(ue_idx) == 2
-                        % Cancel the RACH of secondary as now we need RACH for
-                        % primary. Secondary RACH already failed without
-                        % assitance from primary.
+                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'Declared-RLF-Going2-NonConnectedState-CanConnect-any-available-BS'}];
+                    end
+                end
+            elseif UE.primaryConnectionState(ue_idx) == 5
+                if UE.primaryNextEventTime(ue_idx) == currentTime
+                    tmpMCGBSIdx = UE.tmpMCGBSIdx(ue_idx);
+                    if link{ue_idx,tmpMCGBSIdx}.blockageStatus && link{ue_idx,tmpMCGBSIdx}.discovery_state
+                        %Remove from secondary
                         UE.secondaryConnectionState(ue_idx) = 0;
                         UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                        
-                        UE.primaryConnectionState(ue_idx) = 2;
+                        UE.secondaryBSIdx(ue_idx) = 0;
+                        UE.secondaryConnectionEnds = [UE.secondaryConnectionEnds, currentTime];
+                        UE.secondaryConnectionEndIndices = [UE.secondaryConnectionEndIndices, ue_idx];
+                        UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
+                        UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
+                        UE.secondaryEventDescriptions = [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': primaryBlocked-and-Secondary-Changed-to-Primary'}];
+                        % Add to primary
+                        UE.primaryConnectionState(ue_idx) = 1;
                         UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                        
-                        UE.primaryTargetIdx(ue_idx) = UE.secondaryTargetIdx(ue_idx);
-                        UE.secondaryTargetIdx(ue_idx) = 0;
-                        UE.primaryBSIdx(ue_idx) = 0;
-                        UE.primaryNextEventTime(ue_idx) = (UE.RACH_eff + currentTime);
-                        UE.secondaryNextEventTime(ue_idx) = UE.primaryNextEventTime(ue_idx) + 1e-8;
+                        UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
+                        UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
+                        if UE.sub6ConnectionState(ue_idx) == 1
+                            UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
+                            UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
+                            UE.sub6ConnectionState(ue_idx) = 0;
+                            UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+                        end
+                        UE.primaryBSIdx(ue_idx) = tmpMCGBSIdx;
+                        UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
+                        next_blockage = link{ue_idx,tmpMCGBSIdx}.discoveredTimes(3,find(link{ue_idx,tmpMCGBSIdx}.discoveredTimes(3,:)> currentTime,1));
+                        UE.primaryNextEventTime(ue_idx) = next_blockage;
                         UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
                         UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                        UE.primaryEventDescriptions = [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementsDone,SecondaryRACH-Aborted,now-the-sameBS used as primary RACH.'}];
+                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryGotBlocked-Secondary-Become-Primary-BS-Completed'}];
                     else
+                        %Secondary BS also have problems, so try recovery with the
+                        %primary
                         UE.primaryConnectionState(ue_idx) = 4;
                         UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
                         UE.primaryNextEventTime(ue_idx) = currentTime + UE.beamFailureRecoveryTimer;
@@ -437,90 +527,8 @@ while nextEventTime < params.simTime
                         % now event recording
                         UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
                         UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': MeasurementDone,-No-Secondary-BS-Available-4-MCG-Failure-Recovery,-Declared-Beam-Failure-going2-BeamRecovery'}];
+                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': Secondary BS also have problems, couldnt transfer secondary to primary. Trying BFR with primary.'}];
                     end
-                end            
-            end
-        elseif UE.primaryConnectionState(ue_idx) == 4
-            if UE.primaryNextEventTime(ue_idx) == currentTime
-                idxPrimaryBS = UE.primaryBSIdx(ue_idx);
-                % if isempty( idxPrimaryBS )
-                if idxPrimaryBS==0
-                    isBSRecovered = false;
-                else
-                    isBSRecovered = link{ue_idx,idxPrimaryBS}.blockageStatus;
-                end
-                if isBSRecovered
-                    if link{ue_idx,idxPrimaryBS}.blockageStatus %&& link{idxPrimaryBS}.discovery_state
-                        UE.primaryConnectionState(ue_idx) = 2;
-                        UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                        UE.primaryTargetIdx(ue_idx) = idxPrimaryBS;
-                        UE.primaryNextEventTime(ue_idx) = currentTime + UE.RACH_eff;
-                        link{ue_idx,idxPrimaryBS}.nextEventTime = currentTime + UE.RACH_eff;
-                        % now event recording
-                        UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
-                        UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': Recovered-b4-RLF-expired-(Re)Connecting-to-BS'}];
-                    else
-                        disp('Arrived this line something might be wrong. DEBUG')
-                    end
-                else
-                    %Declare RLF to go idle state
-                    UE.primaryConnectionState(ue_idx) = 0;
-                    UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                    UE.primaryBSIdx(ue_idx) = 0;
-                    % now event recording
-                    UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
-                    UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                    UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'Declared-RLF-Going2-NonConnectedState-CanConnect-any-available-BS'}];
-                end
-            end
-        elseif UE.primaryConnectionState(ue_idx) == 5
-            if UE.primaryNextEventTime(ue_idx) == currentTime
-                tmpMCGBSIdx = UE.tmpMCGBSIdx(ue_idx);
-                if link{ue_idx,tmpMCGBSIdx}.blockageStatus && link{ue_idx,tmpMCGBSIdx}.discovery_state
-                    %Remove from secondary
-                    UE.secondaryConnectionState(ue_idx) = 0;
-                    UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                    UE.secondaryBSIdx(ue_idx) = 0;
-                    UE.secondaryConnectionEnds = [UE.secondaryConnectionEnds, currentTime];
-                    UE.secondaryConnectionEndIndices = [UE.secondaryConnectionEndIndices, ue_idx];
-                    UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
-                    UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                    UE.secondaryEventDescriptions = [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': primaryBlocked-and-Secondary-Changed-to-Primary'}];
-                    % Add to primary
-                    UE.primaryConnectionState(ue_idx) = 1;
-                    UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                    UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
-                    UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
-                    if UE.sub6ConnectionState(ue_idx) == 1
-                        UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
-                        UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
-                        UE.sub6ConnectionState(ue_idx) = 0;
-                        UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
-                    end
-                    UE.primaryBSIdx(ue_idx) = tmpMCGBSIdx;
-                    UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
-                    next_blockage = link{ue_idx,tmpMCGBSIdx}.discoveredTimes(3,find(link{ue_idx,tmpMCGBSIdx}.discoveredTimes(3,:)> currentTime,1));
-                    UE.primaryNextEventTime(ue_idx) = next_blockage;
-                    UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
-                    UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                    UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryGotBlocked-Secondary-Become-Primary-BS-Completed'}];
-                else
-                    %Secondary BS also have problems, so try recovery with the
-                    %primary
-                    UE.primaryConnectionState(ue_idx) = 4;
-                    UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                    UE.primaryNextEventTime(ue_idx) = currentTime + UE.beamFailureRecoveryTimer;
-                    % In order to give this BS a priority in the future
-                    lastConnectedBS = UE.primaryBSHistory(ue_idx,end);
-                    bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
-                    [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
-                    % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
-                    % now event recording
-                    UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
-                    UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                    UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': Secondary BS also have problems, couldnt transfer secondary to primary. Trying BFR with primary.'}];
                 end
             end
         end
@@ -528,39 +536,41 @@ while nextEventTime < params.simTime
     %Now conection establishment start or end procedures
     %Let's start with primary
     for ue_idx = 1:numUE
-        if UE.primaryConnectionState(ue_idx) == 0
-            % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
-            UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
-        elseif UE.primaryConnectionState(ue_idx) == 2
-            if UE.primaryNextEventTime(ue_idx) == currentTime
-                idxBS = UE.primaryTargetIdx(ue_idx);
-                if link{ue_idx,idxBS}.discovery_state
-                    UE.primaryConnectionState(ue_idx) = 1;
-                    UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                    UE.primaryTargetIdx(ue_idx) = 0;
-                    UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
-                    UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
-                    if UE.sub6ConnectionState(ue_idx) == 1
-                        UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
-                        UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
-                        UE.sub6ConnectionState(ue_idx) = 0;
-                        UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+        if (numBS_mobile(ue_idx) > 0)
+            if UE.primaryConnectionState(ue_idx) == 0
+                % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+            elseif UE.primaryConnectionState(ue_idx) == 2
+                if UE.primaryNextEventTime(ue_idx) == currentTime
+                    idxBS = UE.primaryTargetIdx(ue_idx);
+                    if link{ue_idx,idxBS}.discovery_state
+                        UE.primaryConnectionState(ue_idx) = 1;
+                        UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+                        UE.primaryTargetIdx(ue_idx) = 0;
+                        UE.primaryConnectionStarts = [UE.primaryConnectionStarts, currentTime];
+                        UE.primaryConnectionStartIndices = [UE.primaryConnectionStartIndices, ue_idx];
+                        if UE.sub6ConnectionState(ue_idx) == 1
+                            UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, currentTime];
+                            UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
+                            UE.sub6ConnectionState(ue_idx) = 0;
+                            UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+                        end
+                        UE.primaryBSIdx(ue_idx) = idxBS;
+                        UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
+                        next_blockage = link{ue_idx,idxBS}.discoveredTimes(3,find(link{ue_idx,idxBS}.discoveredTimes(3,:)> currentTime,1));
+                        UE.primaryNextEventTime(ue_idx) = next_blockage;
+                        UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
+                        UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
+                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryRachCompleted-Connected'}];
+                    else
+                        UE.primaryConnectionState(ue_idx) = 0;
+                        UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
+                        UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
+                        UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
+                        UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryRachFailed-NotConnected-go2-Idle-State-Can-Try-another-BS'}];
+                        % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                        UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
                     end
-                    UE.primaryBSIdx(ue_idx) = idxBS;
-                    UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
-                    next_blockage = link{ue_idx,idxBS}.discoveredTimes(3,find(link{ue_idx,idxBS}.discoveredTimes(3,:)> currentTime,1));
-                    UE.primaryNextEventTime(ue_idx) = next_blockage;
-                    UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
-                    UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                    UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryRachCompleted-Connected'}];
-                else
-                    UE.primaryConnectionState(ue_idx) = 0;
-                    UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
-                    UE.primaryEventTimes = [UE.primaryEventTimes; currentTime];
-                    UE.primaryEventIndices = [UE.primaryEventIndices; ue_idx];
-                    UE.primaryEventDescriptions =  [UE.primaryEventDescriptions; {'UE '+string(ue_idx)+': primaryRachFailed-NotConnected-go2-Idle-State-Can-Try-another-BS'}];
-                    % UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
-                    UE = tryPrimaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
                 end
             end
         end
@@ -568,33 +578,35 @@ while nextEventTime < params.simTime
 
         %Secondary Connection Establishment Procedures
     for ue_idx = 1:numUE
-        if UE.secondaryConnectionState(ue_idx) == 0
-            % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
-            UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
-        elseif UE.secondaryConnectionState(ue_idx) == 2
-            if UE.secondaryNextEventTime(ue_idx) == currentTime
-                idxBS = UE.secondaryTargetIdx(ue_idx);
-                if link{ue_idx,idxBS}.discovery_state
-                    UE.secondaryConnectionState(ue_idx) = 1;
-                    UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                    UE.secondaryTargetIdx(ue_idx) = 0;
-                    UE.secondaryConnectionStarts = [UE.secondaryConnectionStarts, currentTime];
-                    UE.secondaryConnectionStartIndices = [UE.secondaryConnectionStartIndices, ue_idx];
-                    UE.secondaryBSIdx(ue_idx) = idxBS;
-                    UE.secondaryBSHistory = [UE.secondaryBSHistory, UE.secondaryBSIdx];
-                    next_blockage = link{ue_idx,idxBS}.discoveredTimes(3,find(link{ue_idx,idxBS}.discoveredTimes(3,:)> currentTime,1));
-                    UE.secondaryNextEventTime(ue_idx) = next_blockage;
-                    UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
-                    UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                    UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': secondaryRachCompleted-Connected'}];
-                else
-                    UE.secondaryConnectionState(ue_idx) = 0;
-                    UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
-                    UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
-                    UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
-                    UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': secondaryRachFailed-NotConnected-go2-Idle-State-Can-Try-another-BS'}];
-                    % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
-                    UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+        if (numBS_mobile(ue_idx) > 0)
+            if UE.secondaryConnectionState(ue_idx) == 0
+                % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+            elseif UE.secondaryConnectionState(ue_idx) == 2
+                if UE.secondaryNextEventTime(ue_idx) == currentTime
+                    idxBS = UE.secondaryTargetIdx(ue_idx);
+                    if link{ue_idx,idxBS}.discovery_state
+                        UE.secondaryConnectionState(ue_idx) = 1;
+                        UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
+                        UE.secondaryTargetIdx(ue_idx) = 0;
+                        UE.secondaryConnectionStarts = [UE.secondaryConnectionStarts, currentTime];
+                        UE.secondaryConnectionStartIndices = [UE.secondaryConnectionStartIndices, ue_idx];
+                        UE.secondaryBSIdx(ue_idx) = idxBS;
+                        UE.secondaryBSHistory = [UE.secondaryBSHistory, UE.secondaryBSIdx];
+                        next_blockage = link{ue_idx,idxBS}.discoveredTimes(3,find(link{ue_idx,idxBS}.discoveredTimes(3,:)> currentTime,1));
+                        UE.secondaryNextEventTime(ue_idx) = next_blockage;
+                        UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
+                        UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
+                        UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': secondaryRachCompleted-Connected'}];
+                    else
+                        UE.secondaryConnectionState(ue_idx) = 0;
+                        UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
+                        UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
+                        UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
+                        UE.secondaryEventDescriptions =  [UE.secondaryEventDescriptions; {'UE '+string(ue_idx)+': secondaryRachFailed-NotConnected-go2-Idle-State-Can-Try-another-BS'}];
+                        % UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx);
+                        UE = trySecondaryConnecting(UE,currentTime,link,bsPriorities,bsLastConnectionTimes,ue_idx,numBS_mobile);
+                    end
                 end
             end
         end
