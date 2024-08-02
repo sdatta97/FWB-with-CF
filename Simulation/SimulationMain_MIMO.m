@@ -69,6 +69,7 @@ params.simTime = 60*60; %sec Total Simulation time should be more than 100.
 % center and gNBs are distributed around the UE. We only need to consider
 % the coverageRange amount of distance from the UE.
 params.deployRange = 300; %20:20:100;
+params.deployRange_sub6 = 1000;
 params.coverageRange = 100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
@@ -127,13 +128,15 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         % while (n==0)
         %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange/1000)^2);       
         % end
-        n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        while (n==0)
-            n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
-        end
-        params.numGNB = n;
+        % n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        % while (n==0)
+        %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
+        % end
+        % params.numGNB = n;
+        params.numGNB = ceil(lambda_BS(idxBSDensity)*pi*(params.deployRange_sub6/1000)^2);
         % params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
-        params.RgNB = params.coverageRange_sub6 * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+        % params.RgNB = params.coverageRange_sub6 * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+        params.RgNB = params.deployRange_sub6 * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (params.deployRange+params.coverageRange) * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
         params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
