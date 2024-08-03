@@ -28,10 +28,10 @@ ht = params.ht;
 distancesBS = sqrt(sum((params.locationsBS - repmat(UE_location,[params.numGNB,1])).^2,2));
 locationsBS = params.locationsBS(find(distancesBS < params.coverageRange),:);
 nBS = size(locationsBS,1);
-if (nBS == 0)
-    dataBS = [];
-    return;
-end
+% if (nBS == 0)
+    % dataBS = [];
+    % return;
+% end
 
 V=params.V;
 hb = params.hb;

@@ -70,7 +70,7 @@ params.simTime = 60*60; %sec Total Simulation time should be more than 100.
 % the coverageRange amount of distance from the UE.
 params.deployRange = 300; %20:20:100;
 params.deployRange_sub6 = 1000;
-params.coverageRange = 100;
+params.coverageRange = 125*sqrt(2); %100;
 length_area = 2*params.coverageRange;   
 width_area = 2*params.coverageRange;
 % length_area = 2*(params.deployRange + params.coverageRange);   
@@ -133,14 +133,17 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         %     n = poissrnd(lambda_BS(idxBSDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         % end
         % params.numGNB = n;
-        params.numGNB = ceil(lambda_BS(idxBSDensity)*pi*(params.deployRange_sub6/1000)^2);
+        params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
         % params.RgNB = params.coverageRange * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = params.coverageRange_sub6 * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
-        params.RgNB = params.deployRange_sub6 * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
+        % params.RgNB = params.deployRange_sub6 * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (params.deployRange+params.coverageRange) * sqrt(rand(params.numGNB,1)); %location of gNBs (distance from origin)
         % params.RgNB = (2*params.coverageRange/3) * ones(params.numGNB,1); %location of gNBs (distance from origin)
-        params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
-        params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+        % params.angleGNB = 2*pi*rand(params.numGNB,1);%location of gNBs (angle from x-axis)
+        params.xGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
+        params.yGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
+        % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+        params.locationsBS = (combvec(params.xGNB,params.yGNB)).';
                 %Length of the coherence block
 %                 params.tau_c = 200;
             
