@@ -354,7 +354,7 @@ while nextEventTime < params.simTime
                             [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
                             ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
                             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));                                              
-                            lb = quantile(rate_dl_before_handoff(params.ue_rearranged)./params.Band,params.lb_thres);
+                            lb = quantile(rate_dl_before_handoff(ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - r_min_sub6/lb;
                             if (bw_alloc < 0) || isnan(bw_alloc)
                                 bw_alloc = 0;
