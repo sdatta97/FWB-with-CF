@@ -356,7 +356,7 @@ while nextEventTime < params.simTime
                             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));                                              
                             lb = quantile(rate_dl_before_handoff(ue_rearranged)./params.Band,params.lb_thres);
                             bw_alloc = Band - r_min_sub6/lb;
-                            if (bw_alloc < 0) || isnan(bw_alloc)
+                            if (bw_alloc < 0) %|| isnan(bw_alloc)
                                 bw_alloc = 0;
                                 params.p_fac = 1;
                                 rate_dl_after_handoff = rate_dl_before_handoff;

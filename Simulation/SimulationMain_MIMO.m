@@ -11,7 +11,7 @@ if (isempty(aID))
 end
 if(isempty(aID))
     warning('aID is empty. Replacing it with 0010.')
-    aID = '0098';
+    aID = '0022';
 end
 %RNG seed.
 rng(str2double(aID),'twister');
