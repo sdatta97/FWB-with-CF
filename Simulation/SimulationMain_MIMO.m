@@ -92,12 +92,11 @@ params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 params.N_UE_mmW = 1; %8;
 params.N_UE_sub6 = 1; %4;
 rmin_arr = 4*10^8;
-% lambda_BS = 50:50:200;%densityBS
-lambda_BS = ([2 3 4 6]).^2;
+lambda_BS = ([6 7 8 9 10]).^2;
 % num_BS_arr = [2,5,10,20]; %densityBS
 % numUE_sub6_arr = 2:2:10;
 % numUE_sub6_arr = 10;
-lambda_UE_sub6 = 500; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 1000; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.loss_pc_thresh = 10;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
@@ -221,17 +220,17 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         % self_blockage = 5/6;
         
         %% Mobile blockage events
-        tic
-        numBS_mobile = [];
-        dataBS_mobile = [];
-        for i = 1:(params.numUE)
-            % dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
-            [dataBS, nBS] = computeBlockageEvents(params,i);
-            dataBS_mobile = [dataBS_mobile; dataBS];
-            numBS_mobile = [numBS_mobile; nBS];
-        end
-
-        fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
+        % tic
+        % numBS_mobile = [];
+        % dataBS_mobile = [];
+        % for i = 1:(params.numUE)
+        %     % dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
+        %     [dataBS, nBS] = computeBlockageEvents(params,i);
+        %     dataBS_mobile = [dataBS_mobile; dataBS];
+        %     numBS_mobile = [numBS_mobile; nBS];
+        % end
+        % 
+        % fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
         %% Simulation FR1 setup
 
         for idxUEDensity = 1:length(lambda_UE_sub6)
