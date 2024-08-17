@@ -221,16 +221,16 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         
         %% Mobile blockage events
         % tic
-        % numBS_mobile = [];
-        % dataBS_mobile = [];
-        % for i = 1:(params.numUE)
-        %     % dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
-        %     [dataBS, nBS] = computeBlockageEvents(params,i);
-        %     dataBS_mobile = [dataBS_mobile; dataBS];
-        %     numBS_mobile = [numBS_mobile; nBS];
-        % end
-        % 
-        % fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
+        numBS_mobile = [];
+        dataBS_mobile = [];
+        for i = 1:(params.numUE)
+            % dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
+            [dataBS, nBS] = computeBlockageEvents(params,i);
+            dataBS_mobile = [dataBS_mobile; dataBS];
+            numBS_mobile = [numBS_mobile; nBS];
+        end
+
+        fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
         %% Simulation FR1 setup
 
         for idxUEDensity = 1:length(lambda_UE_sub6)
