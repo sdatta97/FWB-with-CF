@@ -354,7 +354,7 @@ while nextEventTime < params.simTime
                             [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
                             ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
                             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));                                              
-                            lb = quantile(rate_dl_before_handoff(ue_rearranged)./params.Band,params.lb_thres);
+                            lb = quantile(rate_dl_before_handoff(ue_rearranged)./params.Band,params.loss_pc_thresh);
                             bw_alloc = Band - r_min_sub6/lb;
                             if (bw_alloc < 0) %|| isnan(bw_alloc)
                                 bw_alloc = 0;
@@ -362,7 +362,7 @@ while nextEventTime < params.simTime
                                 rate_dl_after_handoff = rate_dl_before_handoff;
                             elseif isnan(bw_alloc)
                                 rate_dl_after_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
-                                lb = quantile(rate_dl_after_handoff((1+numUE):(numUE+numUE_sub6)),params.lb_thres);                                
+                                lb = quantile(rate_dl_after_handoff((1+numUE):(numUE+numUE_sub6)),params.loss_pc_thresh);                                
                             else 
                                 params.ue_rearranged = ue_rearranged;
                                 ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
@@ -381,7 +381,7 @@ while nextEventTime < params.simTime
         %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
                                 rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);    
                                 ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
-                                lb = quantile(rate_dl_after_handoff(ues_not_affected),params.lb_thres);
+                                lb = quantile(rate_dl_after_handoff(ues_not_affected),params.loss_pc_thresh);
                             end
                             if (all(rate_dl_after_handoff(find((1:numUE)'.*sub6ConnectionState)) >= r_min) && (lb >= r_min_sub6))
                                 UE.sub6ConnectionStarts = [UE.sub6ConnectionStarts, currentTime];
