@@ -2,7 +2,7 @@
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
 % projectdir = '/Users/sdatta/FWB-with-CF/Simulation/resultData/impactResults';
-projectdir = '/Users/sdatta/Desktop/data/multiUEsqgridBS_small/outageResults/lambda_750';
+projectdir = '/Users/sdatta/Desktop/data/multiUEsqgridBS_varyBSdensity/lambda_100';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
@@ -30,5 +30,5 @@ end
 
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std','median'});
 
-writetable(summaryTable,'./outage_multi_UE_sqgridBS_fr1_ue_density_750_small.txt')
-writetable(summaryTable,'./outage_multi_UE_sqgridBS_fr1_ue_density_750_small.csv')
+writetable(summaryTable,'./outage_multi_UE_sqgridBS_bs_density_100.txt')
+writetable(summaryTable,'./outage_multi_UE_sqgridBS_bs_density_100.csv')
