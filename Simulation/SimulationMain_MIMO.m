@@ -92,10 +92,10 @@ params.N_UE_mmW = 1; %8;
 params.N_UE_sub6 = 1; %4;
 rmin_arr = 4*10^8;
 lambda_BS = 25; %([6 7 8 9 10]).^2;
-lambda_UE_sub6 = 1000; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 500; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-lb_thresh = [0:0.05:0.1 1]; %0.1; %[0.1, 0.25, 0.5];
+lb_thresh = [0:0.05:0.1 0.5 1]; %0.1; %[0.1, 0.25, 0.5];
 for idxnumUE = 1:length(percent_fr2_UE_arr)
     % n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     % while(n==0)
