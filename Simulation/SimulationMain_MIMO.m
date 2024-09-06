@@ -56,7 +56,7 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
-percent_fr2_UE_arr = 5; %5:5:20;
+percent_fr2_UE_arr = 5:5:20;
 
 %Prepare to save simulation results
 
@@ -92,18 +92,18 @@ params.N_UE_mmW = 1; %8;
 params.N_UE_sub6 = 1; %4;
 rmin_arr = 4*10^8;
 lambda_BS = 25; %([6 7 8 9 10]).^2;
-lambda_UE_sub6 = 500; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 250; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
-lb_thresh = [0:0.05:0.1 0.5 1]; %0.1; %[0.1, 0.25, 0.5];
+lb_thresh = 0.1; %[0.1, 0.25, 0.5]; [0:0.05:0.1 0.5 1];
 for idxnumUE = 1:length(percent_fr2_UE_arr)
     % n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     % while(n==0)
     %     n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     % end
     % params.numUE = n;
-    % params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-    params.numUE = 20;
+    params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    % params.numUE = 20;
     %%UE location
     deployRange = params.deployRange; %(idxdeployRange);
     params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
@@ -215,10 +215,11 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         for idxUEDensity = 1:length(lambda_UE_sub6)
             params.ue_rearranged = [];        
             %%UE locations
-            n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-            while (n==0)
-                n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
-            end
+            % n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+            % while (n==0)
+            %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
+            % end
+            n = ceil(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
             params.numUE_sub6 = n;
             % params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
             % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
