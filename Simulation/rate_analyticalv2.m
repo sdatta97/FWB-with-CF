@@ -1,5 +1,5 @@
 function rate_dl = rate_analyticalv2(params,sub6ConnectionState)
-M = params.numGNB_sub6;
+M = params.numGNB;
 K_mmW = params.numUE;
 K = params.numUE + params.numUE_sub6;
 TAU_FAC = params.preLogFactor;
