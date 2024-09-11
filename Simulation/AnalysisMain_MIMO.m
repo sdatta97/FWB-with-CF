@@ -292,10 +292,10 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                             plos(k) = prod(plos2(idx_max(:,k),k),1);
                                         end
                                         % rate_dl = rate_analytical(params);
-                                        for ue_idx = 1:params.numUE
+                                        for ue_idx = 1:numUE
                                            % plos3 = pLoS3(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
                                            % plos4 = pLoS4(params.locationsBS, params.UE_locations(k,:), theta,omega,psi,idx_max);
-                                           [pos3, tos3] = pLoS3(params.locationsBS(numBS*(ue_idx-1)+1:numBS*ue_idx,:), params.UE_locations(ue_idx,:), theta,omega,psi,idx_max);
+                                           [pos3, tos3] = pLoS3(params.locationsBS, params.UE_locations(ue_idx,:), theta,omega,psi,idx_max);
                                            sub6ConnectionState = zeros(params.numUE,1);
                                            rate_dl_before_handoff = real(rate_analytical(params,sub6ConnectionState));
                                            [~, params.ue_rearranged] = AP_reassign(params,ue_idx);
