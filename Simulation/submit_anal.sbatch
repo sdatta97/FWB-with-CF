@@ -7,7 +7,7 @@
 #SBATCH --error=./logs/%a_%A.err
 
 
-#SBATCH --job-name=FWB
+#SBATCH --job-name=FWB_ANAL
 #SBATCH --mail-type=END
 #SBATCH --mail-user=sd3927@nyu.edu
 
