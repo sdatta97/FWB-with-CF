@@ -56,7 +56,7 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
-percent_fr2_UE_arr = 5:5:20;
+percent_fr2_UE_arr = 5; %5:5:20;
 
 %Prepare to save simulation results
 
@@ -91,8 +91,8 @@ params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 params.N_UE_mmW = 1; %8;
 params.N_UE_sub6 = 1; %4;
 rmin_arr = 4*10^8;
-lambda_BS = 25; %([6 7 8 9 10]).^2;
-lambda_UE_sub6 = 250; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_BS = ([6 7 8 9 10]).^2;
+lambda_UE_sub6 = 1000; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 lb_thresh = 0.1; %[0.1, 0.25, 0.5]; [0:0.05:0.1 0.5 1];
@@ -102,132 +102,129 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     %     n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     % end
     % params.numUE = n;
-    params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-    % params.numUE = 20;
+    % params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
+    params.numUE = 20;
     %%UE location
     deployRange = params.deployRange; %(idxdeployRange);
     params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
     params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
     params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-    for idxBSDensity = 1:length(lambda_BS)
-        %% gNB locations
-        params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
-        params.xGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
-        params.yGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
-        % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
-        params.locationsBS = (combvec(params.xGNB,params.yGNB)).';
-        params.coverageRange =  (params.deployRange_sub6/(sqrt(params.numGNB)-1))/sqrt(2);%125*sqrt(2); %100;
-        length_area = 2*params.coverageRange;   
-        width_area = 2*params.coverageRange;
-        % length_area = 2*(params.deployRange + params.coverageRange);   
-        % width_area = 2*(params.deployRange + params.coverageRange);
-        params.areaDimensions = [width_area, length_area, height_transmitter];
-                %Length of the coherence block
-%                 params.tau_c = 200;
-            
-            %Compute number of pilots per coherence block
-%                 params.tau_p = params.numUE+params.numUE_sub6;
-            
-            %Compute the prelog factor assuming only downlink data transmission
-    %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
-        params.preLogFactor = 1;
-
-        %Number of setups with random UE locations
-        params.nbrOfSetups = 100;
+    %% Simulation FR1 setup
+    for idxUEDensity = 1:length(lambda_UE_sub6)
+        params.ue_rearranged = [];        
+        %%UE locations
+        % n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        % while (n==0)
+        %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
+        % end
+        n = ceil(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        params.numUE_sub6 = n;
+        % params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+        % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+        params.RUE_sub6 = (max(sqrt(sum(params.UE_locations.^2,2)))+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+        params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
+        % params.UE_locations_sub6 =  mean(params.UE_locations,1) + [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+        params.UE_locations_sub6 =  [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+        for idxBSDensity = 1:length(lambda_BS)
+            %% gNB locations
+            params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
+            params.xGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
+            params.yGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
+            % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+            params.locationsBS = (combvec(params.xGNB,params.yGNB)).';
+            params.coverageRange =  (params.deployRange_sub6/(sqrt(params.numGNB)-1))/sqrt(2);%125*sqrt(2); %100;
+            length_area = 2*params.coverageRange;   
+            width_area = 2*params.coverageRange;
+            % length_area = 2*(params.deployRange + params.coverageRange);   
+            % width_area = 2*(params.deployRange + params.coverageRange);
+            params.areaDimensions = [width_area, length_area, height_transmitter];
+                    %Length of the coherence block
+    %                 params.tau_c = 200;
                 
-              
-        %Number of channel realizations per setup
-        params.nbrOfRealizations = 100;
-        
-        %% PHY layer params
-        params.scs_mmw = 2e9;     %not using this parameter now
-        params.scs_sub6 = [0.5*(params.Band), 0.5*(params.Band)];   %sub-6 GHz bandwidth 100 MHz
-        params.num_sc_mmw = 1;    %not using this parameter now
-        params.num_sc_sub6 = 2;   %sub-6 GHz considered as one full band                    
-        %% UE angular coverage range (full 360 coverage for now)
-        lookAngleCell{1} = [0,360];
-        
-        %% Blocker Properties and Simulation Duration
-        params.lambdaBlockers = 0.01; %How many blockers around
-        % params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
-        params.numBlockers = floor(pi*(params.coverageRange)^2*params.lambdaBlockers);
-%         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
-        params.V = 1; %velocity of blocker m/s
-        % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.
-        % params.hb = (175 + TruncatedGaussian(5, [-15,15], [1 params.numBlockers])) / 100;
-        params.hb = 1.8*ones(1,params.numBlockers); %height blocker
-        params.mu = 2; %Expected bloc dur =1/mu sec
-        
-        
-        %% Protocol Characteristics    
-        % gNB discovery time. This should include the initial beamsearch delays to
-        % establish a viable channel btw UE and a recently unblocked gNB. This can
-        % run in paralel, i.e., even when UE is connected to another gNB, UE can
-        % discover other gNB in the background.
-        % protocolParams.discovery_time = [5 20]*10^(-3);
-        protocolParams.discovery_time = 20*10^(-3);
-        
-        % in ms, measurement report trigger time. 
-        % BeamFailureMaxCount*MeasurementFrequency (10*2 = 20).
-        % How long for the measurements to trigger before the UE starts the procedure to change
-        % its gNB after it got blocked. 
-        % protocolParams.FailureDetectionTime = [2 10 20]*10^(-3); 
-        protocolParams.FailureDetectionTime = 1e-8; %20*10^(-3); 
-        % Frame delivery delay, for FR2 small subframe duration around 1 ms
-        protocolParams.frameDeliveryDelay = 0; %1*10^(-3); 
-        % in numbers, how many hops until the MCG Failure info delivered and HO initated
-        protocolParams.frameHopCount = 0; %6;
-        % RACH delay, how long it takes to setup a connection with a discovered
-        % gNB.
-        % protocolParams.connection_time = [10 20 50]*10^(-3);
-        protocolParams.connection_time = 50*10^(-3);
-        
-        % Signaling delay to start data transfer after rach is completed. Singaling
-        % to setup UE data plane path Can be modeled as addition to the RACH in our
-        % previous rotation simulations. Say Instead of RACH delay =20ms we have 
-        % real RACH delay 20ms plus a extra delay coming from signaling around 10ms
-        % protocolParams.signalingAfterRachTime = [5 10 20]*10^(-3);
-        protocolParams.signalingAfterRachTime = 0; %20*10^(-3);
-        
-        
-        %% protocol params from other paper
-        frac = (mean(params.hb)-params.hr)/(params.ht-params.hr);
-        protocolParams.theta = 2*params.V.*params.lambdaBlockers*frac/pi;
-        % density_limits = [30,40,50,60,70];      % up to how many BS in coverage area, it will be ok since poisson distr.
-        % K_list = [1,2,3,4];                      % Degree of Connectivity
-        % protocolParams.omega_list = 1./protocolParams.connection_time;
-        % self_blockage = 5/6;
-        
-        %% Mobile blockage events
-        % tic
-        numBS_mobile = [];
-        dataBS_mobile = [];
-        for i = 1:(params.numUE)
-            % dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
-            [dataBS, nBS] = computeBlockageEvents(params,i);
-            dataBS_mobile = [dataBS_mobile; dataBS];
-            numBS_mobile = [numBS_mobile; nBS];
-        end
-
-        fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)
-        %% Simulation FR1 setup
-
-        for idxUEDensity = 1:length(lambda_UE_sub6)
-            params.ue_rearranged = [];        
-            %%UE locations
-            % n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-            % while (n==0)
-            %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
-            % end
-            n = ceil(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-            params.numUE_sub6 = n;
-            % params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-            % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-            params.RUE_sub6 = (max(sqrt(sum(params.UE_locations.^2,2)))+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-            params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
-            % params.UE_locations_sub6 =  mean(params.UE_locations,1) + [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
-            params.UE_locations_sub6 =  [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+                %Compute number of pilots per coherence block
+    %                 params.tau_p = params.numUE+params.numUE_sub6;
+                
+                %Compute the prelog factor assuming only downlink data transmission
+        %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
+            params.preLogFactor = 1;
+    
+            %Number of setups with random UE locations
+            params.nbrOfSetups = 100;
+                    
+                  
+            %Number of channel realizations per setup
+            params.nbrOfRealizations = 100;
             
+            %% PHY layer params
+            params.scs_mmw = 2e9;     %not using this parameter now
+            params.scs_sub6 = [0.5*(params.Band), 0.5*(params.Band)];   %sub-6 GHz bandwidth 100 MHz
+            params.num_sc_mmw = 1;    %not using this parameter now
+            params.num_sc_sub6 = 2;   %sub-6 GHz considered as one full band                    
+            %% UE angular coverage range (full 360 coverage for now)
+            lookAngleCell{1} = [0,360];
+            
+            %% Blocker Properties and Simulation Duration
+            params.lambdaBlockers = 0.01; %How many blockers around
+            % params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+            params.numBlockers = floor(pi*(params.coverageRange)^2*params.lambdaBlockers);
+    %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
+            params.V = 1; %velocity of blocker m/s
+            % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.
+            % params.hb = (175 + TruncatedGaussian(5, [-15,15], [1 params.numBlockers])) / 100;
+            params.hb = 1.8*ones(1,params.numBlockers); %height blocker
+            params.mu = 2; %Expected bloc dur =1/mu sec
+            
+            
+            %% Protocol Characteristics    
+            % gNB discovery time. This should include the initial beamsearch delays to
+            % establish a viable channel btw UE and a recently unblocked gNB. This can
+            % run in paralel, i.e., even when UE is connected to another gNB, UE can
+            % discover other gNB in the background.
+            % protocolParams.discovery_time = [5 20]*10^(-3);
+            protocolParams.discovery_time = 20*10^(-3);
+            
+            % in ms, measurement report trigger time. 
+            % BeamFailureMaxCount*MeasurementFrequency (10*2 = 20).
+            % How long for the measurements to trigger before the UE starts the procedure to change
+            % its gNB after it got blocked. 
+            % protocolParams.FailureDetectionTime = [2 10 20]*10^(-3); 
+            protocolParams.FailureDetectionTime = 1e-8; %20*10^(-3); 
+            % Frame delivery delay, for FR2 small subframe duration around 1 ms
+            protocolParams.frameDeliveryDelay = 0; %1*10^(-3); 
+            % in numbers, how many hops until the MCG Failure info delivered and HO initated
+            protocolParams.frameHopCount = 0; %6;
+            % RACH delay, how long it takes to setup a connection with a discovered
+            % gNB.
+            % protocolParams.connection_time = [10 20 50]*10^(-3);
+            protocolParams.connection_time = 50*10^(-3);
+            
+            % Signaling delay to start data transfer after rach is completed. Singaling
+            % to setup UE data plane path Can be modeled as addition to the RACH in our
+            % previous rotation simulations. Say Instead of RACH delay =20ms we have 
+            % real RACH delay 20ms plus a extra delay coming from signaling around 10ms
+            % protocolParams.signalingAfterRachTime = [5 10 20]*10^(-3);
+            protocolParams.signalingAfterRachTime = 0; %20*10^(-3);
+            
+            
+            %% protocol params from other paper
+            frac = (mean(params.hb)-params.hr)/(params.ht-params.hr);
+            protocolParams.theta = 2*params.V.*params.lambdaBlockers*frac/pi;
+            % density_limits = [30,40,50,60,70];      % up to how many BS in coverage area, it will be ok since poisson distr.
+            % K_list = [1,2,3,4];                      % Degree of Connectivity
+            % protocolParams.omega_list = 1./protocolParams.connection_time;
+            % self_blockage = 5/6;
+            
+            %% Mobile blockage events
+            % tic
+            numBS_mobile = [];
+            dataBS_mobile = [];
+            for i = 1:(params.numUE)
+                % dataBS_mobile = [dataBS_mobile; computeBlockageEvents(params,i)];
+                [dataBS, nBS] = computeBlockageEvents(params,i);
+                dataBS_mobile = [dataBS_mobile; dataBS];
+                numBS_mobile = [numBS_mobile; nBS];
+            end
+            fprintf('Blocker generation, physical blockage and channel computation done : %f seconds\n',toc)            
             K = params.numUE + params.numUE_sub6;  % --Ground UEs
             snr_db = params.snr_db;
             ASD_VALUE = params.ASD_VALUE;
