@@ -1,0 +1,2 @@
+UE idx,lambdaBS,lambdaUE,deployRange,minRatereq,powerFac,lower_bound_thresh,mean_rate_before_handoff_affected,mean_rate_after_handoff_affected,mean_rate_before_handoff_not_affected,mean_rate_after_handoff_not_affected,rate_after_handoff_fr2
+1,25,250,300.000000,400000000.000000,10.000000,0.100000,98309224.6013127565383911,35959930.1359859481453896,97901316.9552162587642670,98366633.5215343683958054,1001446882.1936225891113281

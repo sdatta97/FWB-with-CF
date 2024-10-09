@@ -164,7 +164,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             lookAngleCell{1} = [0,360];
             
             %% Blocker Properties and Simulation Duration
-            params.lambdaBlockers = 0.1; %How many blockers around
+            params.lambdaBlockers = 0.01; %How many blockers around
             % params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
             params.numBlockers = floor(pi*(params.coverageRange)^2*params.lambdaBlockers);
     %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
