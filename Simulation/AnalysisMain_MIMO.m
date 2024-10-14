@@ -56,7 +56,7 @@ params.p = 100;
 %Power factor division
 p_fac_arr = 10; %.^(1:1:2);
 % params.p_fac = 10;
-percent_fr2_UE_arr = 5:5:20;
+percent_fr2_UE_arr = 15:5:20;
 
 %Prepare to save simulation results
 
