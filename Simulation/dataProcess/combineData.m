@@ -1,9 +1,9 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-projectdir = '//Users/sdatta/FWB-with-CF/Simulation/resultData/ratecomparisonResults';
-% projectdir = '/Users/sdatta/Desktop/data/multiUEsqgridBS_varyBSdensity_fix_numUE/outageResults';
-dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
+% projectdir = '//Users/sdatta/FWB-with-CF/Simulation/resultData/ratecomparisonResults';
+projectdir = '/Users/sdatta/Desktop/data/multiUEsqgridBS_varyBSdensity_fix_numUE_lambda_UE_500/outageResults';
+dinfo = dir(fullfile(projectdir, '*100lambdaBS*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
 tables = cell(nfiles,1);
@@ -19,14 +19,14 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
 % end
-% changingVars = cell(1,length(colNames)-4);
-% for i=1:(length(colNames)-4)
-%     changingVars{i} = colNames{i};
-% end
-changingVars = cell(1,length(colNames)-5);
-for i=1:(length(colNames)-5)
+changingVars = cell(1,length(colNames)-4);
+for i=1:(length(colNames)-4)
     changingVars{i} = colNames{i};
 end
+% changingVars = cell(1,length(colNames)-5);
+% for i=1:(length(colNames)-5)
+%     changingVars{i} = colNames{i};
+% end
 % changingVars = cell(1,length(colNames)-2);
 % for i=1:(length(colNames)-2)
 %     changingVars{i} = colNames{i};
@@ -34,5 +34,5 @@ end
 
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std','median'});
 
-writetable(summaryTable,'./rate_comparison.txt')
-writetable(summaryTable,'./rate_comparison.csv')
+writetable(summaryTable,'./outage_data_lambda_BS_100_lambda_UE_500.txt')
+writetable(summaryTable,'./outage_data_lambda_BS_100_lambda_UE_500.csv')
