@@ -2,7 +2,7 @@
 
 #SBATCH --mem=128GB
 #SBATCH --time=240:00:00
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=4
 #SBATCH --output=./logs/%a_%A.out
 #SBATCH --error=./logs/%a_%A.err
 #SBATCH --account=pr_181_general
