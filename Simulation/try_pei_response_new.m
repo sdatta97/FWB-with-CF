@@ -42,7 +42,6 @@ for aID = 1:99
     params.sigma_sf =4;
     params.Band = 100e6; %Communication bandwidth
     
-    
     %% Define simulation setup
     
     %Angular standard deviation in the local scattering model (in radians)
@@ -56,15 +55,15 @@ for aID = 1:99
     % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
     
     %Power factor division
-    p_fac_arr = [1 5 10]; %10:10:100; %10; %.^(1:1:2);
+    p_fac_arr = 10; %[1 5 10]; %10:10:100; %10; %.^(1:1:2);
     % params.p_fac = 10;
-    percent_fr2_UE_arr = 5; %5:5:20;
+    percent_fr2_UE_arr = 0:10:100;
     params.simTime = 60*60; %sec Total Simulation time should be more than 100.
     %% Room Setup, UE placement, UE height
     % We are considering an outdoor scenario where the UE is located at the
     % center and gNBs are distributed around the UE. We only need to consider
     % the coverageRange amount of distance from the UE.
-    params.deployRange = 300; %20:20:100;
+    params.deployRange = 1000; %20:20:100;
     params.deployRange_sub6 = 1000;
     
     params.coverageRange_sub6 = 430;
@@ -88,77 +87,67 @@ for aID = 1:99
     params.N_UE_sub6 = 1; %4;
     rmin_arr = 4*10^8;
     lambda_BS = 25; %([6 7 8 9 10]).^2;
-    lambda_UE_sub6 = 250; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+    lambda_UE_sub6 = 250:250:500; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
     params.Lmax = 4;
     % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
     lb_thresh = 0.1; %[0.1, 0.25, 0.5]; [0:0.05:0.1 0.5 1];
-    for idxnumUE = 1:length(percent_fr2_UE_arr)
-        % n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-        % while(n==0)
-        %     n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-        % end
-        % params.numUE = n;
-        % params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
-        params.numUE = 20;
-        %%UE location
-        deployRange = params.deployRange; %(idxdeployRange);
-        params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
-        params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
-        params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
-        for idxBSDensity = 1:length(lambda_BS)
-            %% gNB locations
-            params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
-            params.xGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
-            params.yGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
-            % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
-            params.locationsBS = (combvec(params.xGNB,params.yGNB)).';
-            params.coverageRange =  (params.deployRange_sub6/(sqrt(params.numGNB)-1))/sqrt(2);%125*sqrt(2); %100;
-            length_area = 2*params.coverageRange;   
-            width_area = 2*params.coverageRange;
-            % length_area = 2*(params.deployRange + params.coverageRange);   
-            % width_area = 2*(params.deployRange + params.coverageRange);
-            params.areaDimensions = [width_area, length_area, height_transmitter];
-                    %Length of the coherence block
-    %                 params.tau_c = 200;
-                
-                %Compute number of pilots per coherence block
-    %                 params.tau_p = params.numUE+params.numUE_sub6;
-                
-                %Compute the prelog factor assuming only downlink data transmission
-        %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
-            params.preLogFactor = 1;
-    
-            %Number of setups with random UE locations
-            params.nbrOfSetups = 100;
-                    
-                  
-            %Number of channel realizations per setup
-            params.nbrOfRealizations = 100;
-            
-            %% PHY layer params
-            params.scs_mmw = 2e9;     %not using this parameter now
-            params.scs_sub6 = [0.5*(params.Band), 0.5*(params.Band)];   %sub-6 GHz bandwidth 100 MHz
-            params.num_sc_mmw = 1;    %not using this parameter now
-            params.num_sc_sub6 = 2;   %sub-6 GHz considered as one full band                    
-            %% UE angular coverage range (full 360 coverage for now)
-            lookAngleCell{1} = [0,360];
-            
+    for idxUEDensity = 1:length(lambda_UE_sub6)
+        n = ceil(lambda_UE_sub6(idxUEDensity)*(params.coverageRange_sub6/1000)^2);
+        for idxnumUE = 1:length(percent_fr2_UE_arr)
+            params.numUE = ceil(percent_fr2_UE_arr(idxnumUE)*n/100);
+            params.numUE_sub6 = n - params.numUE;
+            %%UE location
+            deployRange = params.deployRange/sqrt(pi); %(idxdeployRange);
+            params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+            params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
+            params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
             %% Simulation FR1 setup
-    
-            for idxUEDensity = 1:length(lambda_UE_sub6)
-                %%UE locations
-                % n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-                % while (n==0)
-                %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
-                % end
-                n = ceil(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-                params.numUE_sub6 = n;
-                % params.RUE_sub6 = params.coverageRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-                % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-                params.RUE_sub6 = (max(sqrt(sum(params.UE_locations.^2,2)))+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
-                params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
-                % params.UE_locations_sub6 =  mean(params.UE_locations,1) + [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
-                params.UE_locations_sub6 =  [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+            %%UE locations
+            deployRange_sub6 = params.deployRange_sub6/sqrt(pi); %(idxdeployRange);
+            params.RUE_sub6 = deployRange_sub6*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+            % params.RUE_sub6 = (norm(params.UE_locations(:,1) - params.UE_locations(:,2))/2+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+            % params.RUE_sub6 = (max(sqrt(sum(params.UE_locations.^2,2)))+params.coverageRange_sub6)*sqrt(rand(params.numUE_sub6,1)); %location of UEs (distance from origin)
+            params.angleUE_sub6 = 2*pi*rand(params.numUE_sub6,1);%location of UEs (angle from x-axis)
+            % params.UE_locations_sub6 =  mean(params.UE_locations,1) + [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+            params.UE_locations_sub6 =  [params.RUE_sub6.*cos(params.angleUE_sub6), params.RUE_sub6.*sin(params.angleUE_sub6)];   
+            for idxBSDensity = 1:length(lambda_BS)
+                %% gNB locations
+                params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
+                params.xGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
+                params.yGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
+                % params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+                params.locationsBS = (combvec(params.xGNB,params.yGNB)).';
+                params.coverageRange =  (params.deployRange_sub6/(sqrt(params.numGNB)-1))/sqrt(2);%125*sqrt(2); %100;
+                length_area = 2*params.coverageRange;   
+                width_area = 2*params.coverageRange;
+                % length_area = 2*(params.deployRange + params.coverageRange);   
+                % width_area = 2*(params.deployRange + params.coverageRange);
+                params.areaDimensions = [width_area, length_area, height_transmitter];
+                        %Length of the coherence block
+        %                 params.tau_c = 200;
+                    
+                    %Compute number of pilots per coherence block
+        %                 params.tau_p = params.numUE+params.numUE_sub6;
+                    
+                    %Compute the prelog factor assuming only downlink data transmission
+            %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
+                params.preLogFactor = 1;
+        
+                %Number of setups with random UE locations
+                params.nbrOfSetups = 100;
+                        
+                      
+                %Number of channel realizations per setup
+                params.nbrOfRealizations = 100;
+                
+                %% PHY layer params
+                params.scs_mmw = 2e9;     %not using this parameter now
+                params.scs_sub6 = [0.5*(params.Band), 0.5*(params.Band)];   %sub-6 GHz bandwidth 100 MHz
+                params.num_sc_mmw = 1;    %not using this parameter now
+                params.num_sc_sub6 = 2;   %sub-6 GHz considered as one full band                    
+                %% UE angular coverage range (full 360 coverage for now)
+                lookAngleCell{1} = [0,360];
+                
                 numUE = params.numUE;
                 numUE_sub6 = params.numUE_sub6;
                 K = params.numUE + params.numUE_sub6;  % --Ground UEs
@@ -194,6 +183,7 @@ for aID = 1:99
                     for idx_p = 1:length(p_fac_arr)
                         for idxlbthres = 1:length(lb_thresh)
                             params.ue_rearranged = [];
+                            params.ues_not_affected = [];
                             lb_thres = lb_thresh(idxlbthres);
                             rmin = rmin_arr(idxrmin);
                             r_min_sub6 = 35e6;
@@ -202,13 +192,21 @@ for aID = 1:99
                             params.r_min = rmin;  %stores min rate requirement for all mmWave users
                             params.rate_reduce_threshold = 5e7;
                             params.p_fac = p_fac_arr(idx_p);
-                            params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);                               
-                            sub6ConnectionState = zeros(params.numUE,1);
-                            ue_idx = 1;
-                            sub6ConnectionState(ue_idx) = 1;
+                            params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);        
+                            sub6ConnectionState = ones(params.numUE,1);
                             [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-                            [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
-                            ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
+                            for ue_idx = 1:params.numUE
+                                [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                                params.ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
+                            end
+                            ue_rearranged = params.ue_rearranged;
+                            % sub6ConnectionState = zeros(params.numUE,1);
+                            % ue_idx = 1;
+                            % sub6ConnectionState(ue_idx) = 1;
+                            % [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+                            % [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                            % ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
+                            
                             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));                                              
                             lb = quantile(rate_dl_before_handoff(ue_rearranged)./params.Band,params.loss_pc_thresh);
                             bw_alloc = Band - r_min_sub6/lb;
@@ -221,29 +219,30 @@ for aID = 1:99
                                 lb = quantile(rate_dl_after_handoff((1+numUE):(numUE+numUE_sub6)),params.loss_pc_thresh);                                
                             else 
                                 params.ue_rearranged = ue_rearranged;
-                                ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
+                                params.ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
                                 params.scs_sub6(1) = bw_alloc;
                                 params.scs_sub6(2) = Band - bw_alloc;
                                 % user_sc_alloc = ones(numUE+numUE_sub6,params.num_sc_sub6);                               
                                 user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);     
                                 user_sc_alloc(find(sub6ConnectionState),1) = 1;
                                 user_sc_alloc(find(sub6ConnectionState),2) = 0;
-                                user_sc_alloc(ues_not_affected,1) = 1;
-                                user_sc_alloc(ues_not_affected,2) = 1;
+                                user_sc_alloc(params.ues_not_affected,1) = 1;
+                                user_sc_alloc(params.ues_not_affected,2) = 1;
                                 user_sc_alloc(params.ue_rearranged,1) = 0;
                                 user_sc_alloc(params.ue_rearranged,2) = 1;
                                 params.user_sc_alloc = user_sc_alloc;
-                                ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
+                                ues_sharing = union(((1:numUE).*sub6ConnectionState),params.ues_not_affected);
         %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
                                 rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);    
-                                ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
-                                lb = quantile(rate_dl_after_handoff(ues_not_affected),params.loss_pc_thresh);
-                            end             
+                                lb = quantile(rate_dl_after_handoff(params.ues_not_affected),params.loss_pc_thresh);
+                            end       
+                            params.ues_not_affected = setdiff((1+numUE):(numUE+numUE_sub6),params.ue_rearranged);
                             %% Recording the Results
                     
                             %Taking care of folder directory creation etc
                             dataFolder = 'resultData';
-                            rateFolder = strcat(dataFolder,'/ratecomparisonResults');
+                            % rateFolder = strcat(dataFolder,'/ratecomparisonResults');
+                            rateFolder = strcat(dataFolder,'/ppResults');
                             if not(isfolder(dataFolder))
                                 mkdir(dataFolder)
                             end
@@ -275,19 +274,19 @@ for aID = 1:99
                             recording_text_file_string = strcat(rateFolder,result_string,'.csv');
                             fileID = fopen(recording_text_file_string,'w');
                             output_categories = ['UE idx,','lambdaBS,','lambdaUE,',...
-                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,', 'mean_rate_before_handoff_affected,','mean_rate_after_handoff_affected,','mean_rate_before_handoff_not_affected,','mean_rate_after_handoff_not_affected,','rate_after_handoff_fr2\n'];
+                                'deployRange,','minRatereq,','powerFac,','lower_bound_thresh,', 'pp_below\n']; %'mean_rate_before_handoff_affected,','mean_rate_after_handoff_affected,','mean_rate_before_handoff_not_affected,','mean_rate_after_handoff_not_affected,','rate_after_handoff_fr2
                             fprintf(fileID,output_categories);
     
                             mean_rate_before_handoff_affected = mean(rate_dl_before_handoff(params.ue_rearranged));
                             mean_rate_after_handoff_affected = mean(rate_dl_after_handoff(params.ue_rearranged));
-                            mean_rate_before_handoff_not_affected = mean(rate_dl_before_handoff(ues_not_affected));
-                            mean_rate_after_handoff_not_affected = mean(rate_dl_after_handoff(ues_not_affected));
-                            fr2_rate = rate_dl_after_handoff(ue_idx);
-                            
-                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+                            mean_rate_before_handoff_not_affected = mean(rate_dl_before_handoff(params.ues_not_affected));
+                            mean_rate_after_handoff_not_affected = mean(rate_dl_after_handoff(params.ues_not_affected));
+                            % fr2_rate = rate_dl_after_handoff(ue_idx);
+                            fr2_rate = mean(rate_dl_after_handoff(1:params.numUE));
+                            pp_below = (numel(find(rate_dl_after_handoff(1:params.numUE) < params.r_min))/params.numUE)*100;
+                            formatSpec = '%d,%d,%d,%f,%f,%f,%f,%.16f\n'; %%.16f,%.16f,%.16f,%.16f,%.16f,
                             fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),...
-                            deployRange, min_rate_req, p_fac, lb_thres, ...
-                            mean_rate_before_handoff_affected,mean_rate_after_handoff_affected,mean_rate_before_handoff_not_affected,mean_rate_after_handoff_not_affected,fr2_rate);
+                            deployRange, min_rate_req, p_fac, lb_thres, pp_below); %mean_rate_before_handoff_affected,mean_rate_after_handoff_affected,mean_rate_before_handoff_not_affected,mean_rate_after_handoff_not_affected, fr2_rate
                             fclose(fileID);
                         end
                     end
