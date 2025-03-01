@@ -102,15 +102,15 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     %     n = poissrnd((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*pi*(params.deployRange/1000)^2);
     % end
     % params.numUE = n;
-    params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6*(params.deployRange/1000)^2);
-    % params.numUE = 20;
-    %%UE location
-    deployRange = params.deployRange/sqrt(pi); %(idxdeployRange);
-    params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
-    params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
-    params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
     %% Simulation FR1 setup
     for idxUEDensity = 1:length(lambda_UE_sub6)
+        params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange/1000)^2);
+        % params.numUE = 20;
+        %%UE location
+        deployRange = params.deployRange/sqrt(pi); %(idxdeployRange);
+        params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
+        params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
+        params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
         params.ue_rearranged = [];        
         %%UE locations
         % n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
