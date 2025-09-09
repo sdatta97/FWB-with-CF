@@ -123,7 +123,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         % while (n==0)
         %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         % end
-        n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
         % params.numUE_sub6 = ceil(((100 - percent_fr2_UE_arr(idxnumUE))/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange_sub6/1000)^2);  
         deployRange_sub6 = params.deployRange_sub6; %/sqrt(pi);
         if params.RANDOM_UE
@@ -140,15 +140,15 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             %% gNB locations
             params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
             if params.RANDOM_BS
-                params.RNB =  deployRange_sub6*sqrt(rand(params.numGNB,1)); %location of GNBs (distance from origin)
-                params.angleGNB = 2*pi*rand(params.numGNB,1);%location of GNBs (angle from x-axis)
-                params.locationsBS = [params.RgNB.*cos(params.angleGNB), params.RgNB.*sin(params.angleGNB)];
+                params.RgNB =  deployRange_sub6*sqrt(rand(params.numGNB,1)); %location of GNBs (distance from origin)
+                params.anglegNB = 2*pi*rand(params.numGNB,1);%location of GNBs (angle from x-axis)
+                params.locationsBS = [params.RgNB.*cos(params.anglegNB), params.RgNB.*sin(params.anglegNB)];
             else
                 params.xGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
                 params.yGNB = (-params.deployRange_sub6/2):(params.deployRange_sub6/(sqrt(params.numGNB)-1)):(params.deployRange_sub6/2);
                 params.locationsBS = (combvec(params.xGNB,params.yGNB)).';
             end
-            params.coverageRange = params.deployRange_sub6/(sqrt(params.numGNB)-1))/sqrt(2);
+            params.coverageRange = params.deployRange_sub6/(sqrt(params.numGNB)-1)/sqrt(2);
             length_area = 2*params.coverageRange;   
             width_area = 2*params.coverageRange;
             % length_area = 2*(params.deployRange + params.coverageRange);   
