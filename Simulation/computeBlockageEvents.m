@@ -26,7 +26,12 @@ ht = params.ht;
 % locationsBS = params.locationsBS_sub6;
 % locationsBS = params.locationsBS(params.numGNB*(ue_idx-1)+1:params.numGNB*ue_idx,:);
 distancesBS = sqrt(sum((params.locationsBS - repmat(UE_location,[params.numGNB,1])).^2,2));
-locationsBS = params.locationsBS(find(distancesBS < params.coverageRange),:);
+[min_dist, idx_min] = min(distancesBS);
+if (min_dist < params.coverageRange)
+    locationsBS = params.locationsBS(find(distancesBS < params.coverageRange),:);
+else
+    locationsBS = params.locationsBS(idx_min,:);
+end
 nBS = size(locationsBS,1);
 % if (nBS == 0)
     % dataBS = [];
