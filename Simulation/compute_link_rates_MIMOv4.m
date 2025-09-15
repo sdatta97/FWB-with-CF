@@ -16,6 +16,8 @@ p_fac_rearrange = params.p_fac_rearrange;
 D = params.D;
 % ue_rearranged = params.ue_rearranged;
 user_sc_alloc = params.user_sc_alloc;
+Kt = params.Kt_Kr_vsUE;
+Kr = params.Kt_Kr_vsUE;
 % perm_vec  = repmat(randperm(tau_p),1,2);
 % phi_index = perm_vec(1:K);
 % for k = 1:K
@@ -224,9 +226,11 @@ for n_idx = 1:num_sc_sub6
     DS_mmW = zeros(K_mmW,N_UE_mmW);
     MSI_mmW = zeros(K_mmW,N_UE_mmW);
     MUI_mmW = zeros(K_mmW,N_UE_mmW);
+    HI_mmW = zeros(K_mmW,N_UE_mmW);
     DS_sub6 = zeros(K-K_mmW,N_UE_sub6);
     MSI_sub6 = zeros(K-K_mmW,N_UE_sub6);
     MUI_sub6 = zeros(K-K_mmW,N_UE_sub6);
+    HI_sub6 = zeros(K-K_mmW,N_UE_sub6);
     
     noise_mmW = abs(sqrt(0.5)*(randn(K_mmW,N_UE_mmW) + 1j*randn(K_mmW,N_UE_mmW))).^2;
     noise_sub6 = abs(sqrt(0.5)*(randn(K-K_mmW,N_UE_sub6) + 1j*randn(K-K_mmW,N_UE_sub6))).^2;
@@ -239,24 +243,28 @@ for n_idx = 1:num_sc_sub6
         if (sub6ConnectionState(k)==1) && (user_sc_alloc(k,n_idx) == 1)
             for n = 1:N_UE_mmW              
     %             DS_mmW(k,n) = p_d*norm(reshape(D_mmW_mmW(k,k,n,:),[1,N_UE_mmW]))^2;
-                DS_mmW(k,n) = p_d*(abs(D_mmW_mmW(k,k,n,n,n_idx)))^2;
+                DS_mmW(k,n) = p_d*Kr*Kt*(abs(D_mmW_mmW(k,k,n,n,n_idx)))^2;
+                HI_mmW(k,n) = p_d*(1-Kr*Kt)*(abs(D_mmW_mmW(k,k,n,n,n_idx)))^2;
                 for nn = 1:N_UE_mmW
     %                 if (nn~=n)
                     if (abs(D_mmW_mmW(k,k,nn,nn,n_idx))<abs(D_mmW_mmW(k,k,n,n,n_idx)))
     %                     MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,k,nn,:),[1,N_UE_mmW]))^2;
-                        MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*(abs(D_mmW_mmW(k,k,n,nn,n_idx)))^2;
+                        MSI_mmW(k,n) = MSI_mmW(k,n) + p_d*Kr*Kt*(abs(D_mmW_mmW(k,k,n,nn,n_idx)))^2;
+                        HI_mmW(k,n) = HI_mmW(k,n) + p_d*(1-Kr*Kt)*(abs(D_mmW_mmW(k,k,n,nn,n_idx)))^2;
                     end
                 end
                 for q = 1:K_mmW
                     if (q~=k && sub6ConnectionState(q)==1)
-                      MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(reshape(D_mmW_mmW(k,q,n,:,n_idx),[1,N_UE_mmW]))^2;
+                      MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*Kr*Kt*norm(reshape(D_mmW_mmW(k,q,n,:,n_idx),[1,N_UE_mmW]))^2;
+                      HI_mmW(k,n) = HI_mmW(k,n) + p_d*(1-Kr*Kt)*norm(reshape(D_mmW_mmW(k,q,n,:,n_idx),[1,N_UE_mmW]))^2;
                     end
                 end
                 for q = 1:K-K_mmW
-                   MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*norm(reshape(D_mmW_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
+                   MUI_mmW(k,n) = MUI_mmW(k,n) + p_d*Kr*Kt*norm(reshape(D_mmW_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
+                   HI_mmW(k,n) = HI_mmW(k,n) + p_d*(1-Kr*Kt)*norm(reshape(D_mmW_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
                 end
                 snr_num_mmW(k,n) = DS_mmW(k,n);
-                snr_den_mmW(k,n) = MSI_mmW(k,n) + MUI_mmW(k,n) + noise_mmW(k,n);
+                snr_den_mmW(k,n) = MSI_mmW(k,n) + MUI_mmW(k,n) + HI_mmW(k,n) + noise_mmW(k,n);
                 % rate_dl(k) = rate_dl(k) + scs(1)*TAU_FAC*log2(1+snr_num_mmW(k,n)/snr_den_mmW(k,n));
                 rate_dl(k) = rate_dl(k) + scs(n_idx)*TAU_FAC*log2(1+snr_num_mmW(k,n)/snr_den_mmW(k,n));
             end
@@ -265,27 +273,30 @@ for n_idx = 1:num_sc_sub6
     for k = 1:K-K_mmW
         for n = 1:N_UE_sub6
            if (user_sc_alloc(k+K_mmW,n_idx) == 1)
-    
         %         DS_sub6(k,n) = p_d*norm(reshape(D_sub6_sub6(k,k,n,:),[1,N_UE_sub6]))^2;
-                DS_sub6(k,n) = p_d*(abs(D_sub6_sub6(k,k,n,n,n_idx)))^2;
+                DS_sub6(k,n) = p_d*Kr*Kt*(abs(D_sub6_sub6(k,k,n,n,n_idx)))^2;
+                HI_sub6(k,n) = p_d*(1-Kr*Kt)*(abs(D_sub6_sub6(k,k,n,n,n_idx)))^2;
                 for nn = 1:N_UE_sub6
         %             if (nn~=n)
         %             if (nn>n)
                     if (abs(D_sub6_sub6(k,k,nn,nn,n_idx))<abs(D_sub6_sub6(k,k,n,n,n_idx)))
         %                 MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*norm(reshape(D_sub6_sub6(k,k,nn,:),[1,N_UE_sub6]))^2;
-                        MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*(abs(D_sub6_sub6(k,k,n,nn,n_idx)))^2;
+                        MSI_sub6(k,n) = MSI_sub6(k,n) + p_d*Kr*Kt*(abs(D_sub6_sub6(k,k,n,nn,n_idx)))^2;
+                        HI_sub6(k,n) = HI_sub6(k,n) + p_d*(1-Kr*Kt)*(abs(D_sub6_sub6(k,k,n,nn,n_idx)))^2;
                     end
                 end
                 for q = 1:K_mmW
                     if (q~=k && sub6ConnectionState(q)==1)
-                      MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(reshape(D_sub6_mmW(k,q,n,:,n_idx),[1,N_UE_mmW]))^2;
+                      MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*Kr*Kt*norm(reshape(D_sub6_mmW(k,q,n,:,n_idx),[1,N_UE_mmW]))^2;
+                      HI_sub6(k,n) = HI_sub6(k,n) + p_d*(1-Kr*Kt)*norm(reshape(D_sub6_mmW(k,q,n,:,n_idx),[1,N_UE_mmW]))^2;
                     end
                 end
                 for q = 1:K-K_mmW
-                   MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*norm(reshape(D_sub6_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
+                   MUI_sub6(k,n) = MUI_sub6(k,n) + p_d*Kr*Kt*norm(reshape(D_sub6_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
+                   HI_sub6(k,n) = HI_sub6(k,n) + p_d*(1-Kr*Kt)*norm(reshape(D_sub6_sub6(k,q,n,:,n_idx),[1,N_UE_sub6]))^2;
                 end
                 snr_num_sub6(k,n) = DS_sub6(k,n);
-                snr_den_sub6(k,n) = MSI_sub6(k,n) + MUI_sub6(k,n) + noise_sub6(k,n);
+                snr_den_sub6(k,n) = MSI_sub6(k,n) + MUI_sub6(k,n) + HI_sub6(k,n) + noise_sub6(k,n);
                 % rate_dl(k+K_mmW) = rate_dl(k+K_mmW) + scs(2)*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
                 rate_dl(k+K_mmW) = rate_dl(k+K_mmW) + scs(n_idx)*TAU_FAC*log2(1+snr_num_sub6(k,n)/snr_den_sub6(k,n));
             end

@@ -1,5 +1,5 @@
 % function simOutputs = discreteSimulator(simInputs, ue_idx)
-function simOutputs = discreteSimulator_MIMO(simInputs) %trying Pei's idea
+function simOutputs = discreteSimulator_MIMO(simInputs) 
 %% Inputs
 params = simInputs.params;
 protocolParams = simInputs.protocolParams;

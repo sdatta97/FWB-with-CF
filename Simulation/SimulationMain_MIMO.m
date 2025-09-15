@@ -33,7 +33,7 @@ params.no_of_rea = 1;     % no.of channel realizations
 params.snr_db = 40;
 params.ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 0;
-params.Kt_Kr_vsUE  = 0; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.Kt_Kr_vsUE  = 0.99; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
@@ -63,7 +63,7 @@ percent_fr2_UE_arr = 10; %5:5:20;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 60*60; %sec Total Simulation time should be more than 100.
+params.simTime = 10*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -87,14 +87,14 @@ params.num_antennas_per_gNB = 64;
 params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 
 params.RANDOM_UE = 0;
-params.RANDOM_BS = 1;
+params.RANDOM_BS = 0;
 % params.num_antennas_per_gNB = 8;
 %Number of antennas per UE
 params.N_UE_mmW = 1; %8;
 params.N_UE_sub6 = 1; %4;
 rmin_arr = 4*10^8;
 lambda_BS = ([5 6 7 8]).^2;
-lambda_UE_sub6 = 500; %[250, 750, 1000]; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 250; %[250, 750, 1000]; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 lb_thresh = 0.1; %[0:0.05:0.1 0.5 1];
