@@ -2,9 +2,8 @@
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
 % projectdir = '//Users/sdatta/FWB-with-CF/Simulation/resultData/ppResults';
-% projectdir = '/Users/sdatta/outageResults';
-projectdir = '/Users/sdatta/Desktop/data/multiUEsscatterBS_final/outageResults';
-% projectdir = '/Users/sdatta/outage_data_modify/outageResults';
+projectdir = '/Users/sdatta/Desktop/data/multiUEsscatterBS_final/lambda_250/outageResults';
+% projectdir = '/Users/sdatta/FWB-with-CF/Simulation/resultData/algocompResults';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);
@@ -17,6 +16,10 @@ combinedTable = vertcat(tables{:});
 
 colNames = combinedTable.Properties.VariableNames;
 %% group the same parameter iterations and get stats mean and std, can add other stuff
+% changingVars = cell(1,length(colNames)-8);
+% for i=1:(length(colNames)-8)
+%     changingVars{i} = colNames{i};
+% end
 % changingVars = cell(1,length(colNames)-6);
 % for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
@@ -39,6 +42,7 @@ end
 % end
 
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std','median'});
+% summaryTable  = groupsummary(combinedTable,changingVars,{'mean'});
 
 writetable(summaryTable,'./outage_data_lambda_UE_250_lambda_BS_vary_modify_scatter_fin.txt')
 writetable(summaryTable,'./outage_data_lambda_UE_250_lambda_BS_vary_modify_scatter_fin.csv')
