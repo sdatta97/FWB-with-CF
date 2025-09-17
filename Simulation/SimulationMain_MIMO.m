@@ -33,7 +33,7 @@ params.no_of_rea = 1;     % no.of channel realizations
 params.snr_db = 40;
 params.ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 0;
-params.Kt_Kr_vsUE  = 0.99; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.Kt_Kr_vsUE  = 1; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
@@ -182,8 +182,8 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             
             %% Blocker Properties and Simulation Duration
             params.lambdaBlockers = 0.01; %How many blockers around
-            % params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
-            params.numBlockers = floor(pi*(params.coverageRange)^2*params.lambdaBlockers);
+            params.numBlockers = 4*(params.coverageRange)^2*params.lambdaBlockers;
+            % params.numBlockers = floor(pi*(params.coverageRange)^2*params.lambdaBlockers);
     %         params.numBlockers = 4*(params.coverageRange_sub6)^2*params.lambdaBlockers;
             params.V = 1; %velocity of blocker m/s
             % 160-190 cm truncated gaussian with mean at 3 sigma to each sides.

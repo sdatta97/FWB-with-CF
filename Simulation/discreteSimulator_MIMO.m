@@ -295,7 +295,7 @@ while nextEventTime < params.simTime
         end
     end
     for ue_idx = 1:numUE
-        if (numBS_mobile > 0)
+        if (numBS_mobile(ue_idx) > 0)
             if UE.primaryConnectionState(ue_idx) == 1
                 if UE.primaryNextEventTime(ue_idx) == currentTime
                     UE.primaryConnectionState(ue_idx) = 3;
