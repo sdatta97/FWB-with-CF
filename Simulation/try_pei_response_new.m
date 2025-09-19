@@ -54,7 +54,7 @@ for aID = 1:10
     % rho_tot_arr = [10:10:100, 200:100:1000, 2000:1000:10000];
     
     %Power factor division
-    p_fac_arr = 10; %[1 5 10]; %10:10:100; %10; %.^(1:1:2);
+    p_fac_arr = 1; %[1 5 10]; %10:10:100; %10; %.^(1:1:2);
     % params.p_fac = 10;
     percent_fr2_UE_arr = 5:5:50;
     params.simTime = 60*60; %sec Total Simulation time should be more than 100.
