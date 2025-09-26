@@ -33,7 +33,7 @@ params.no_of_rea = 1;     % no.of channel realizations
 params.snr_db = 40;
 params.ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 0;
-params.Kt_Kr_vsUE  = 1; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.Kt_Kr_vsUE  = 0.99; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
 params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
 params.noiseFigure = 9; % gue
@@ -94,7 +94,7 @@ params.N_UE_mmW = 1; %8;
 params.N_UE_sub6 = 1; %4;
 rmin_arr = 4*10^8;
 lambda_BS = ([5 6 7 8]).^2;
-lambda_UE_sub6 = 500; %[250, 750, 1000]; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
+lambda_UE_sub6 = 250; %[250, 750, 1000]; %250:250:1000; %200:10:250; %150; %100:50:200; %[30:20:90, 100]; %100;
 params.Lmax = 4;
 % for idxnumUEsub6 = 1:length(numUE_sub6_arr)
 lb_thresh = 0.1; %[0:0.05:0.1 0.5 1];
