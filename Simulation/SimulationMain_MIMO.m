@@ -17,25 +17,17 @@ end
 rng(str2double(aID),'twister');
 
 %% GUE channel parameters
-params.K_Factor = 9;         %dB -- %rician factor Ground UE  % if beta_gains=1
-params.RAYLEIGH=0;   %1= rayleigh, % 0=rician
-params.Perf_CSI =1;
-params.cov_area = 1; %0.25; % 4; %km
-%%
-params.TAU_P_K_by_two = 0; %1;  
+params.Perf_CSI = 0;
 params.CH_estimation = 0;  % 1= have channel estimation
-%%
-params.LB=1;  %Lower bound
-params.UB =1;  %Upper bound
 params.no_of_rea = 1;     % no.of channel realizations
 %%
 % snr_db = -50:10:40;
 params.snr_db = 40;
 params.ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 0;
-params.Kt_Kr_vsUE  = 0.99; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.Kt_Kr_vsUE  = 1; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 
-params.pilot_pow = 100;  % 0.1W   % UL pilot. power (W)
+params.pilot_pow = 200;  % 0.1W   % DL pilot. power (mW)
 params.noiseFigure = 9; % gue
 params.sigma_sf =4;
 params.Band = 100e6; %Communication bandwidth
@@ -88,6 +80,7 @@ params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 
 params.RANDOM_UE = 0;
 params.RANDOM_BS = 1;
+params.BRUTE_FORCE = 1;
 % params.num_antennas_per_gNB = 8;
 %Number of antennas per UE
 params.N_UE_mmW = 1; %8;
@@ -108,6 +101,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange/1000)^2);
         params.numUE = 20;
+        % if params.BRUTE_FORCE 
+        %     params.numUE = 2;
+        % end
         %%UE location
         deployRange = params.deployRange; %/sqrt(pi); %(idxdeployRange);
         if params.RANDOM_UE
@@ -124,6 +120,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         % end
         params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
+        % if params.BRUTE_FORCE 
+        %     params.numUE_sub6 = 6;
+        % end
         % params.numUE_sub6 = ceil(((100 - percent_fr2_UE_arr(idxnumUE))/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange_sub6/1000)^2);  
         deployRange_sub6 = params.deployRange_sub6; %/sqrt(pi);
         if params.RANDOM_UE
@@ -139,6 +138,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         for idxBSDensity = 1:length(lambda_BS)
             %% gNB locations
             params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
+            % if params.BRUTE_FORCE 
+            %     params.numGNB = 2;
+            % end
             if params.RANDOM_BS
                 params.RgNB =  deployRange_sub6*sqrt(rand(params.numGNB,1)); %location of GNBs (distance from origin)
                 params.anglegNB = 2*pi*rand(params.numGNB,1);%location of GNBs (angle from x-axis)
@@ -155,15 +157,18 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             % length_area = 2*(params.deployRange + params.coverageRange);   
             % width_area = 2*(params.deployRange + params.coverageRange);
             params.areaDimensions = [width_area, length_area, height_transmitter];
-                    %Length of the coherence block
-    %                 params.tau_c = 200;
-                
-                %Compute number of pilots per coherence block
-    %                 params.tau_p = params.numUE+params.numUE_sub6;
-                
-                %Compute the prelog factor assuming only downlink data transmission
-        %         params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
-            params.preLogFactor = 1;
+            % Length of the coherence block
+            params.tau_c = 200;
+
+            % Compute number of pilots per coherence block
+            params.tau_p = params.numUE; %+params.numUE_sub6;
+    
+            % Compute the prelog factor assuming only downlink data transmission
+            if params.Perf_CSI
+                params.preLogFactor = 1;
+            else
+                params.preLogFactor = (params.tau_c-params.tau_p)/params.tau_c;
+            end
     
             %Number of setups with random UE locations
             params.nbrOfSetups = 100;
@@ -247,10 +252,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             ASD_VALUE = params.ASD_VALUE;
             ASD_CORR = params.ASD_CORR;
             Kt_Kr_vsUE = params.Kt_Kr_vsUE;
-            K_Factor = params.K_Factor;
-            RAYLEIGH=params.RAYLEIGH;   %1= rayleigh, % 0=rician
             Perf_CSI = params.Perf_CSI;
-            cov_area = params.cov_area;
             %%
             no_of_rea = params.no_of_rea;     % no.of channel realizations
             %%
@@ -279,7 +281,6 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                         params.loss_pc_thresh = lb_thres;
                         params.r_min_sub6 = rmin_sub6;  %stores min rate requirement for all sub-6 users
                         params.r_min = rmin;  %stores min rate requirement for all mmWave users
-                        params.rate_reduce_threshold = 5e7;
                         params.p_fac = p_fac_arr(idx_p);
                         params.p_fac_rearrange = 1; % 0.1*p_fac_arr(idx_p);                               
                         %% Create Discrete Time Event Simulation input
@@ -372,22 +373,31 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
                                         connDelay               = thisOutputs.connection_setup_delay;
                                         signalingAfterRachDelay = thisOutputs.signalingAfterRachDelay;
                                         frameHopCount           = thisOutputs.frameHopCount;
-                                        frameDeliveryDelay      = thisOutputs.frameDeliveryDelay;
-                                        outage_durations_wo_cf = thisOutputs.outage_durations_wo_cf;
-                                        outage_durations_wi_cf = thisOutputs.outage_durations_wi_cf;
-                
+                                        frameDeliveryDelay      = thisOutputs.frameDeliveryDelay;                
                                         for ue_idx = 1:params.numUE   %storing outage probability and duration for each user
                                             mean_outage_duration_wo_cf    = thisOutputs.mean_outage_duration_wo_cf(ue_idx);
                                             outage_probability_wo_cf      = thisOutputs.outage_probability_wo_cf(ue_idx);
+                                            if params.BRUTE_FORCE
+                                                outage_probability_wi_bf = thisOutputs.outage_probability_wi_bf;
+                                                mean_outage_duration_wi_bf = thisOutputs.mean_outage_duration_wi_bf;
+                                            end
                                             mean_outage_duration    = thisOutputs.mean_outage_duration(ue_idx);
                                             outage_probability      = thisOutputs.outage_probability(ue_idx);
                                             min_rate_req = params.r_min;
                                             p_fac = params.p_fac;
-                                            formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
-                                            fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
-                                                deployRange,discDelay,failureDetectionDelay,connDelay,...
-                                                signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
-                                                min_rate_req, p_fac, lb_thres, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
+                                            if params.BRUTE_FORCE
+                                                formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+                                                fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
+                                                    deployRange,discDelay,failureDetectionDelay,connDelay,...
+                                                    signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
+                                                    min_rate_req, p_fac, lb_thres, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability,mean_outage_duration_wi_bf,outage_probability_wi_bf);
+                                            else
+                                                formatSpec = '%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%.16f,%.16f,%.16f,%.16f,%.16f\n';
+                                                fprintf(fileID,formatSpec,ue_idx, lambda_BS(idxBSDensity),lambda_UE_sub6(idxUEDensity),numBlockers,...
+                                                    deployRange,discDelay,failureDetectionDelay,connDelay,...
+                                                    signalingAfterRachDelay,frameHopCount,frameDeliveryDelay,...
+                                                    min_rate_req, p_fac, lb_thres, mean_outage_duration_wo_cf,outage_probability_wo_cf,mean_outage_duration,outage_probability);
+                                            end
                                         end
                                     end
                                 end

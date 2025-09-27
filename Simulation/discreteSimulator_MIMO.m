@@ -7,7 +7,6 @@ dataBS_mobile = simInputs.dataBS_mobile; %{(ue_idx-1)*params.numGNB+1:ue_idx*par
 numBS_mobile = simInputs.numBS_mobile;
 r_min = params.r_min;
 r_min_sub6 = params.r_min_sub6;
-rate_reduce_threshold = params.rate_reduce_threshold;
 Band = params.Band;
 D = params.D;
 ap_idxs = find(D(:,1));
@@ -144,7 +143,16 @@ UE.sub6EventTimes = [];
 UE.sub6EventIndices = [];
 UE.sub6EventDescriptions = [];
 UE.sub6ConnectionStateHistory = [];
-
+if params.BRUTE_FORCE 
+    UE.sub6ConnectionStarts_bf = [];
+    UE.sub6ConnectionStartIndices_bf = [];
+    UE.sub6ConnectionEnds_bf = [];
+    UE.sub6ConnectionEndIndices_bf = [];
+    UE.sub6EventTimes_bf = [];
+    UE.sub6EventIndices_bf = [];
+    UE.sub6EventDescriptions_bf = [];
+    UE.sub6ConnectionStateHistory_bf = [];
+end
 %Primary State variables
 UE.primaryConnectionState = zeros(numUE,1);
 UE.primaryConnectionStateHistory = [UE.primaryConnectionStateHistory, UE.primaryConnectionState];
@@ -164,6 +172,12 @@ UE.tmpMCGBSIdx = zeros(numUE,1);
 UE.sub6ConnectionState = zeros(numUE,1);
 UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
 UE.sub6NextEventTime = -100*ones(numUE,1);
+
+if params.BRUTE_FORCE 
+    UE.sub6ConnectionState_bf = zeros(numUE,1);
+    UE.sub6ConnectionStateHistory_bf = [UE.sub6ConnectionStateHistory_bf, UE.sub6ConnectionState_bf];
+    UE.sub6NextEventTime_bf = -100*ones(numUE,1);
+end
 
 % Try RACH if BS available
 for ue_idx = 1:numUE
@@ -250,10 +264,10 @@ while nextEventTime < params.simTime
                         UE.secondaryConnectionStateHistory = [UE.secondaryConnectionStateHistory, UE.secondaryConnectionState];
                         UE.secondaryNextEventTime(ue_idx) = currentTime + UE.beamFailureRecoveryTimer;
                         % In order to give this BS a priority in the future
-                            lastConnectedBS = UE.secondaryBSHistory(ue_idx,end);
-                            bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
-                            [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
-                            % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
+                        lastConnectedBS = UE.secondaryBSHistory(ue_idx,end);
+                        bsLastConnectionTimes(ue_idx,lastConnectedBS) = currentTime;
+                        [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,:),'descend');
+                        % [~,bsPriorities(ue_idx,:)] = sort(bsLastConnectionTimes(ue_idx,1:numBS_mmW),'descend');
                        % now event recording
                         UE.secondaryEventTimes = [UE.secondaryEventTimes; currentTime];
                         UE.secondaryEventIndices = [UE.secondaryEventIndices; ue_idx];
@@ -321,6 +335,7 @@ while nextEventTime < params.simTime
                             UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 0;
                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+                            
                         end
                         UE.primaryBSIdx(ue_idx) = idxPrimaryBS;
                         UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
@@ -336,21 +351,6 @@ while nextEventTime < params.simTime
                             sub6ConnectionState = UE.sub6ConnectionState;
                             sub6ConnectionState(ue_idx) = 1;
                             [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
-                            % rate_dl_before_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-    %                         rate_dl_before_handoff = compute_link_rates_MIMOv2(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                         
-    %                         rate_dl_before_handoff = compute_link_rates_MIMOv3(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                            % rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-                            % rate_dl_before_handoff_old = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,ue_idx,sub6ConnectionState);                                              
-    %                         if (sub6ConnectionState == zeros(params.numUE,1))
-    %                             p_fac = params.p_fac;
-    %                             params.p_fac = 0;
-    %                         end
-    %                         rate_dl_before_handoff = compute_link_rates_MIMO_quadriga(params,link,ue_idx,sub6ConnectionState);    
-    %                         if (sub6ConnectionState == zeros(params.numUE,1))
-    %                             params.p_fac = p_fac;
-    %                         end
-    %                         D_old = params.D;
-    %                         [params.D, ue_idxs_affected] = AP_reassign(params,ue_idx);
                             [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
                             ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
                             rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));                                              
@@ -388,6 +388,52 @@ while nextEventTime < params.simTime
                                 UE.sub6ConnectionStartIndices = [UE.sub6ConnectionStartIndices, ue_idx];
                                 UE.sub6ConnectionState(ue_idx) = 1;
                                 UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+                            else
+                                if params.BRUTE_FORCE
+                                    sub6ConnectionState = UE.sub6ConnectionState;
+                                    sub6ConnectionState(ue_idx) = 1;
+                                    [channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW] = computePhysicalChannels_sub6_MIMO(params);
+                                    [~, ue_idxs_affected] = AP_reassign(params,ue_idx);
+                                    ue_rearranged = union(ue_idxs_affected, params.ue_rearranged);
+                                    rate_dl_before_handoff = compute_link_rates_MIMO_mmse(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,zeros(numUE,1));     
+                                    user_sc_alloc = params.user_sc_alloc; %zeros(numUE+numUE_sub6,1);     
+                                    user_sc_alloc(find(sub6ConnectionState),1) = 1;
+                                    user_sc_alloc(find(sub6ConnectionState),2) = 0;
+                                    for nUE_idx = 0:params.numUE_sub6
+                                        sc_arr_tmp = ones(params.numUE_sub6,1);
+                                        % sc_arr_tmp(1:nUE_idx) = 0;
+                                        Perms = unique(perms(sc_arr_tmp),'rows');
+                                        flag = 0;
+                                        for c_idx = 1:size(Perms,1)
+                                            for c2_idx = 1:size(Perms,1)
+                                                user_sc_alloc((1+params.numUE):end,1) = Perms(c_idx,:)';
+                                                user_sc_alloc((1+params.numUE):end,2) = Perms(c2_idx,:)';
+                                                params.user_sc_alloc = user_sc_alloc;
+                                                ues_sharing = union(((1:numUE).*sub6ConnectionState),ues_not_affected);
+                        %                         rate_dl_after_handoff = compute_link_rates_MIMO(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);                                              
+                                                rate_dl_after_handoff = compute_link_rates_MIMOv4(params,channel_dl, channel_est_dl,channel_dl_mmW, channel_est_dl_mmW,sub6ConnectionState);    
+                                                lb = quantile(rate_dl_after_handoff((1+numUE):(numUE+numUE_sub6)),params.loss_pc_thresh);
+                                                if (all(rate_dl_after_handoff(find((1:numUE)'.*sub6ConnectionState)) >= r_min) && (lb >= r_min_sub6))
+                                                    flag = 1;
+                                                    break;
+                                                end
+                                            end
+                                            if (flag == 1)
+                                               break;
+                                            end
+                                        end
+                                        if (flag == 1)
+                                           break;
+                                        end
+                                    end
+                                    if (flag == 1)
+                                        UE.sub6ConnectionStarts_bf = [UE.sub6ConnectionStarts_bf, currentTime];
+                                        UE.sub6ConnectionStartIndices_bf = [UE.sub6ConnectionStartIndices_bf, ue_idx];
+                                        UE.sub6ConnectionState_bf(ue_idx) = 1;
+                                        UE.sub6ConnectionStateHistory_bf = [UE.sub6ConnectionStateHistory_bf, UE.sub6ConnectionState_bf];
+                                    end
+
+                                end
                             end
                         end
                         %BS didnt recover now we declare beam faiure and go to
@@ -498,6 +544,15 @@ while nextEventTime < params.simTime
                             UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 0;
                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+                        else
+                            if params.BRUTE_FORCE
+                                if UE.sub6ConnectionState_bf(ue_idx) == 1
+                                    UE.sub6ConnectionEnds_bf = [UE.sub6ConnectionEnds_bf, currentTime];
+                                    UE.sub6ConnectionEndIndices_bf = [UE.sub6ConnectionEndIndices_bf, ue_idx];
+                                    UE.sub6ConnectionState_bf(ue_idx) = 0;
+                                    UE.sub6ConnectionStateHistory_bf = [UE.sub6ConnectionStateHistory_bf, UE.sub6ConnectionState_bf];
+                                end
+                            end
                         end
                         UE.primaryBSIdx(ue_idx) = tmpMCGBSIdx;
                         UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
@@ -652,6 +707,12 @@ for ue_idx = 1:numUE
         UE.sub6ConnectionEnds = [UE.sub6ConnectionEnds, params.simTime];
         UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
     end
+    if params.BRUTE_FORCE
+        if length(UE.sub6ConnectionStarts_bf(UE.sub6ConnectionStartIndices_bf==ue_idx)) > length(UE.sub6ConnectionEnds_bf(UE.sub6ConnectionEndIndices_bf==ue_idx))
+            UE.sub6ConnectionEnds_bf = [UE.sub6ConnectionEnds_bf, params.simTime];
+            UE.sub6ConnectionEndIndices_bf = [UE.sub6ConnectionEndIndices_bf, ue_idx];
+        end
+    end
 end
 
 %% Event structuring
@@ -678,36 +739,51 @@ mean_outage_duration = zeros(numUE,1);
 for ue_idx = 1:numUE
     connectionEvents = [connectionStarts(connectionStartIndices==ue_idx);connectionEnds(connectionEndIndices==ue_idx)-connectionStarts(connectionStartIndices==ue_idx);connectionEnds(connectionEndIndices==ue_idx)];
     sub6connectionEvents = [sub6connectionStarts(sub6connectionStartIndices==ue_idx);sub6connectionEnds(sub6connectionEndIndices==ue_idx)-sub6connectionStarts(sub6connectionStartIndices==ue_idx);sub6connectionEnds(sub6connectionEndIndices==ue_idx)];
+    if params.BRUTE_FORCE
+        sub6connectionEvents_bf = [sub6connectionStarts_bf(sub6connectionStartIndices_bf==ue_idx);sub6connectionEnds_bf(sub6connectionEndIndices_bf==ue_idx)-sub6connectionStarts_bf(sub6connectionStartIndices_bf==ue_idx);sub6connectionEnds_bf(sub6connectionEndIndices_bf==ue_idx)];
+    end
     %Merge connection events so that means track the times at
     %least one of the LAs is connected. If there is not even
     %one that means outage.
     connectionEvents = mergeConnectionEvents(connectionEvents);
     sub6connectionEvents = mergeConnectionEvents(sub6connectionEvents);
+    if params.BRUTE_FORCE
+        sub6connectionEvents_bf = mergeConnectionEvents(sub6connectionEvents_bf);
+    end
     outageEvents = getOutageEvents(connectionEvents,params);
-    outage_durations_wo_cf = outageEvents(2,:);
     outage_duration_wo_cf = sum(outageEvents(2,:));
     connected_duration_wo_cf = sum(connectionEvents(2,:));
     try
-%       outage_not_mitigated_by_cf = (setdiff(outageEvents',sub6connectionEvents','rows'))';
-        [~,ia] = setdiff(outageEvents(1,:),sub6connectionEvents(1,:)-1e-8);
-        outage_durations_wi_cf = outageEvents(2,ia);
         outage_duration = sum(outageEvents(2,:)) - sum(sub6connectionEvents(2,:));
         connected_duration = sum(connectionEvents(2,:)) + sum(sub6connectionEvents(2,:));
+        if params.BRUTE_FORCE
+            outage_duration_wi_bf = outage_duration - sum(sub6connectionEvents_bf(2,:));
+            connected_duration_wi_bf = connected_duration + sum(sub6connectionEvents_bf(2,:));
+        end
     catch 
-        outage_durations_wi_cf = outage_durations_wo_cf;
         outage_duration = sum(outageEvents(2,:));
         connected_duration = sum(connectionEvents(2,:));
     end
     total_duration =   outage_duration + connected_duration;
     total_duration_wo_cf =   outage_duration_wo_cf + connected_duration_wo_cf;
+    if params.BRUTE_FORCE
+        total_duration_wi_bf =   outage_duration_wi_bf + connected_duration_wi_bf;
+    end
     outage_probability_wo_cf(ue_idx) = outage_duration_wo_cf / total_duration;
     mean_outage_duration_wo_cf(ue_idx) = outage_duration_wo_cf / size(outageEvents,2);
     outage_probability(ue_idx) = outage_duration / total_duration;
     mean_outage_duration(ue_idx) = outage_duration / size(outageEvents,2);
+    if params.BRUTE_FORCE
+        outage_probability_wi_bf(ue_idx) = outage_duration_wi_bf / total_duration;
+        mean_outage_duration_wi_bf(ue_idx) = outage_duration_wi_bf / size(outageEvents,2);
+    end
     if abs(total_duration - params.simTime) > 1e-10
         warning('TotalTime and simTime doesnt match check here.')
     end
     if abs(total_duration_wo_cf - params.simTime) > 1e-10
+        warning('TotalTime and simTime doesnt match check here.')
+    end
+    if abs(total_duration_wi_bf - params.simTime) > 1e-10
         warning('TotalTime and simTime doesnt match check here.')
     end
 end
@@ -728,8 +804,10 @@ simOutputs.outage_probability_wo_cf = outage_probability_wo_cf;
 simOutputs.mean_outage_duration_wo_cf = mean_outage_duration_wo_cf;
 simOutputs.outage_probability = outage_probability;
 simOutputs.mean_outage_duration = mean_outage_duration;
-simOutputs.outage_durations_wo_cf = outage_durations_wo_cf;
-simOutputs.outage_durations_wi_cf = outage_durations_wi_cf;
+if params.BRUTE_FORCE
+    simOutputs.outage_probability_wi_bf = outage_probability_wi_bf;
+    simOutputs.mean_outage_duration_wi_bf = mean_outage_duration_wi_bf;
+end
 % General parameters
 simOutputs.discovery_delay = discovery_delay;
 simOutputs.failureDetectionDelay = failureDetectionDelay;
