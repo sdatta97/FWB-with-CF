@@ -783,8 +783,10 @@ for ue_idx = 1:numUE
     if abs(total_duration_wo_cf - params.simTime) > 1e-10
         warning('TotalTime and simTime doesnt match check here.')
     end
-    if abs(total_duration_wi_bf - params.simTime) > 1e-10
-        warning('TotalTime and simTime doesnt match check here.')
+    if params.BRUTE_FORCE
+        if abs(total_duration_wi_bf - params.simTime) > 1e-10
+            warning('TotalTime and simTime doesnt match check here.')
+        end
     end
 end
 
