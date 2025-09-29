@@ -724,6 +724,12 @@ sub6connectionStarts = [];
 sub6connectionStartIndices = [];
 sub6connectionEnds = [];
 sub6connectionEndIndices = [];
+if params.BRUTE_FORCE
+    sub6connectionStarts_bf = [];
+    sub6connectionStartIndices_bf = [];
+    sub6connectionEnds_bf = [];
+    sub6connectionEndIndices_bf = [];
+end
 connectionStarts = [connectionStarts, UE.primaryConnectionStarts];
 connectionStartIndices = [connectionStartIndices, UE.primaryConnectionStartIndices];
 connectionEnds = [connectionEnds, UE.primaryConnectionEnds];
@@ -732,8 +738,18 @@ sub6connectionStarts = [sub6connectionStarts, UE.sub6ConnectionStarts];
 sub6connectionStartIndices = [sub6connectionStartIndices, UE.sub6ConnectionStartIndices];
 sub6connectionEnds = [sub6connectionEnds, UE.sub6ConnectionEnds];
 sub6connectionEndIndices = [sub6connectionEndIndices, UE.sub6ConnectionEndIndices];
+if params.BRUTE_FORCE
+    sub6connectionStarts_bf = [sub6connectionStarts_bf, UE.sub6ConnectionStarts_bf];
+    sub6connectionStartIndices_bf = [sub6connectionStartIndices_bf, UE.sub6ConnectionStartIndices_bf];
+    sub6connectionEnds_bf = [sub6connectionEnds_bf, UE.sub6ConnectionEnds_bf];
+    sub6connectionEndIndices_bf = [sub6connectionEndIndices_bf, UE.sub6ConnectionEndIndices_bf];
+end
 outage_probability_wo_cf = ones(numUE,1);
 mean_outage_duration_wo_cf = zeros(numUE,1);
+if params.BRUTE_FORCE
+    outage_probability_wi_bf = ones(numUE,1);
+    mean_outage_duration_wi_bf = zeros(numUE,1);
+end
 outage_probability = ones(numUE,1);
 mean_outage_duration = zeros(numUE,1);
 for ue_idx = 1:numUE
