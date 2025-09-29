@@ -17,7 +17,7 @@ end
 rng(str2double(aID),'twister');
 
 %% GUE channel parameters
-params.Perf_CSI = 0;
+params.Perf_CSI = 1;
 params.CH_estimation = 0;  % 1= have channel estimation
 params.no_of_rea = 1;     % no.of channel realizations
 %%
@@ -80,7 +80,7 @@ params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 
 params.RANDOM_UE = 0;
 params.RANDOM_BS = 1;
-params.BRUTE_FORCE = 0;
+params.BRUTE_FORCE = 1;
 % params.num_antennas_per_gNB = 8;
 %Number of antennas per UE
 params.N_UE_mmW = 1; %8;
