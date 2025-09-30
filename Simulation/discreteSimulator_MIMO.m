@@ -772,13 +772,18 @@ for ue_idx = 1:numUE
     try
         outage_duration = sum(outageEvents(2,:)) - sum(sub6connectionEvents(2,:));
         connected_duration = sum(connectionEvents(2,:)) + sum(sub6connectionEvents(2,:));
-        if params.BRUTE_FORCE
-            outage_duration_wi_bf = outage_duration - sum(sub6connectionEvents_bf(2,:));
-            connected_duration_wi_bf = connected_duration + sum(sub6connectionEvents_bf(2,:));
-        end
     catch 
         outage_duration = sum(outageEvents(2,:));
         connected_duration = sum(connectionEvents(2,:));
+    end
+    if params.BRUTE_FORCE
+        try
+            outage_duration_wi_bf = outage_duration - sum(sub6connectionEvents_bf(2,:));
+            connected_duration_wi_bf = connected_duration + sum(sub6connectionEvents_bf(2,:));
+        catch
+            outage_duration_wi_bf = outage_duration;
+            connected_duration_wi_bf = connected_duration;
+        end
     end
     total_duration =   outage_duration + connected_duration;
     total_duration_wo_cf =   outage_duration_wo_cf + connected_duration_wo_cf;
