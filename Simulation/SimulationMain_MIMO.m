@@ -101,9 +101,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange/1000)^2);
         params.numUE = 20;
-        if params.BRUTE_FORCE 
-            params.numUE = 2;
-        end
+        % if params.BRUTE_FORCE 
+        %     params.numUE = 2;
+        % end
         %%UE location
         deployRange = params.deployRange; %/sqrt(pi); %(idxdeployRange);
         if params.RANDOM_UE
@@ -120,9 +120,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         % end
         params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        if params.BRUTE_FORCE 
-            params.numUE_sub6 = 6;
-        end
+        % if params.BRUTE_FORCE 
+        %     params.numUE_sub6 = 6;
+        % end
         % params.numUE_sub6 = ceil(((100 - percent_fr2_UE_arr(idxnumUE))/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange_sub6/1000)^2);  
         deployRange_sub6 = params.deployRange_sub6; %/sqrt(pi);
         if params.RANDOM_UE
@@ -138,9 +138,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         for idxBSDensity = 1:length(lambda_BS)
             %% gNB locations
             params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
-            if params.BRUTE_FORCE 
-                params.numGNB = 2;
-            end
+            % if params.BRUTE_FORCE 
+            %     params.numGNB = 2;
+            % end
             if params.RANDOM_BS
                 params.RgNB =  deployRange_sub6*sqrt(rand(params.numGNB,1)); %location of GNBs (distance from origin)
                 params.anglegNB = 2*pi*rand(params.numGNB,1);%location of GNBs (angle from x-axis)
