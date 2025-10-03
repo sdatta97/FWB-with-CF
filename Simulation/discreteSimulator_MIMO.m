@@ -335,7 +335,15 @@ while nextEventTime < params.simTime
                             UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 0;
                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
-                            
+                        else
+                            if params.BRUTE_FORCE
+                                if UE.sub6ConnectionState_bf(ue_idx) == 1
+                                    UE.sub6ConnectionEnds_bf = [UE.sub6ConnectionEnds_bf, currentTime];
+                                    UE.sub6ConnectionEndIndices_bf = [UE.sub6ConnectionEndIndices_bf, ue_idx];
+                                    UE.sub6ConnectionState_bf(ue_idx) = 0;
+                                    UE.sub6ConnectionStateHistory_bf = [UE.sub6ConnectionStateHistory_bf, UE.sub6ConnectionState_bf];
+                                end
+                            end
                         end
                         UE.primaryBSIdx(ue_idx) = idxPrimaryBS;
                         UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
@@ -602,6 +610,15 @@ while nextEventTime < params.simTime
                             UE.sub6ConnectionEndIndices = [UE.sub6ConnectionEndIndices, ue_idx];
                             UE.sub6ConnectionState(ue_idx) = 0;
                             UE.sub6ConnectionStateHistory = [UE.sub6ConnectionStateHistory, UE.sub6ConnectionState];
+                        else
+                            if params.BRUTE_FORCE
+                                if UE.sub6ConnectionState_bf(ue_idx) == 1
+                                    UE.sub6ConnectionEnds_bf = [UE.sub6ConnectionEnds_bf, currentTime];
+                                    UE.sub6ConnectionEndIndices_bf = [UE.sub6ConnectionEndIndices_bf, ue_idx];
+                                    UE.sub6ConnectionState_bf(ue_idx) = 0;
+                                    UE.sub6ConnectionStateHistory_bf = [UE.sub6ConnectionStateHistory_bf, UE.sub6ConnectionState_bf];
+                                end
+                            end
                         end
                         UE.primaryBSIdx(ue_idx) = idxBS;
                         UE.primaryBSHistory = [UE.primaryBSHistory, UE.primaryBSIdx];
