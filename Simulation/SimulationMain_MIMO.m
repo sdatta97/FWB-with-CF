@@ -25,7 +25,10 @@ params.no_of_rea = 1;     % no.of channel realizations
 params.snr_db = 40;
 params.ASD_VALUE = 0;%[0,0.25,0.5,0.75,1];  % [0,30,10]; %
 params.ASD_CORR = 0;
-params.Kt_Kr_vsUE  = 1; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+% params.Kt_Kr_vsUE  = 1; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
+params.Kt  = 1;
+params.Kr_mmW  = 1;
+params.Kr_sub6  = 0.99;
 
 params.pilot_pow = 200;  % 0.1W   % DL pilot. power (mW)
 params.noiseFigure = 9; % gue
@@ -80,7 +83,7 @@ params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 
 params.RANDOM_UE = 0;
 params.RANDOM_BS = 1;
-params.BRUTE_FORCE = 1;
+params.BRUTE_FORCE = 0;
 % params.num_antennas_per_gNB = 8;
 %Number of antennas per UE
 params.N_UE_mmW = 1; %8;
@@ -101,9 +104,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
     for idxUEDensity = 1:length(lambda_UE_sub6)
         % params.numUE = ceil((percent_fr2_UE_arr(idxnumUE)/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange/1000)^2);
         params.numUE = 20;
-        % if params.BRUTE_FORCE 
-        %     params.numUE = 2;
-        % end
+        if params.BRUTE_FORCE 
+            params.numUE = 2;
+        end
         %%UE location
         deployRange = params.deployRange; %/sqrt(pi); %(idxdeployRange);
         if params.RANDOM_UE
@@ -120,9 +123,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         %     n = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);       
         % end
         params.numUE_sub6 = poissrnd(lambda_UE_sub6(idxUEDensity)*pi*(params.coverageRange_sub6/1000)^2);
-        % if params.BRUTE_FORCE 
-        %     params.numUE_sub6 = 6;
-        % end
+        if params.BRUTE_FORCE 
+            params.numUE_sub6 = 6;
+        end
         % params.numUE_sub6 = ceil(((100 - percent_fr2_UE_arr(idxnumUE))/100)*lambda_UE_sub6(idxUEDensity)*(params.deployRange_sub6/1000)^2);  
         deployRange_sub6 = params.deployRange_sub6; %/sqrt(pi);
         if params.RANDOM_UE
@@ -138,9 +141,9 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         for idxBSDensity = 1:length(lambda_BS)
             %% gNB locations
             params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
-            % if params.BRUTE_FORCE 
-            %     params.numGNB = 2;
-            % end
+            if params.BRUTE_FORCE 
+                params.numGNB = 2;
+            end
             if params.RANDOM_BS
                 params.RgNB =  deployRange_sub6*sqrt(rand(params.numGNB,1)); %location of GNBs (distance from origin)
                 params.anglegNB = 2*pi*rand(params.numGNB,1);%location of GNBs (angle from x-axis)
@@ -251,7 +254,6 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             snr_db = params.snr_db;
             ASD_VALUE = params.ASD_VALUE;
             ASD_CORR = params.ASD_CORR;
-            Kt_Kr_vsUE = params.Kt_Kr_vsUE;
             Perf_CSI = params.Perf_CSI;
             %%
             no_of_rea = params.no_of_rea;     % no.of channel realizations
