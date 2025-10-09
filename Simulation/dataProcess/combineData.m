@@ -2,7 +2,7 @@
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
 % projectdir = '//Users/sdatta/FWB-with-CF/Simulation/resultData/ppResults';
-projectdir = '/Users/sdatta/Desktop/data/multiUEsscatterBS_final/lambda_250_bf/outageResults';
+projectdir = '/Users/sdatta/Desktop/data/multiUEsscatterBS_final/lambda_250_Kt_1_0.99_Kr_1/outageResults';
 % projectdir = '/Users/sdatta/FWB-with-CF/Simulation/resultData/algocompResults';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
@@ -20,14 +20,14 @@ colNames = combinedTable.Properties.VariableNames;
 % for i=1:(length(colNames)-8)
 %     changingVars{i} = colNames{i};
 % end
-changingVars = cell(1,length(colNames)-6);
-for i=1:(length(colNames)-6)
-    changingVars{i} = colNames{i};
-end
-% changingVars = cell(1,length(colNames)-4);
-% for i=1:(length(colNames)-4)
+% changingVars = cell(1,length(colNames)-6);
+% for i=1:(length(colNames)-6)
 %     changingVars{i} = colNames{i};
 % end
+changingVars = cell(1,length(colNames)-4);
+for i=1:(length(colNames)-4)
+    changingVars{i} = colNames{i};
+end
 % changingVars = cell(1,length(colNames)-5);
 % for i=1:(length(colNames)-5)
 %     changingVars{i} = colNames{i};
@@ -44,5 +44,5 @@ end
 summaryTable  = groupsummary(combinedTable,changingVars,{'mean','std','median'});
 % summaryTable  = groupsummary(combinedTable,changingVars,{'mean'});
 
-writetable(summaryTable,'./outage_data_lambda_UE_250_lambda_BS_vary_modify_scatter_fin_bf.txt')
-writetable(summaryTable,'./outage_data_lambda_UE_250_lambda_BS_vary_modify_scatter_fin_bf.csv')
+writetable(summaryTable,'./outage_data_lambda_UE_250_lambda_BS_vary_modify_scatter_fin_hi_Kr_1_Kt_1_0.99.txt')
+writetable(summaryTable,'./outage_data_lambda_UE_250_lambda_BS_vary_modify_scatter_fin_hi_Kr_1_Kt_1_0.99.csv')
