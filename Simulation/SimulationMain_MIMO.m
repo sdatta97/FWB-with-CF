@@ -28,7 +28,7 @@ params.ASD_CORR = 0;
 % params.Kt_Kr_vsUE  = 1; %0.175^2; %0.175^2; %[1,2,3,4];  %to save 1=AP 0.1,UE=0.1;  2=AP 0.1,UE=0.3;  3=AP 0.3,UE=0.1
 params.Kt  = 1;
 params.Kr_mmW  = 1;
-params.Kr_sub6  = 0.99;
+params.Kr_sub6  = 1;
 
 params.pilot_pow = 200;  % 0.1W   % DL pilot. power (mW)
 params.noiseFigure = 9; % gue
@@ -81,8 +81,8 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 params.num_antennas_per_gNB = 64;
 params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 
-params.RANDOM_UE = 1;
-params.RANDOM_BS = 1;
+params.RANDOM_UE = 0;
+params.RANDOM_BS = 0;
 params.BRUTE_FORCE = 0;
 params.EE = 0;
 % params.num_antennas_per_gNB = 8;
