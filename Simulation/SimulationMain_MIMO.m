@@ -114,7 +114,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
             params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
         else
             params.RUE =  deployRange*sqrt(rand(params.numUE,1)); %location of UEs (distance from origin)
-            params.angleUE = 2*pi*(0.5+random(pd,params.numUE,1));%location of UEs (angle from x-axis)
+            params.angleUE = 2*pi*rand(params.numUE,1);%location of UEs (angle from x-axis)
             params.UE_locations = [params.RUE.*cos(params.angleUE), params.RUE.*sin(params.angleUE)];
         end
         params.ue_rearranged = [];        
