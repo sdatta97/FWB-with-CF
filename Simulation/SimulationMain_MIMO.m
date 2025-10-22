@@ -82,7 +82,7 @@ params.num_antennas_per_gNB = 64;
 params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 
 params.RANDOM_UE = 1;
-params.RANDOM_BS = 0;
+params.RANDOM_BS = 1;
 params.BRUTE_FORCE = 0;
 params.EE = 0;
 % params.num_antennas_per_gNB = 8;
@@ -106,7 +106,7 @@ for idxnumUE = 1:length(percent_fr2_UE_arr)
         %% gNB locations
         params.numGNB = ceil(lambda_BS(idxBSDensity)*(params.deployRange_sub6/1000)^2);
         if params.RANDOM_BS
-            params.RgNB =  deployRange_sub6*sqrt(rand(params.numGNB,1)); %location of GNBs (distance from origin)
+            params.RgNB =  params.deployRange_sub6*sqrt(rand(params.numGNB,1)); %location of GNBs (distance from origin)
             params.anglegNB = 2*pi*rand(params.numGNB,1);%location of GNBs (angle from x-axis)
             params.locationsBS = [params.RgNB.*cos(params.anglegNB), params.RgNB.*sin(params.anglegNB)];
         else
