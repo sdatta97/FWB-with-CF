@@ -11,7 +11,7 @@ if (isempty(aID))
 end
 if(isempty(aID))
     warning('aID is empty. Replacing it with 0010.')
-    aID = '0022';
+    aID = '50';
 end
 %RNG seed.
 rng(str2double(aID),'twister');
@@ -58,7 +58,7 @@ percent_fr2_UE_arr = 10; %5:5:20;
 % rng(2,'twister');
 %%
 % load('params.mat')
-params.simTime = 10*60; %sec Total Simulation time should be more than 100.
+params.simTime = 60*60; %sec Total Simulation time should be more than 100.
 %% Room Setup, UE placement, UE height
 % We are considering an outdoor scenario where the UE is located at the
 % center and gNBs are distributed around the UE. We only need to consider
@@ -81,8 +81,8 @@ params.ht_sub6 = height_transmitter_sub6; %height transmitter (BS)
 params.num_antennas_per_gNB = 64;
 params.rho_tot = 10^(3.6)*params.num_antennas_per_gNB; %200;
 
-params.RANDOM_UE = 1;
-params.RANDOM_BS = 1;
+params.RANDOM_UE = 0;
+params.RANDOM_BS = 0;
 params.BRUTE_FORCE = 0;
 params.EE = 0;
 % params.num_antennas_per_gNB = 8;
