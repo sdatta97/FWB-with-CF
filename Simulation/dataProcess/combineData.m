@@ -1,9 +1,7 @@
 %Taken from 
 % https://in.mathworks.com/matlabcentral/answers/
 %   538119-how-to-import-to-matlab-many-text-files-as-table-type
-% projectdir = '//Users/sdatta/FWB-with-CF/Simulation/resultData/ppResults';
-projectdir = '/Users/sdatta/Desktop/data/multiUEsscatterBS_final/lambda_500_new/outageResults';
-% projectdir = '/Users/sdatta/FWB-with-CF/Simulation/resultData/algocompResults';
+projectdir = '../resultData/outageResults';
 dinfo = dir(fullfile(projectdir, '*.csv'));   %use appropriate extension
 filenames = fullfile({dinfo.folder}, {dinfo.name});
 nfiles = length(filenames);

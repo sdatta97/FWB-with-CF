@@ -1,5 +1,8 @@
 clear
-% load("../../Desktop/data-mmW.mat","DeepMIMO_dataset")
+% DeepMIMO 'O1-Blockage' channel datasets: download data-sub6.mat and
+% data-mmW.mat from the repository's 'deepmimo-data' GitHub release into a
+% data/ folder at the repository root.
+% load("../data/data-mmW.mat","DeepMIMO_dataset")
 % DeepMIMO_dataset_mmW = DeepMIMO_dataset;
 % bs_dataset = DeepMIMO_dataset{2};
 % bs_loc = bs_dataset.loc;
@@ -10,7 +13,7 @@ clear
 %     user_los_mmW(j) = bs_dataset.user{j}.LoS_status;
 % end
 % clear DeepMIMO_dataset
-load("../../Desktop/data-sub6.mat","DeepMIMO_dataset")
+load("../data/data-sub6.mat","DeepMIMO_dataset")
 DeepMIMO_dataset_sub6 = DeepMIMO_dataset;
 bs_dataset = DeepMIMO_dataset{3};
 user_locs_sub6 = zeros(length(bs_dataset.user), 2);

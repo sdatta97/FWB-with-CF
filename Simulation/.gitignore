@@ -1,1 +1,6 @@
 *.asv
+.DS_Store
+logs/*
+!logs/.gitkeep
+resultData/*/*
+!resultData/*/.gitkeep
