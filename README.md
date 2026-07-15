@@ -25,7 +25,7 @@ Entry-point scripts (MATLAB, tested with R2023a):
 
 Supporting functions include blockage/mobility generation (`Generate_Mobility.m`, `computeBlockageEvents.m`, `lineSegmentIntersect.m`), the discrete-event simulator (`discreteSimulator_MIMO.m` and the `try*/get*/update*` helpers), CF mMIMO channel and rate computation (`generateSetup.m`, `computePhysicalChannels_sub6_MIMO.m`, `compute_link_rates_MIMO*.m`), and truncated-normal UE placement (`TruncatedGaussian.m`).
 
-The `submit*.sbatch` scripts run the corresponding entry points on a SLURM cluster; outputs are written to `Simulation/resultData/`. `dataProcess/combineData.m` aggregates the per-run CSV outputs into summary statistics.
+The `submit*.sbatch` scripts run the corresponding entry points on a SLURM cluster; outputs are written to `Simulation/resultData/`. `dataProcess/combineData.m` aggregates the per-run CSV outputs into summary statistics. Generated figures are collected in `Simulation/plots/`.
 
 #### DeepMIMO datasets
 
